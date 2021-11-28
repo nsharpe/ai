@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /**
@@ -52,9 +53,13 @@ public class Simulation {
     }
 
     public void start() {
-
-        for (int i = 0; i < numberOfRuns; i++) {
-            startRun();
+        try {
+            for (int i = 0; i < numberOfRuns; i++) {
+                startRun();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
     }
 
@@ -92,11 +97,13 @@ public class Simulation {
             // in the event that all creatures died create random creatures
             createCreatures();
         } else {
-            for (int i = 0; i < numberOfCreatures; i++) {
-                Network toCopy = randomNetworkBuilder.copyWithChanceToMutate(networks.get(i % networks.size()));
-
-                coordinateMap.generateCreature(toCopy);
-            }
+            IntStream.range(0,numberOfCreatures)
+                    .mapToObj(x -> networks.get(x % networks.size()))
+                    .parallel()
+                    .map(x->randomNetworkBuilder.copyWithChanceToMutate(x))
+                    .collect(Collectors.toList())
+            .stream()
+            .forEach(x->coordinateMap.generateCreature(x));
         }
         creatureInitialPosition.clear();
         creatureInitialPosition.putAll(coordinateMap.getCreatures().stream()
@@ -120,8 +127,11 @@ public class Simulation {
     }
 
     private boolean defaultAcceptanceCriteria(Creature creature) {
-        if (creature.getPosition().x < 50 ||
-                creatureInitialPosition.get(creature).equals(creature.getPosition())) {
+        if (creature.getPosition().x < coordinateMap.xRange / 2 ) {
+            return false;
+        }
+
+        if(creatureInitialPosition.get(creature).equals(creature.getPosition())){
             return false;
         }
 

@@ -1,6 +1,10 @@
 package org.neil.neural;
 
+import org.neil.neural.input.DirectionViewInput;
+import org.neil.neural.input.MovementBlockedInput;
+import org.neil.neural.input.ProximityInput;
 import org.neil.neural.input.XDirectionInput;
+import org.neil.neural.input.XPositionInput;
 import org.neil.neural.input.YDirectionInput;
 import org.neil.neural.output.LeftDirectionOutput;
 import org.neil.neural.output.MoveOutput;
@@ -16,11 +20,11 @@ public class RandomNetworkBuilder {
     private List<Input> inputs;
     private List<Output> outputs;
     private int minNodes = 0;
-    private int maxNodes = 5;
+    private int maxNodes = 3;
     private int minConnection = 0;
-    private int maxConnection = 20;
+    private int maxConnection = 25;
     private int minStorage = 0;
-    private int maxStorage = 128;
+    private int maxStorage = 256;
     private int minBandwith = 0;
     private int maxBandwith = 64;
     private int bandwidthModificationIncrements = 10;
@@ -30,7 +34,11 @@ public class RandomNetworkBuilder {
         inputs = new ArrayList<>();
         inputs.add(new XDirectionInput(256));
         inputs.add(new YDirectionInput(256));
-        //inputs.add(new XPositionInput(512));
+        inputs.add(new XPositionInput(256));
+        inputs.add(new ProximityInput(256));
+        inputs.add(new MovementBlockedInput(256));
+        inputs.add(new DirectionViewInput(256));
+
 
         outputs = new ArrayList<>();
         outputs.add(new LeftDirectionOutput(32));
@@ -73,7 +81,6 @@ public class RandomNetworkBuilder {
         List<Node> intermediate = network.getIntermediateNodes().stream().map(x -> x.copy()).collect(Collectors.toList());
 
         MutationType mutation = MutationType.random(mutationRate);
-        mutation = random.nextBoolean() ? MutationType.CONNECTION_ADD : mutation;
 
         if (mutation == MutationType.NODE_REMOVAL) {
             if (!intermediate.isEmpty()) {
@@ -119,6 +126,8 @@ public class RandomNetworkBuilder {
                 connections.remove(toModify);
                 connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
             }
+        } else if( mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY){
+            Collections.shuffle(connections);
         }
 
         return new Network(allNodes, connections);
@@ -151,6 +160,7 @@ public class RandomNetworkBuilder {
         CONNECTION_REMOVAL,
         ADD_CONNECTION_BANDWIDTH,
         REDUCE_CONNECTION_BANDWIDTH,
+        SHUFFLE_CONNECTION_PRIORITY,
         NONE;
         private static Random random = new Random();
 

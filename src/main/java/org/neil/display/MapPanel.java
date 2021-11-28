@@ -48,7 +48,7 @@ public class MapPanel extends JPanel {
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
         this.simulation.setStepCompleteListener(x -> {
-            if(x.getRunsCompleted() % 25 != 0){
+            if(x.getRunsCompleted() % 5 != 0){
                 return;
             }
 
@@ -67,7 +67,7 @@ public class MapPanel extends JPanel {
             this.removeAll();
             this.revalidate();
             this.repaint();
-        }, 10, 10, TimeUnit.MILLISECONDS);
+        }, 20, 20, TimeUnit.MILLISECONDS);
 
     }
 

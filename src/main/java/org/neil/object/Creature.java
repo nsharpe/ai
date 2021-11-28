@@ -32,6 +32,8 @@ public class Creature extends Life {
     public void input() {
         Inputs inputs = new Inputs();
         inputs.direction = direction;
+        inputs.coordinateMap = coordinateMap;
+        inputs.coordinates = getPosition();
         neuralNetwork.getInputs()
                 .forEach(x->x.input(inputs));
     }

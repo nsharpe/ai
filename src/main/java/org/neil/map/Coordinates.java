@@ -1,15 +1,19 @@
 package org.neil.map;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class Coordinates {
     public final int x;
     public final int y;
     private int _hash;
+    private volatile Set<Coordinates> _adjacent;
 
-    private static Map<Integer,Map<Integer,Coordinates>> cache = new HashMap<>();
+    private static Map<Integer,Map<Integer,Coordinates>> cache = Collections.synchronizedMap(new HashMap<>());
 
     private Coordinates(int x, int y) {
         this.x = x;
@@ -18,8 +22,22 @@ public class Coordinates {
     }
 
     public static Coordinates of(final int x, final int y){
-        return cache.computeIfAbsent(x,(key) -> new HashMap<>())
+        return cache.computeIfAbsent(x,(key) -> Collections.synchronizedMap(new HashMap<>()))
                 .computeIfAbsent(y, key -> new Coordinates(x,y));
+    }
+
+    public Set<Coordinates> adjacent(){
+        if(_adjacent == null){
+            _adjacent = Set.of(Coordinates.of(x - 1, y),
+                    Coordinates.of(x - 1, y - 1),
+                    Coordinates.of(x, y - 1),
+                    Coordinates.of(x + 1, y - 1),
+                    Coordinates.of(x + 1, y),
+                    Coordinates.of(x + 1, y + 1),
+                    Coordinates.of(x, y + 1),
+                    Coordinates.of(x - 1, y + 1));
+        }
+        return _adjacent;
     }
 
     @Override

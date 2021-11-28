@@ -1,5 +1,6 @@
 package org.neil.neural;
 
+
 public class NodeDefault implements Node {
     private final int id;
     private final int capacity;
@@ -28,11 +29,14 @@ public class NodeDefault implements Node {
     public void addToStorage(int toAdd) {
         stored += toAdd;
         if (stored > capacity) {
-            stored += capacity;
+            stored = capacity;
         }
 
         if (stored < 0) {
             throw new IllegalStateException("stored can't be less then zero");
+        }
+        if(stored > capacity){
+            throw new IllegalStateException("stored can't be greater then capacity");
         }
     }
 
@@ -49,6 +53,11 @@ public class NodeDefault implements Node {
     @Override
     public int getStored() {
         return stored;
+    }
+
+    @Override
+    public void clearStorage() {
+        stored = 0;
     }
 
     @Override

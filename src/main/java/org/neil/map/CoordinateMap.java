@@ -44,12 +44,22 @@ public class CoordinateMap {
 
         // Set inputs for neural net
         creatureList.values().stream()
+                .parallel()
                 .forEach(x -> x.input());
 
         // activate neural net
         creatureList.values().stream()
                 .map(x -> x.getNeuralNetwork())
                 .forEach(x -> x.increment());
+
+//        // setinputs and activate neural net
+//        // activate neural net
+//        creatureList.values().stream()
+//                .parallel()
+//                .forEach(x -> {
+//                    x.input();
+//                    x.getNeuralNetwork().increment();
+//                });
 
         //set output intentions
         creatureList.values().stream()

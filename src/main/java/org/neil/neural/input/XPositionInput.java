@@ -10,11 +10,15 @@ public class XPositionInput extends NodeDefault implements Input {
 
     @Override
     public void input(Inputs toAdd) {
-        clearStorage();
-        if(getCapacity() < toAdd.coordinates.x){
-            addToStorage(getCapacity());
-        }else{
-            addToStorage(toAdd.coordinates.x);
+        try {
+            clearStorage();
+            if (availableCapacity() < toAdd.coordinates.x) {
+                addToStorage(availableCapacity());
+            } else {
+                addToStorage(toAdd.coordinates.x);
+            }
+        }catch (Exception e){
+            throw new IllegalStateException(e);
         }
     }
 
