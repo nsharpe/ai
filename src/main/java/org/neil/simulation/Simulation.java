@@ -1,12 +1,15 @@
 package org.neil.simulation;
 
 import org.neil.map.CoordinateMap;
+import org.neil.map.Coordinates;
 import org.neil.neural.Network;
 import org.neil.neural.RandomNetworkBuilder;
 import org.neil.object.Creature;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -22,15 +25,17 @@ public class Simulation {
     private final int numberOfCreatures;
     private final int numberOfRuns;
     private CoordinateMap coordinateMap;
-    private Predicate<Creature> acceptanceCriteria = x -> x.getPosition().x < 50;
+    private Predicate<Creature> acceptanceCriteria = this::defaultAcceptanceCriteria;
     private RandomNetworkBuilder randomNetworkBuilder;
 
     private int runsCompleted = 0;
 
+    private Map<Creature, Coordinates> creatureInitialPosition = new HashMap<>();
+
     private Consumer<Simulation> stepCompleteListener = x -> { // noop
     };
     private Consumer<Simulation> runCompletionListener = x -> { //noop
-        System.out.println("Run #"+ runsCompleted + " completed: " );
+        System.out.println("Run #" + runsCompleted + " completed: ");
     };
 
     public Simulation(SimulationInput simulationInput,
@@ -83,18 +88,19 @@ public class Simulation {
         coordinateMap.clearMap();
 
         // create creatures based off of neural netowkrs
-        if (coordinateMap.getCreatures().isEmpty()) {
+        if (networks.isEmpty()) {
             // in the event that all creatures died create random creatures
             createCreatures();
-        }else {
+        } else {
             for (int i = 0; i < numberOfCreatures; i++) {
                 Network toCopy = randomNetworkBuilder.copyWithChanceToMutate(networks.get(i % networks.size()));
 
                 coordinateMap.generateCreature(toCopy);
             }
         }
-
-
+        creatureInitialPosition.clear();
+        creatureInitialPosition.putAll(coordinateMap.getCreatures().stream()
+                .collect(Collectors.toMap(x -> x, x -> x.getPosition())));
     }
 
     public CoordinateMap getCoordinateMap() {
@@ -111,5 +117,14 @@ public class Simulation {
 
     public int getRunsCompleted() {
         return runsCompleted;
+    }
+
+    private boolean defaultAcceptanceCriteria(Creature creature) {
+        if (creature.getPosition().x < 50 ||
+                creatureInitialPosition.get(creature).equals(creature.getPosition())) {
+            return false;
+        }
+
+        return true;
     }
 }
