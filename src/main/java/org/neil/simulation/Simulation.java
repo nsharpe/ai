@@ -127,7 +127,7 @@ public class Simulation {
     }
 
     private boolean defaultAcceptanceCriteria(Creature creature) {
-        if (creature.getPosition().x < coordinateMap.xRange / 2 ) {
+        if (creature.getPosition().x > 20 ) {
             return false;
         }
 

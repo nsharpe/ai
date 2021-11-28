@@ -22,21 +22,21 @@ public class RandomNetworkBuilder {
     private int minNodes = 0;
     private int maxNodes = 3;
     private int minConnection = 0;
-    private int maxConnection = 25;
+    private int maxConnection = 10;
     private int minStorage = 0;
-    private int maxStorage = 256;
+    private int maxStorage = 512;
     private int minBandwith = 0;
-    private int maxBandwith = 64;
+    private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.015;
+    private double mutationRate = 0.00015;
 
     public RandomNetworkBuilder() {
         inputs = new ArrayList<>();
         inputs.add(new XDirectionInput(256));
         inputs.add(new YDirectionInput(256));
         inputs.add(new XPositionInput(256));
-        inputs.add(new ProximityInput(256));
-        inputs.add(new MovementBlockedInput(256));
+        //inputs.add(new ProximityInput(256));
+        //inputs.add(new MovementBlockedInput(256));
         inputs.add(new DirectionViewInput(256));
 
 
@@ -110,7 +110,8 @@ public class RandomNetworkBuilder {
                 Node source = randomEntry(sources);
                 Node destination = randomEntry(destinations);
 
-                connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith)));
+                connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith),
+                        Connection.ConnectionType.random() ));
             }
         } else if (mutation == MutationType.CONNECTION_REMOVAL) {
             if (!connections.isEmpty()) {
@@ -150,7 +151,7 @@ public class RandomNetworkBuilder {
             return null;
         }
 
-        return new Connection(source, destination, toCopy.getBandwith());
+        return new Connection(source, destination, toCopy.getBandwith(), Connection.ConnectionType.random());
     }
 
     private enum MutationType {
@@ -204,7 +205,10 @@ public class RandomNetworkBuilder {
             Node source = randomEntry(sources);
             Node destination = randomEntry(destinations);
 
-            connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith)));
+            connections.add(new Connection(source,
+                    destination,
+                    randomRange(minBandwith, maxBandwith),
+                    Connection.ConnectionType.random()));
         }
         return connections;
     }

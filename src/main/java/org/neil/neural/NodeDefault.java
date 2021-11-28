@@ -4,7 +4,7 @@ package org.neil.neural;
 public class NodeDefault implements Node {
     private final int id;
     private final int capacity;
-    private int stored = 0;
+    private volatile int stored = 0;
 
     public NodeDefault(int id) {
         this(id, Integer.MAX_VALUE);

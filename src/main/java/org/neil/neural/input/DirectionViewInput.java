@@ -26,7 +26,7 @@ public class DirectionViewInput extends NodeDefault implements Input {
 
         Set<Coordinates> nextLayer;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             nextLayer = currentLayer.stream()
                     .flatMap(x -> Stream.of(direction.left().position(x),
                             direction.position(x),

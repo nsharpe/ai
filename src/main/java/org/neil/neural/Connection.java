@@ -1,16 +1,21 @@
 package org.neil.neural;
 
+import java.util.stream.IntStream;
+
 public class Connection {
     private final Node source;
     private final Node destination;
     private final int bandwith;
+    private final ConnectionType connectionType;
 
     public Connection(Node source,
                       Node destination,
-                      int bandwith) {
+                      int bandwith,
+                      ConnectionType connectionType) {
         this.source = source;
         this.destination = destination;
         this.bandwith = bandwith;
+        this.connectionType = connectionType;
     }
 
     public Node getSource() {
@@ -26,13 +31,45 @@ public class Connection {
     }
 
     public Connection copyModifyBandWidth(int amount) {
-        return new Connection(this.source, this.destination, bandwith + amount);
+        return new Connection(this.source, this.destination, bandwith + amount, connectionType);
     }
 
     public void activate() {
         if (source.getStored() <= 0) {
             return; // Nothing to move
         }
+
+        if (connectionType == ConnectionType.ADD) {
+            addLogic();
+        } else {
+            subtractLogic();
+        }
+    }
+
+    private void subtractLogic() {
+        if (source == destination) {
+            return;
+        }
+
+        int toMove = IntStream.of(
+                bandwith,
+                destination.getStored(),
+                source.getStored()
+        ).min().orElse(0);
+        int originalDestinationStored = destination.getStored();
+        int originalSourceStored = source.getStored();
+
+        if (toMove == 0) {
+            return; //Destination is at capacity
+        }
+
+        toMove = -toMove;
+
+        destination.addToStorage(toMove);
+        source.addToStorage(toMove);
+    }
+
+    private void addLogic() {
         if (destination.getCapacity() == destination.getStored()) {
             return; //Destination is at capacity
         }
@@ -48,4 +85,16 @@ public class Connection {
         destination.addToStorage(toMove);
         source.addToStorage(-toMove);
     }
+
+    public enum ConnectionType {
+        ADD, SUBTRACT;
+
+        public static ConnectionType random() {
+            if (Math.random() > 0.5) {
+                return ADD;
+            }
+            return SUBTRACT;
+        }
+    }
+
 }
