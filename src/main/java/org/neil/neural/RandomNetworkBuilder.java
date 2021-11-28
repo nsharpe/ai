@@ -18,12 +18,13 @@ public class RandomNetworkBuilder {
     private int minNodes = 0;
     private int maxNodes = 5;
     private int minConnection = 0;
-    private int maxConnection = 25;
+    private int maxConnection = 20;
     private int minStorage = 0;
     private int maxStorage = 128;
     private int minBandwith = 0;
     private int maxBandwith = 64;
-    private double mutationRate = 0.15;
+    private int bandwidthModificationIncrements = 10;
+    private double mutationRate = 0.015;
 
     public RandomNetworkBuilder() {
         inputs = new ArrayList<>();
@@ -108,6 +109,16 @@ public class RandomNetworkBuilder {
             if (!connections.isEmpty()) {
                 connections.remove(random.nextInt(connections.size()));
             }
+        } else if(mutation == MutationType.ADD_CONNECTION_BANDWIDTH){
+            Connection toModify = connections.get(random.nextInt(connections.size()));
+            connections.remove(toModify);
+            connections.add(toModify.copyModifyBandWidth(bandwidthModificationIncrements));
+        } else if(mutation == MutationType.REDUCE_CONNECTION_BANDWIDTH){
+            Connection toModify = connections.get(random.nextInt(connections.size()));
+            if(toModify.getBandwith() > bandwidthModificationIncrements ) {
+                connections.remove(toModify);
+                connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
+            }
         }
 
         return new Network(allNodes, connections);
@@ -138,6 +149,8 @@ public class RandomNetworkBuilder {
         NODE_REMOVAL,
         CONNECTION_ADD,
         CONNECTION_REMOVAL,
+        ADD_CONNECTION_BANDWIDTH,
+        REDUCE_CONNECTION_BANDWIDTH,
         NONE;
         private static Random random = new Random();
 

@@ -25,11 +25,15 @@ public class Connection {
         return bandwith;
     }
 
+    public Connection copyModifyBandWidth(int amount) {
+        return new Connection(this.source, this.destination, bandwith + amount);
+    }
+
     public void activate() {
         if (source.getStored() <= 0) {
             return; // Nothing to move
         }
-        if(destination.getCapacity() == destination.getStored()){
+        if (destination.getCapacity() == destination.getStored()) {
             return; //Destination is at capacity
         }
 
