@@ -1,0 +1,62 @@
+org/neil/neural/Connection.java
+ org.neil.neural.Connection
+org/neil/simulation/SimulationInput.java
+ org.neil.simulation.SimulationInput
+org/neil/neural/Network.java
+ org.neil.neural.Network
+org/neil/object/XDirection.java
+ org.neil.object.XDirection
+org/neil/neural/RandomNetworkBuilder.java
+ org.neil.neural.RandomNetworkBuilder
+ org.neil.neural.RandomNetworkBuilder$MutationType
+org/neil/neural/Node.java
+ org.neil.neural.Node
+org/neil/object/YDirection.java
+ org.neil.object.YDirection
+org/neil/Main.java
+ org.neil.Main
+org/neil/neural/NodeDefault.java
+ org.neil.neural.NodeDefault
+org/neil/simulation/Simulation.java
+ org.neil.simulation.Simulation
+org/neil/simulation/RunRecording.java
+ org.neil.simulation.RunRecording
+org/neil/display/MainFrame.java
+ org.neil.display.MainFrame
+org/neil/neural/output/LeftDirectionOutput.java
+ org.neil.neural.output.LeftDirectionOutput
+org/neil/object/Direction.java
+ org.neil.object.Direction
+ org.neil.object.Direction$1
+org/neil/neural/output/MoveOutput.java
+ org.neil.neural.output.MoveOutput
+org/neil/object/Creature.java
+ org.neil.object.Creature
+org/neil/simulation/SimulationOutput.java
+ org.neil.simulation.SimulationOutput
+org/neil/neural/input/XPositionInput.java
+ org.neil.neural.input.XPositionInput
+org/neil/display/MapPanel.java
+ org.neil.display.MapPanel
+org/neil/object/Life.java
+ org.neil.object.Life
+org/neil/neural/Input.java
+ org.neil.neural.Input
+org/neil/neural/input/XDirectionInput.java
+ org.neil.neural.input.XDirectionInput
+ org.neil.neural.input.XDirectionInput$1
+org/neil/map/Coordinates.java
+ org.neil.map.Coordinates
+org/neil/neural/output/RightDirectionOutput.java
+ org.neil.neural.output.RightDirectionOutput
+org/neil/neural/input/Inputs.java
+ org.neil.neural.input.Inputs
+org/neil/neural/input/YDirectionInput.java
+ org.neil.neural.input.YDirectionInput
+ org.neil.neural.input.YDirectionInput$1
+org/neil/neural/Output.java
+ org.neil.neural.Output
+org/neil/map/CoordinateMap.java
+ org.neil.map.CoordinateMap
+org/neil/display/MapGrid.java
+ org.neil.display.MapGrid
