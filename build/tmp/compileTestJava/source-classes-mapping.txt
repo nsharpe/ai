@@ -1,9 +1,0 @@
-org/neil/neural/OutputTest.java
- org.neil.neural.OutputTest
- org.neil.neural.OutputTest$OutputNodeTester
-org/neil/object/DirectionTest.java
- org.neil.object.DirectionTest
-org/neil/neural/input/YDirectionInputTest.java
- org.neil.neural.input.YDirectionInputTest
-org/neil/neural/input/XDirectionInputTest.java
- org.neil.neural.input.XDirectionInputTest
