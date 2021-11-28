@@ -31,6 +31,8 @@ public class MapPanel extends JPanel {
 
     Simulation simulation;
 
+    List<Coordinates> previousFrame = Collections.emptyList();
+
     public MapPanel() {
         this(new CoordinateMap(100, 100));
         this.setPreferredSize(new Dimension(coordinateMap.xRange * gridSize,
@@ -46,6 +48,9 @@ public class MapPanel extends JPanel {
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
         this.simulation.setStepCompleteListener(x -> {
+            if(x.getRunsCompleted() % 100 != 0){
+                return;
+            }
 
             List<Coordinates> frame = x.getCoordinateMap()
                     .getCreatures()
@@ -71,7 +76,13 @@ public class MapPanel extends JPanel {
 
         drawGrid(graphics);
 
-        for (Coordinates coordinates : Optional.ofNullable(frames.poll()).orElse(Collections.emptyList())) {
+        List<Coordinates> frameToUse = frames.poll();
+
+
+        frameToUse = frameToUse == null ? previousFrame : frameToUse;
+        previousFrame = frameToUse;
+
+        for (Coordinates coordinates : frameToUse) {
             populateMap(graphics, coordinates);
         }
     }

@@ -25,11 +25,12 @@ public class Simulation {
     private Predicate<Creature> acceptanceCriteria = x -> x.getPosition().x < 50;
     private RandomNetworkBuilder randomNetworkBuilder;
 
+    private int runsCompleted = 0;
+
     private Consumer<Simulation> stepCompleteListener = x -> { // noop
-        System.out.println("Step completed");
     };
     private Consumer<Simulation> runCompletionListener = x -> { //noop
-        System.out.println("Run completed");
+        System.out.println("Run #"+ runsCompleted + " completed: " );
     };
 
     public Simulation(SimulationInput simulationInput,
@@ -58,6 +59,7 @@ public class Simulation {
             coordinateMap.activateAllNeuralNets();
             stepCompleteListener.accept(this);
         }
+        runsCompleted++;
         runCompletionListener.accept(this);
     }
 
@@ -107,5 +109,7 @@ public class Simulation {
         this.runCompletionListener = this.runCompletionListener.andThen(runCompletionListener);
     }
 
-
+    public int getRunsCompleted() {
+        return runsCompleted;
+    }
 }

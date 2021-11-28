@@ -45,6 +45,27 @@ public class RandomNetworkBuilder {
 
     }
 
+    public Node createIntermediateNode(Collection<Node> currentNodes) {
+        return createIntermediateNode(currentNodes.stream()
+                .mapToInt(x -> x.getId())
+                .max().orElse(1000) + 1);
+    }
+
+    public Node createIntermediateNode(int id) {
+        int capacity = randomRange(minStorage, maxStorage);
+        switch (random.nextInt(4)){
+            case 0:
+                return new NodeDefault(id, capacity);
+            case 1:
+                return new NodeMultiplier(id, capacity);
+            case 2:
+                return new NodeDivisor(id, capacity);
+            case 3:
+                return new NodeSink(id);
+        }
+        throw new IllegalStateException("createIntermediateNode function broken");
+    }
+
     public Network copyWithChanceToMutate(Network network) {
         List<Node> inputs = network.getInputs().stream().map(x -> x.copy()).collect(Collectors.toList());
         List<Node> outputs = network.getOutputs().stream().map(x -> x.copy()).collect(Collectors.toList());
@@ -59,7 +80,7 @@ public class RandomNetworkBuilder {
             }
         } else if (mutation == MutationType.NODE_ADD) {
             if (intermediate.size() < maxNodes) {
-                intermediate.add(new NodeDefault(intermediate.size() + 2000,randomRange(minStorage, maxStorage)));
+                intermediate.add(createIntermediateNode(intermediate));
             }
         }
 
@@ -71,8 +92,8 @@ public class RandomNetworkBuilder {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if(mutation == MutationType.CONNECTION_ADD){
-            if(connections.size() < maxConnection){
+        if (mutation == MutationType.CONNECTION_ADD) {
+            if (connections.size() < maxConnection) {
                 List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
                         .collect(Collectors.toList());
                 List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
@@ -83,8 +104,8 @@ public class RandomNetworkBuilder {
 
                 connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith)));
             }
-        }else if(mutation == MutationType.CONNECTION_REMOVAL){
-            if(!connections.isEmpty()){
+        } else if (mutation == MutationType.CONNECTION_REMOVAL) {
+            if (!connections.isEmpty()) {
                 connections.remove(random.nextInt(connections.size()));
             }
         }
@@ -97,7 +118,7 @@ public class RandomNetworkBuilder {
                 .filter(x -> toCopy.getSource().getId() == x.getId())
                 .findAny().orElse(null);
 
-        if(source == null){
+        if (source == null) {
             return null;
         }
 
@@ -105,7 +126,7 @@ public class RandomNetworkBuilder {
                 .filter(x -> toCopy.getDestination().getId() == x.getId())
                 .findAny().orElse(null);
 
-        if(destination ==null){
+        if (destination == null) {
             return null;
         }
 
@@ -121,7 +142,7 @@ public class RandomNetworkBuilder {
         private static Random random = new Random();
 
         public static MutationType random(double mutationRate) {
-            if(random.nextDouble() > mutationRate){
+            if (random.nextDouble() > mutationRate) {
                 return NONE;
             }
             return MutationType.values()[random.nextInt(MutationType.values().length)];
