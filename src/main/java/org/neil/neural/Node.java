@@ -17,5 +17,7 @@ public interface Node {
         addToStorage(-getStored());
     }
 
+    void fillStorage();
+
     Node copy();
 }

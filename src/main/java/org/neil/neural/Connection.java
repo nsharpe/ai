@@ -35,14 +35,24 @@ public class Connection {
     }
 
     public void activate() {
-        if (source.getStored() <= 0 || source == destination) {
+        if (source == destination) {
             return; // Nothing to move
         }
 
-        if (connectionType == ConnectionType.ADD) {
-            addLogic();
-        } else {
-            subtractLogic();
+        Node lock1 = source.getId() < destination.getId() ? source : destination;
+        Node lock2 = source == lock1 ? destination : source;
+
+        synchronized (lock1) {
+            synchronized (lock2) {
+                if (source.getStored() == 0) {
+                    return;
+                }
+                if (connectionType == ConnectionType.ADD) {
+                    addLogic();
+                } else {
+                    subtractLogic();
+                }
+            }
         }
     }
 

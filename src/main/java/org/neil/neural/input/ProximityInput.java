@@ -14,7 +14,7 @@ public class ProximityInput extends NodeDefault implements Input {
 
         if (inputs.coordinates.adjacent()
                 .stream().anyMatch(x -> !inputs.coordinateMap.isEmpty(x))) {
-            addToStorage(availableCapacity());
+            fillStorage();
         }
     }
 

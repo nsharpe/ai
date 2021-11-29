@@ -5,11 +5,10 @@ import java.util.stream.Stream;
 
 public class Network {
 
-    private List<Node> nodes;
     private Map<Node, List<Connection>> connections;
-    private List<Input> inputs;
-    private List<Output> outputs;
-    private List<Node> intermediate;
+    private final List<Input> inputs;
+    private final List<Output> outputs;
+    private final List<Node> intermediate;
 
     public Network(List<Node> nodes,
                    List<Connection> connections) {
@@ -17,7 +16,6 @@ public class Network {
         Objects.requireNonNull(nodes);
         Objects.requireNonNull(connections);
 
-        this.nodes = nodes;
         this.connections = new HashMap<>();
 
         for (Connection connection : connections) {
@@ -41,10 +39,15 @@ public class Network {
     }
 
     public void increment() {
-        connections.values()
-                .stream()
-                .flatMap(x -> x.stream())
-                .forEach(x -> x.activate());
+        try {
+            connections.values()
+                    .stream()
+                    .flatMap(x -> x.stream())
+                    .forEach(x -> x.activate());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public List<Input> getInputs() {
@@ -59,7 +62,7 @@ public class Network {
         return Collections.unmodifiableList(intermediate);
     }
 
-    public Stream<Connection> getConnections(){
+    public Stream<Connection> streamConnections(){
         return connections.values().stream().flatMap(x-> x.stream());
     }
 }

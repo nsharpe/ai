@@ -1,10 +1,12 @@
 package org.neil.neural;
 
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class NodeDefault implements Node {
     private final int id;
     private final int capacity;
-    private volatile int stored = 0;
+    private AtomicInteger stored = new AtomicInteger();
 
     public NodeDefault(int id) {
         this(id, Integer.MAX_VALUE);
@@ -27,7 +29,7 @@ public class NodeDefault implements Node {
 
     @Override
     public void addToStorage(int toAdd) {
-        stored += toAdd;
+        int stored = this.stored.addAndGet(toAdd);
         if (stored > capacity) {
             stored = capacity;
         }
@@ -52,12 +54,17 @@ public class NodeDefault implements Node {
 
     @Override
     public int getStored() {
-        return stored;
+        return stored.get();
     }
 
     @Override
     public void clearStorage() {
-        stored = 0;
+        stored.set(0);
+    }
+
+    @Override
+    public void fillStorage() {
+        stored.set(capacity);
     }
 
     @Override

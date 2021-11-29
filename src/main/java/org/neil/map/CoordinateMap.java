@@ -12,8 +12,8 @@ public class CoordinateMap {
 
     private static final Random RANDOM = new Random();
 
-    private Map<Coordinates, Creature> creatureList = new HashMap<>();
-    private Map<Coordinates, Creature> nextMapStep = new HashMap<>();
+    private Map<Coordinates, Creature> creatureList = Collections.synchronizedMap(new HashMap<>());
+    private Map<Coordinates, Creature> nextMapStep = Collections.synchronizedMap(new HashMap<>());
 
     public CoordinateMap(int xRange, int yRange) {
         this.xRange = xRange;
@@ -44,12 +44,13 @@ public class CoordinateMap {
 
         // Set inputs for neural net
         creatureList.values().stream()
-                .forEach(x -> x.input());
-
-        // activate neural net
-        creatureList.values().stream()
-                .map(x -> x.getNeuralNetwork())
-                .forEach(x -> x.increment());
+                .parallel()
+                .forEach(x -> {
+                    synchronized (x) {
+                        x.input();
+                        x.getNeuralNetwork().increment();
+                    }
+                });
 
         //set output intentions
         creatureList.values().stream()
@@ -72,12 +73,12 @@ public class CoordinateMap {
         return toReturn;
     }
 
-    public void kill(Creature creature){
+    public void kill(Creature creature) {
         this.creatureList.remove(creature.getPosition());
         this.nextMapStep.remove(creature.getPosition());
     }
 
-    public void clearMap(){
+    public void clearMap() {
         this.creatureList.clear();
         this.nextMapStep.clear();
     }
