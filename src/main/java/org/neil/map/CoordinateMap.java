@@ -51,15 +51,6 @@ public class CoordinateMap {
                 .map(x -> x.getNeuralNetwork())
                 .forEach(x -> x.increment());
 
-//        // setinputs and activate neural net
-//        // activate neural net
-//        creatureList.values().stream()
-//                .parallel()
-//                .forEach(x -> {
-//                    x.input();
-//                    x.getNeuralNetwork().increment();
-//                });
-
         //set output intentions
         creatureList.values().stream()
                 .forEach(x -> x.activateNeuralNetworkOutput());

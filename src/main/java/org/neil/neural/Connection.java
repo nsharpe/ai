@@ -35,7 +35,7 @@ public class Connection {
     }
 
     public void activate() {
-        if (source.getStored() <= 0) {
+        if (source.getStored() <= 0 || source == destination) {
             return; // Nothing to move
         }
 
@@ -47,17 +47,8 @@ public class Connection {
     }
 
     private void subtractLogic() {
-        if (source == destination) {
-            return;
-        }
-
-        int toMove = IntStream.of(
-                bandwith,
-                destination.getStored(),
-                source.getStored()
-        ).min().orElse(0);
-        int originalDestinationStored = destination.getStored();
-        int originalSourceStored = source.getStored();
+        int toMove = bandwith < destination.getStored() ? bandwith : destination.getStored();
+        toMove = toMove < source.getStored() ? toMove : source.getStored();
 
         if (toMove == 0) {
             return; //Destination is at capacity

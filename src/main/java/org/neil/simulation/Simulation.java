@@ -6,6 +6,7 @@ import org.neil.neural.Network;
 import org.neil.neural.RandomNetworkBuilder;
 import org.neil.object.Creature;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -85,18 +88,21 @@ public class Simulation {
                 .stream()
                 .filter(acceptanceCriteria)
                 .map(x -> x.getNeuralNetwork())
-                .collect(Collectors.toList());
-        // Randomize order networks are prioritized for replication
-        Collections.shuffle(networks);
+                .collect( Collectors.toCollection(()->new ArrayList<>()));
 
         //kill all creatures
         coordinateMap.clearMap();
 
-        // create creatures based off of neural netowkrs
+        // create creatures based off of neural networks
         if (networks.isEmpty()) {
             // in the event that all creatures died create random creatures
             createCreatures();
         } else {
+            networks.add(randomNetworkBuilder.build());//add random network
+
+            // Randomize prioritized for replication
+            Collections.shuffle(networks);
+
             IntStream.range(0,numberOfCreatures)
                     .mapToObj(x -> networks.get(x % networks.size()))
                     .parallel()
@@ -130,6 +136,7 @@ public class Simulation {
         if (creature.getPosition().x > 20 ) {
             return false;
         }
+
 
         if(creatureInitialPosition.get(creature).equals(creature.getPosition())){
             return false;

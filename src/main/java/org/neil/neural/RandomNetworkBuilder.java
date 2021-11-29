@@ -20,24 +20,24 @@ public class RandomNetworkBuilder {
     private List<Input> inputs;
     private List<Output> outputs;
     private int minNodes = 0;
-    private int maxNodes = 3;
+    private int maxNodes = 5;
     private int minConnection = 0;
-    private int maxConnection = 10;
+    private int maxConnection = 20;
     private int minStorage = 0;
     private int maxStorage = 512;
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.00015;
+    private double mutationRate = 0.015;
 
     public RandomNetworkBuilder() {
         inputs = new ArrayList<>();
         inputs.add(new XDirectionInput(256));
         inputs.add(new YDirectionInput(256));
-        inputs.add(new XPositionInput(256));
+        //inputs.add(new XPositionInput(256));
         //inputs.add(new ProximityInput(256));
         //inputs.add(new MovementBlockedInput(256));
-        inputs.add(new DirectionViewInput(256));
+        //inputs.add(new DirectionViewInput(256));
 
 
         outputs = new ArrayList<>();
