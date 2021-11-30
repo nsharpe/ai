@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class NodeDefault implements Node {
     private final int id;
     private final int capacity;
-    private AtomicInteger stored = new AtomicInteger();
+    private volatile int stored = 0;
 
     public NodeDefault(int id) {
         this(id, Integer.MAX_VALUE);
@@ -29,7 +29,7 @@ public class NodeDefault implements Node {
 
     @Override
     public void addToStorage(int toAdd) {
-        int stored = this.stored.addAndGet(toAdd);
+        stored += toAdd;
         if (stored > capacity) {
             stored = capacity;
         }
@@ -54,17 +54,17 @@ public class NodeDefault implements Node {
 
     @Override
     public int getStored() {
-        return stored.get();
+        return stored;
     }
 
     @Override
     public void clearStorage() {
-        stored.set(0);
+        stored = 0;
     }
 
     @Override
     public void fillStorage() {
-        stored.set(capacity);
+        stored = capacity;
     }
 
     @Override

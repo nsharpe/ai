@@ -16,7 +16,9 @@ public class NodeDivisor extends NodeDefault{
 
     @Override
     public void addToStorage(int toAdd) {
-        toAdd = toAdd >> 1;
+        if(toAdd > 0) {
+            toAdd = toAdd >> 1;
+        }
         if(toAdd > getCapacity() - getStored()){
             toAdd = getCapacity() - getStored();
         }

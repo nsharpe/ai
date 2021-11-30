@@ -19,16 +19,16 @@ public class RandomNetworkBuilder {
 
     private List<Input> inputs;
     private List<Output> outputs;
-    private int minNodes = 0;
-    private int maxNodes = 5;
-    private int minConnection = 0;
-    private int maxConnection = 3;
+    private int minNodes = 1;
+    private int maxNodes = 20;
+    private int minConnection = 1;
+    private int maxConnection = 30;
     private int minStorage = 0;
     private int maxStorage = 512;
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.015;
+    private double mutationRate = 0.0015;
 
     public RandomNetworkBuilder() {
         inputs = new ArrayList<>();
@@ -85,7 +85,7 @@ public class RandomNetworkBuilder {
         MutationType mutation = MutationType.random(mutationRate);
 
         if (mutation == MutationType.NODE_REMOVAL) {
-            if (!intermediate.isEmpty()) {
+            if (intermediate.size() > minNodes) {
                 intermediate.remove(random.nextInt(intermediate.size()));
             }
         } else if (mutation == MutationType.NODE_ADD) {
@@ -116,7 +116,7 @@ public class RandomNetworkBuilder {
                         Connection.ConnectionType.random() ));
             }
         } else if (mutation == MutationType.CONNECTION_REMOVAL) {
-            if (!connections.isEmpty()) {
+            if (connections.size() > minConnection) {
                 connections.remove(random.nextInt(connections.size()));
             }
         } else if(mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()){

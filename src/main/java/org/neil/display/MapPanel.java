@@ -67,7 +67,7 @@ public class MapPanel extends JPanel {
             this.removeAll();
             this.revalidate();
             this.repaint();
-        }, 20, 20, TimeUnit.MILLISECONDS);
+        }, 50, 50, TimeUnit.MILLISECONDS);
 
     }
 
