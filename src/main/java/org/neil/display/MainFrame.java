@@ -9,10 +9,10 @@ public class MainFrame extends JFrame {
 
     public MainFrame() throws HeadlessException {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(1000, 1000);
+        this.add(new JScrollPane(mapPanel));
+        this.setSize(500, 500);
         this.setLocationRelativeTo(null); // Opens in the middle
         this.setVisible(true);
-        this.add(mapPanel);
         this.pack();
 
 

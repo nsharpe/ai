@@ -1,6 +1,5 @@
 package org.neil.neural;
 
-import org.neil.neural.input.DirectionViewInput;
 import org.neil.neural.input.MovementBlockedInput;
 import org.neil.neural.input.ProximityInput;
 import org.neil.neural.input.XDirectionInput;
@@ -11,6 +10,7 @@ import org.neil.neural.output.MoveOutput;
 import org.neil.neural.output.RightDirectionOutput;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,13 +22,22 @@ public class RandomNetworkBuilder {
     private int minNodes = 1;
     private int maxNodes = 20;
     private int minConnection = 1;
-    private int maxConnection = 30;
+    private int maxConnection = 80;
     private int minStorage = 0;
     private int maxStorage = 512;
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.0015;
+    private double mutationRate = 0.015;
+
+    private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
+            (id, capacity) -> new NodeDefault(id, capacity),
+            (id, capacity) -> new NodeMultiplier(id, capacity),
+            (id, capacity) -> new NodeDivisor(id, capacity),
+            (id, capacity) -> new NodeSink(id),
+            (id, capacity) -> new NodeAlwaysFull(id, capacity),
+            (id, capacity) -> new NodeCapacityPastThreshold(id, capacity, randomRange(this.minStorage, capacity))
+    );
 
     public RandomNetworkBuilder() {
         inputs = new ArrayList<>();
@@ -61,20 +70,11 @@ public class RandomNetworkBuilder {
     }
 
     public Node createIntermediateNode(int id) {
-        int capacity = randomRange(minStorage, maxStorage);
-        switch (random.nextInt(5)){
-            case 0:
-                return new NodeDefault(id, capacity);
-            case 1:
-                return new NodeMultiplier(id, capacity);
-            case 2:
-                return new NodeDivisor(id, capacity);
-            case 3:
-                return new NodeSink(id);
-            case 4:
-                return new NodeAlwaysFull(id);
-        }
-        throw new IllegalStateException("createIntermediateNode function broken");
+        return createIntermediateNode(id, randomRange(minStorage, maxStorage));
+    }
+
+    public Node createIntermediateNode(int id, int capacity) {
+        return nodeSupplier.get(random.nextInt(nodeSupplier.size())).apply(id, capacity);
     }
 
     public Network copyWithChanceToMutate(Network network) {
@@ -82,7 +82,7 @@ public class RandomNetworkBuilder {
         List<Node> outputs = network.getOutputs().stream().map(x -> x.copy()).collect(Collectors.toList());
         List<Node> intermediate = network.getIntermediateNodes().stream().map(x -> x.copy()).collect(Collectors.toList());
 
-        MutationType mutation = MutationType.random(mutationRate);
+        final MutationType mutation = MutationType.random(mutationRate);
 
         if (mutation == MutationType.NODE_REMOVAL) {
             if (intermediate.size() > minNodes) {
@@ -92,6 +92,11 @@ public class RandomNetworkBuilder {
             if (intermediate.size() < maxNodes) {
                 intermediate.add(createIntermediateNode(intermediate));
             }
+        } else if (mutation == MutationType.NODE_RANDOMIZE_CAPACITY) {
+
+            Node toModify = randomEntry(intermediate);
+            intermediate.remove(toModify);
+            intermediate.add(createIntermediateNode(toModify.getId()));
         }
 
         List<Node> allNodes = Stream.concat(Stream.concat(inputs.stream(), outputs.stream()), intermediate.stream())
@@ -109,27 +114,31 @@ public class RandomNetworkBuilder {
                 List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
                         .collect(Collectors.toList());
 
-                Node source = randomEntry(sources);
-                Node destination = randomEntry(destinations);
+                Node source;
+                Node destination;
+                do {
+                    source = randomEntry(sources);
+                    destination = randomEntry(destinations);
+                } while (source != destination);
 
                 connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith),
-                        Connection.ConnectionType.random() ));
+                        Connection.ConnectionType.random()));
             }
         } else if (mutation == MutationType.CONNECTION_REMOVAL) {
             if (connections.size() > minConnection) {
                 connections.remove(random.nextInt(connections.size()));
             }
-        } else if(mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()){
+        } else if (mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
             connections.add(toModify.copyModifyBandWidth(bandwidthModificationIncrements));
-        } else if(mutation == MutationType.REDUCE_CONNECTION_BANDWIDTH && !connections.isEmpty()){
+        } else if (mutation == MutationType.REDUCE_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
-            if(toModify.getBandwith() > bandwidthModificationIncrements ) {
+            if (toModify.getBandwith() > bandwidthModificationIncrements) {
                 connections.remove(toModify);
                 connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
             }
-        } else if( mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY){
+        } else if (mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY) {
             Collections.shuffle(connections);
         }
 
@@ -159,6 +168,7 @@ public class RandomNetworkBuilder {
     private enum MutationType {
         NODE_ADD,
         NODE_REMOVAL,
+        NODE_RANDOMIZE_CAPACITY,
         CONNECTION_ADD,
         CONNECTION_REMOVAL,
         ADD_CONNECTION_BANDWIDTH,
@@ -190,7 +200,7 @@ public class RandomNetworkBuilder {
     }
 
     private static int randomRange(int min, int max) {
-        if(min == max){
+        if (min == max) {
             return min;
         }
         return min + random.nextInt(max - min);

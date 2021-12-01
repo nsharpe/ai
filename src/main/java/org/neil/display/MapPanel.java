@@ -12,7 +12,6 @@ import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MapPanel extends JPanel {
     private final CoordinateMap coordinateMap;
@@ -34,7 +34,7 @@ public class MapPanel extends JPanel {
     List<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        this(new CoordinateMap(100, 100));
+        this(new CoordinateMap(150, 150));
         this.setPreferredSize(new Dimension(coordinateMap.xRange * gridSize,
                 coordinateMap.yRange * gridSize));
     }
@@ -48,7 +48,7 @@ public class MapPanel extends JPanel {
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
         this.simulation.setStepCompleteListener(x -> {
-            if(x.getRunsCompleted() % 20 != 0){
+            if(x.getRunsCompleted() % 50 != 0){
                 return;
             }
 
@@ -75,6 +75,7 @@ public class MapPanel extends JPanel {
         Graphics2D graphics = (Graphics2D) g;
 
         drawGrid(graphics);
+        drawMidPointLine(graphics);
 
         List<Coordinates> frameToUse = frames.poll();
 
@@ -85,6 +86,15 @@ public class MapPanel extends JPanel {
         for (Coordinates coordinates : frameToUse) {
             populateMap(graphics, coordinates);
         }
+    }
+
+    private void drawMidPointLine(Graphics2D graphics2D){
+        int x = coordinateMap.xRange / 2;
+        graphics2D.setColor(Color.gray);
+        IntStream.range(0,coordinateMap.yRange)
+                .forEach( y -> populateMap(graphics2D, Coordinates.of(x,y)));
+        graphics2D.setColor(Color.black);
+
     }
 
     private void drawGrid(Graphics2D graphics) {

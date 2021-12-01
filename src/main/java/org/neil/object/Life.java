@@ -3,7 +3,7 @@ package org.neil.object;
 import org.neil.map.Coordinates;
 
 public class Life {
-    private Coordinates position;
+    private volatile Coordinates position;
     private int energy;
 
     public Coordinates getPosition() {

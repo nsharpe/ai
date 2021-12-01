@@ -29,8 +29,8 @@ public class CoordinateMap {
                 && !nextMapStep.containsKey(newPosition)
                 && newPosition.x >= 0 && newPosition.x < xRange
                 && newPosition.y >= 0 && newPosition.y < yRange) {
-            creature.setPosition(newPosition);
             nextMapStep.remove(creature.getPosition());
+            creature.setPosition(newPosition);
             nextMapStep.put(newPosition, creature);
         }
     }

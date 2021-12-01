@@ -16,8 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 /**
@@ -98,8 +96,6 @@ public class Simulation {
             // in the event that all creatures died create random creatures
             createCreatures();
         } else {
-            networks.add(randomNetworkBuilder.build());//add random network
-
             // Randomize prioritized for replication
             Collections.shuffle(networks);
 
@@ -133,7 +129,7 @@ public class Simulation {
     }
 
     private boolean defaultAcceptanceCriteria(Creature creature) {
-        if (creature.getPosition().x > 20 ) {
+        if (creature.getPosition().x >= coordinateMap.xRange / 2 ) {
             return false;
         }
 
