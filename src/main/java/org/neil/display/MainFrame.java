@@ -15,6 +15,7 @@ public class MainFrame extends JFrame {
         this.setVisible(true);
         this.pack();
 
+        mapPanel.addFrameListener(() -> this);
 
     }
 }

@@ -54,6 +54,7 @@ public class CoordinateMap {
 
         //set output intentions
         creatureList.values().stream()
+                .parallel()
                 .forEach(x -> x.activateNeuralNetworkOutput());
 
         incrementMapMovements();

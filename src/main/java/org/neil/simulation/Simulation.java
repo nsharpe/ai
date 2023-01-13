@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import java.util.stream.IntStream;
  * A Run is defined as a completion of steps that represent
  */
 public class Simulation {
+    private static Random random = new Random();
 
     private final int runTime;
     private final int numberOfCreatures;
@@ -133,9 +135,11 @@ public class Simulation {
             return false;
         }
 
-
-        if(creatureInitialPosition.get(creature).equals(creature.getPosition())){
-            return false;
+        //extinction event
+        if( numberOfRuns == runTime / 2){
+            if (creature.getPosition().x >= coordinateMap.xRange / 4 ) {
+                return false;
+            }
         }
 
         return true;

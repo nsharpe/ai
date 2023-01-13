@@ -6,6 +6,7 @@ import org.neil.object.Life;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,5 +27,11 @@ public class RunRecording {
 
     public void stepConsumer(Simulation simulation) {
         createFrame(simulation.getCoordinateMap().getCreatures());
+    }
+
+    public List<Map<Coordinates,Life>> getRecording(){
+        return recordings.stream()
+                .map( x -> Collections.unmodifiableMap(x))
+                .toList();
     }
 }

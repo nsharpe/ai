@@ -6,11 +6,12 @@ import org.neil.neural.RandomNetworkBuilder;
 import org.neil.object.Creature;
 import org.neil.simulation.Simulation;
 import org.neil.simulation.SimulationInput;
+import org.neil.simulation.SimulationOutput;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
@@ -18,23 +19,26 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public class MapPanel extends JPanel {
     private final CoordinateMap coordinateMap;
     private final int gridSize = 10;
+    private final int stepDisplayInMillis = 50;
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
-    Queue<List<Coordinates>> frames = new LinkedBlockingQueue<>();
+    Queue<Collection<Coordinates>> frames = new LinkedBlockingQueue<>();
 
-    Simulation simulation;
+    private final Simulation simulation;
+    private final SimulationOutput output;
+    Supplier<MainFrame> mainFrameUpdater = () -> null;
 
-    List<Coordinates> previousFrame = Collections.emptyList();
+    Collection<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        this(new CoordinateMap(150, 150));
+        this(new CoordinateMap(100, 100));
         this.setPreferredSize(new Dimension(coordinateMap.xRange * gridSize,
                 coordinateMap.yRange * gridSize));
     }
@@ -45,21 +49,9 @@ public class MapPanel extends JPanel {
         this.simulation = new Simulation(new SimulationInput(),
                 coordinateMap,
                 new RandomNetworkBuilder());
+        this.output = new SimulationOutput(simulation, 20);
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
-        this.simulation.setStepCompleteListener(x -> {
-            if(x.getRunsCompleted() % 50 != 0){
-                return;
-            }
-
-            List<Coordinates> frame = x.getCoordinateMap()
-                    .getCreatures()
-                    .stream()
-                    .map(Creature::getPosition)
-                    .collect(Collectors.toList());
-            frames.offer(frame);
-
-        });
 
         simulationThread.submit(() -> simulation.start());
 
@@ -67,7 +59,7 @@ public class MapPanel extends JPanel {
             this.removeAll();
             this.revalidate();
             this.repaint();
-        }, 50, 50, TimeUnit.MILLISECONDS);
+        }, stepDisplayInMillis, stepDisplayInMillis, TimeUnit.MILLISECONDS);
 
     }
 
@@ -77,7 +69,18 @@ public class MapPanel extends JPanel {
         drawGrid(graphics);
         drawMidPointLine(graphics);
 
-        List<Coordinates> frameToUse = frames.poll();
+        if(frames.isEmpty()){
+            int numOfRuns = output.numberOfRuns()-1;
+            if(numOfRuns > 0) {
+                frames.addAll(output.getRun(numOfRuns).getRecording()
+                        .stream()
+                        .map(x->x.keySet())
+                .toList());
+
+                mainFrameUpdater.get().setTitle("RUN: " + numOfRuns);
+            }
+        }
+        Collection<Coordinates> frameToUse = frames.poll();
 
 
         frameToUse = frameToUse == null ? previousFrame : frameToUse;
@@ -88,11 +91,11 @@ public class MapPanel extends JPanel {
         }
     }
 
-    private void drawMidPointLine(Graphics2D graphics2D){
+    private void drawMidPointLine(Graphics2D graphics2D) {
         int x = coordinateMap.xRange / 2;
         graphics2D.setColor(Color.gray);
-        IntStream.range(0,coordinateMap.yRange)
-                .forEach( y -> populateMap(graphics2D, Coordinates.of(x,y)));
+        IntStream.range(0, coordinateMap.yRange)
+                .forEach(y -> populateMap(graphics2D, Coordinates.of(x, y)));
         graphics2D.setColor(Color.black);
 
     }
@@ -117,5 +120,13 @@ public class MapPanel extends JPanel {
                 gridSize * coordinates.y,
                 gridSize,
                 gridSize);
+    }
+
+    public Simulation getSimulation() {
+        return simulation;
+    }
+
+    public void addFrameListener(Supplier<MainFrame> mainFrameUpdater) {
+        this.mainFrameUpdater = mainFrameUpdater;
     }
 }

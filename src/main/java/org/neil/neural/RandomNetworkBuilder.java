@@ -28,7 +28,7 @@ public class RandomNetworkBuilder {
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.015;
+    private double mutationRate = 0.055;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
             (id, capacity) -> new NodeDefault(id, capacity),
