@@ -87,6 +87,10 @@ public class Connection {
         source.addToStorage(-toMove);
     }
 
+    public ConnectionType getConnectionType() {
+        return connectionType;
+    }
+
     public enum ConnectionType {
         ADD, SUBTRACT;
 

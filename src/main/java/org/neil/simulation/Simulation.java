@@ -8,6 +8,7 @@ import org.neil.object.Creature;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class Simulation {
     private CoordinateMap coordinateMap;
     private Predicate<Creature> acceptanceCriteria = this::defaultAcceptanceCriteria;
     private RandomNetworkBuilder randomNetworkBuilder;
+    private final Comparator<Creature> survivorPriority;
+    private final int maxNumberOfSurvivors;
 
     private int runsCompleted = 0;
 
@@ -53,6 +56,8 @@ public class Simulation {
         this.runTime = simulationInput.runTime;
         this.numberOfCreatures = simulationInput.numberOfCreatures;
         this.numberOfRuns = simulationInput.numberOfRuns;
+        this.maxNumberOfSurvivors = simulationInput.maxNumberOfSurvivors;
+        this.survivorPriority = simulationInput.survivorPriority;
     }
 
     public void start() {
@@ -60,7 +65,7 @@ public class Simulation {
             for (int i = 0; i < numberOfRuns; i++) {
                 startRun();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);
         }
@@ -77,7 +82,11 @@ public class Simulation {
     }
 
     private void createCreatures() {
-        for (int i = 0; i < numberOfCreatures; i++) {
+        createCreatures(numberOfCreatures);
+    }
+
+    private void createCreatures(int total) {
+        for (int i = 0; i < total; i++) {
             coordinateMap.generateCreature(randomNetworkBuilder.build());
         }
     }
@@ -87,8 +96,10 @@ public class Simulation {
         List<Network> networks = coordinateMap.getCreatures()
                 .stream()
                 .filter(acceptanceCriteria)
+                .sorted(survivorPriority)
                 .map(x -> x.getNeuralNetwork())
-                .collect( Collectors.toCollection(()->new ArrayList<>()));
+                .limit(maxNumberOfSurvivors)
+                .collect(Collectors.toCollection(() -> new ArrayList<>()));
 
         //kill all creatures
         coordinateMap.clearMap();
@@ -98,16 +109,13 @@ public class Simulation {
             // in the event that all creatures died create random creatures
             createCreatures();
         } else {
-            // Randomize prioritized for replication
-            Collections.shuffle(networks);
-
-            IntStream.range(0,numberOfCreatures)
+            IntStream.range(0, numberOfCreatures)
                     .mapToObj(x -> networks.get(x % networks.size()))
                     .parallel()
-                    .map(x->randomNetworkBuilder.copyWithChanceToMutate(x))
+                    .map(x -> randomNetworkBuilder.copyWithChanceToMutate(x))
                     .collect(Collectors.toList())
-            .stream()
-            .forEach(x->coordinateMap.generateCreature(x));
+                    .stream()
+                    .forEach(x -> coordinateMap.generateCreature(x));
         }
         creatureInitialPosition.clear();
         creatureInitialPosition.putAll(coordinateMap.getCreatures().stream()
@@ -131,17 +139,28 @@ public class Simulation {
     }
 
     private boolean defaultAcceptanceCriteria(Creature creature) {
-        if (creature.getPosition().x >= coordinateMap.xRange / 2 ) {
-            return false;
-        }
+        return creatureOnLeftSide(creature)
+                // && creatureHasMoved(creature)
+                //&& extinctionEvent(creature)
+                ;
+    }
 
+    private boolean creatureHasMoved(Creature creature){
+        return !creature.getPosition().equals(creatureInitialPosition.get(creature));
+    }
+
+    private boolean creatureOnLeftSide(Creature creature) {
+        return creature.getPosition().x <= coordinateMap.xRange / 2;
+    }
+
+
+    private boolean extinctionEvent(Creature creature) {
         //extinction event
-        if( numberOfRuns == runTime / 2){
-            if (creature.getPosition().x >= coordinateMap.xRange / 4 ) {
+        if (runsCompleted % 100 == 99) {
+            if (creature.getPosition().x >= 10) {
                 return false;
             }
         }
-
         return true;
     }
 }

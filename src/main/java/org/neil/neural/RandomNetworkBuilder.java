@@ -1,10 +1,14 @@
 package org.neil.neural;
 
+import org.neil.neural.input.ConstantInput;
+import org.neil.neural.input.DirectionViewInput;
 import org.neil.neural.input.MovementBlockedInput;
 import org.neil.neural.input.ProximityInput;
+import org.neil.neural.input.RandomInput;
 import org.neil.neural.input.XDirectionInput;
 import org.neil.neural.input.XPositionInput;
 import org.neil.neural.input.YDirectionInput;
+import org.neil.neural.input.YPositionInput;
 import org.neil.neural.output.LeftDirectionOutput;
 import org.neil.neural.output.MoveOutput;
 import org.neil.neural.output.RightDirectionOutput;
@@ -20,15 +24,15 @@ public class RandomNetworkBuilder {
     private List<Input> inputs;
     private List<Output> outputs;
     private int minNodes = 1;
-    private int maxNodes = 20;
+    private int maxNodes = 50;
     private int minConnection = 1;
-    private int maxConnection = 80;
+    private int maxConnection = 100;
     private int minStorage = 0;
     private int maxStorage = 512;
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.055;
+    private double mutationRate = 0.0015;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
             (id, capacity) -> new NodeDefault(id, capacity),
@@ -44,9 +48,12 @@ public class RandomNetworkBuilder {
         inputs.add(new XDirectionInput(256));
         inputs.add(new YDirectionInput(256));
         inputs.add(new XPositionInput(256));
+        inputs.add(new YPositionInput(256));
         inputs.add(new ProximityInput(256));
         inputs.add(new MovementBlockedInput(256));
         //inputs.add(new DirectionViewInput(256));
+        inputs.add(new ConstantInput(256));
+        inputs.add(new RandomInput(256));
 
 
         outputs = new ArrayList<>();
@@ -162,7 +169,7 @@ public class RandomNetworkBuilder {
             return null;
         }
 
-        return new Connection(source, destination, toCopy.getBandwith(), Connection.ConnectionType.random());
+        return new Connection(source, destination, toCopy.getBandwith(), toCopy.getConnectionType());
     }
 
     private enum MutationType {

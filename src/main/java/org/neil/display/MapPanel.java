@@ -38,13 +38,9 @@ public class MapPanel extends JPanel {
     Collection<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        this(new CoordinateMap(100, 100));
-        this.setPreferredSize(new Dimension(coordinateMap.xRange * gridSize,
-                coordinateMap.yRange * gridSize));
-    }
+        SimulationInput simulationInput = new SimulationInput();
 
-    public MapPanel(CoordinateMap coordinateMap) {
-        this.coordinateMap = Objects.requireNonNull(coordinateMap, "coordinateMap");
+        this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
 
         this.simulation = new Simulation(new SimulationInput(),
                 coordinateMap,
@@ -60,7 +56,8 @@ public class MapPanel extends JPanel {
             this.revalidate();
             this.repaint();
         }, stepDisplayInMillis, stepDisplayInMillis, TimeUnit.MILLISECONDS);
-
+        this.setPreferredSize(new Dimension(coordinateMap.xRange * gridSize,
+                coordinateMap.yRange * gridSize));
     }
 
     public void paint(Graphics g) {
