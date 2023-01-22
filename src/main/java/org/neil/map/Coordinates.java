@@ -13,7 +13,7 @@ public class Coordinates {
     private int _hash;
     private volatile Set<Coordinates> _adjacent;
 
-    private static Map<Integer,Map<Integer,Coordinates>> cache = Collections.synchronizedMap(new HashMap<>());
+    private static Map<Integer, Map<Integer, Coordinates>> cache = Collections.synchronizedMap(new HashMap<>());
 
     private Coordinates(int x, int y) {
         this.x = x;
@@ -21,13 +21,13 @@ public class Coordinates {
         this._hash = Objects.hash(x, y);
     }
 
-    public static Coordinates of(final int x, final int y){
-        return cache.computeIfAbsent(x,(key) -> Collections.synchronizedMap(new HashMap<>()))
-                .computeIfAbsent(y, key -> new Coordinates(x,y));
+    public static Coordinates of(final int x, final int y) {
+        return cache.computeIfAbsent(x, (key) -> Collections.synchronizedMap(new HashMap<>()))
+                .computeIfAbsent(y, key -> new Coordinates(x, y));
     }
 
-    public Set<Coordinates> adjacent(){
-        if(_adjacent == null){
+    public Set<Coordinates> adjacent() {
+        if (_adjacent == null) {
             _adjacent = Set.of(Coordinates.of(x - 1, y),
                     Coordinates.of(x - 1, y - 1),
                     Coordinates.of(x, y - 1),
@@ -38,6 +38,15 @@ public class Coordinates {
                     Coordinates.of(x - 1, y + 1));
         }
         return _adjacent;
+    }
+
+    public double distance(Coordinates coordinates) {
+        double xDiff = x - coordinates.x;
+        xDiff *= xDiff;
+        double yDiff = y - coordinates.y;
+        yDiff *= yDiff;
+
+        return Math.sqrt(xDiff + yDiff);
     }
 
     @Override

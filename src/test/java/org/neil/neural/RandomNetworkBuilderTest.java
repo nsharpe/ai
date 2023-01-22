@@ -1,50 +1,56 @@
 package org.neil.neural;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.neil.simulation.SimulationInput;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class RandomNetworkBuilderTest {
 
     @Test
-    public void testCopyDoesNotUseSourceInputNodes(){
-        RandomNetworkBuilder builder = new RandomNetworkBuilder();
-        builder.maxNodes(200);
+    public void testCopyDoesNotUseSourceInputNodes() {
+        SimulationInput simulationInput = new SimulationInput();
+        simulationInput.maxNumberOfNodes = 200;
+
+        RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
         builder.minNodes(200);
 
         Network source = builder.build();
-        Network copy =  builder.copyWithChanceToMutate(source);
+        Network copy = builder.copyWithChanceToMutate(source);
 
-        for(Node node: source.getInputs()){
+        for (Node node : source.getInputs()) {
             assertFalse(copy.getInputs().contains(node));
         }
     }
 
     @Test
-    public void testCopyDoesNotUseSourceIntermediateNodes(){
-        RandomNetworkBuilder builder = new RandomNetworkBuilder();
-        builder.maxNodes(200);
+    public void testCopyDoesNotUseSourceIntermediateNodes() {
+        SimulationInput simulationInput = new SimulationInput();
+        simulationInput.maxNumberOfNodes = 200;
+
+        RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
         builder.minNodes(200);
 
         Network source = builder.build();
-        Network copy =  builder.copyWithChanceToMutate(source);
+        Network copy = builder.copyWithChanceToMutate(source);
 
-        for(Node node: source.getIntermediateNodes()){
+        for (Node node : source.getIntermediateNodes()) {
             assertFalse(copy.getIntermediateNodes().contains(node));
         }
     }
 
     @Test
-    public void testCopyDoesNotUseSourceOutputNodes(){
-        RandomNetworkBuilder builder = new RandomNetworkBuilder();
-        builder.maxNodes(200);
+    public void testCopyDoesNotUseSourceOutputNodes() {
+        SimulationInput simulationInput = new SimulationInput();
+        simulationInput.maxNumberOfNodes = 200;
+
+        RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
         builder.minNodes(200);
 
         Network source = builder.build();
-        Network copy =  builder.copyWithChanceToMutate(source);
+        Network copy = builder.copyWithChanceToMutate(source);
 
-        for(Node node: source.getOutputs()){
+        for (Node node : source.getOutputs()) {
             assertFalse(copy.getOutputs().contains(node));
         }
 

@@ -12,6 +12,7 @@ import org.neil.neural.input.YPositionInput;
 import org.neil.neural.output.LeftDirectionOutput;
 import org.neil.neural.output.MoveOutput;
 import org.neil.neural.output.RightDirectionOutput;
+import org.neil.simulation.SimulationInput;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -24,15 +25,15 @@ public class RandomNetworkBuilder {
     private List<Input> inputs;
     private List<Output> outputs;
     private int minNodes = 1;
-    private int maxNodes = 50;
+    private final int maxNodes;
     private int minConnection = 1;
-    private int maxConnection = 100;
+    private final int maxConnection;
     private int minStorage = 0;
     private int maxStorage = 512;
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;
-    private double mutationRate = 0.0015;
+    private final double mutationRate;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
             (id, capacity) -> new NodeDefault(id, capacity),
@@ -43,7 +44,11 @@ public class RandomNetworkBuilder {
             (id, capacity) -> new NodeCapacityPastThreshold(id, capacity, randomRange(this.minStorage, capacity))
     );
 
-    public RandomNetworkBuilder() {
+    public RandomNetworkBuilder(SimulationInput simulationInput) {
+        this.mutationRate = simulationInput.mutationRate;
+        this.maxNodes = simulationInput.maxNumberOfNodes;
+        this.maxConnection = simulationInput.maxNumberOfConnections;
+
         inputs = new ArrayList<>();
         inputs.add(new XDirectionInput(256));
         inputs.add(new YDirectionInput(256));
@@ -265,18 +270,8 @@ public class RandomNetworkBuilder {
         return this;
     }
 
-    public RandomNetworkBuilder maxNodes(int maxNodes) {
-        this.maxNodes = maxNodes;
-        return this;
-    }
-
     public RandomNetworkBuilder minConnection(int minConnection) {
         this.minConnection = minConnection;
-        return this;
-    }
-
-    public RandomNetworkBuilder maxConnection(int maxConnection) {
-        this.maxConnection = maxConnection;
         return this;
     }
 

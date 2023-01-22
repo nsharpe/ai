@@ -42,9 +42,9 @@ public class MapPanel extends JPanel {
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
 
-        this.simulation = new Simulation(new SimulationInput(),
+        this.simulation = new Simulation(simulationInput,
                 coordinateMap,
-                new RandomNetworkBuilder());
+                new RandomNetworkBuilder(simulationInput));
         this.output = new SimulationOutput(simulation, 20);
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();

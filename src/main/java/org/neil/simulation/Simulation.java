@@ -141,7 +141,7 @@ public class Simulation {
     private boolean defaultAcceptanceCriteria(Creature creature) {
         return creatureOnLeftSide(creature)
                 // && creatureHasMoved(creature)
-                //&& extinctionEvent(creature)
+                && extinctionEvent(creature)
                 ;
     }
 
