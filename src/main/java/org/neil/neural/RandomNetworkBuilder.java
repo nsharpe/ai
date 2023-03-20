@@ -29,7 +29,7 @@ public class RandomNetworkBuilder {
     private int minConnection = 1;
     private final int maxConnection;
     private int minStorage = 0;
-    private int maxStorage = 512;
+    private int maxStorage = 2^12;
     private int minBandwith = 0;
     private int maxBandwith = 128;
     private int bandwidthModificationIncrements = 10;

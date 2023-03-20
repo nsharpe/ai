@@ -12,7 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,7 +24,7 @@ import java.util.stream.IntStream;
 public class MapPanel extends JPanel {
     private final CoordinateMap coordinateMap;
     private final int gridSize = 10;
-    private final int stepDisplayInMillis = 50;
+    private final int stepDisplayInMillis = 100;
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
