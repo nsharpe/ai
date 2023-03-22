@@ -1,17 +1,19 @@
 package org.neil.simulation;
 
+import org.neil.neural.NetworkOwner;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SimulationOutput<E> {
+public class SimulationOutput<K,E extends NetworkOwner> {
     private List<RunRecording> recordings = new ArrayList<>();
-    private Simulation<E> simulation;
+    private Simulation<K,E> simulation;
     private final int maxRuns;
     private AtomicInteger numberOfRuns = new AtomicInteger();
 
-    public SimulationOutput(Simulation<E> simulation, int maxRuns) {
+    public SimulationOutput(Simulation<K,E> simulation, int maxRuns) {
         this.maxRuns = maxRuns;
         this.simulation = Objects.requireNonNull(simulation, "simulation");
         recordings.add(new RunRecording());

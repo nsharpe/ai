@@ -3,10 +3,11 @@ package org.neil.object;
 import org.neil.map.CoordinateMap;
 
 import org.neil.neural.Network;
+import org.neil.neural.NetworkOwner;
 import org.neil.neural.RandomNetworkBuilder;
 import org.neil.neural.input.Inputs;
 
-public class Creature extends Life {
+public class Creature extends Life implements NetworkOwner {
     private final Network neuralNetwork;
     private Direction direction = Direction.random();
     private final CoordinateMap coordinateMap;

@@ -2,10 +2,12 @@ package org.neil.map;
 
 import org.neil.neural.Network;
 import org.neil.object.Creature;
+import org.neil.simulation.SimulationEnvironment;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class CoordinateMap {
+public class CoordinateMap implements SimulationEnvironment<Coordinates,Creature> {
     public final int xRange;
     public final int yRange;
 
@@ -39,18 +41,19 @@ public class CoordinateMap {
         creatureList.putAll(nextMapStep);
     }
 
-    public void activateAllNeuralNets() {
-
-        // Set inputs for neural net
+    @Override
+    public void preStepAction() {
         creatureList.values().stream()
                 .parallel()
                 .forEach(x -> {
                     synchronized (x) {
                         x.input();
-                        x.getNeuralNetwork().increment();
                     }
                 });
+    }
 
+    @Override
+    public void postStepAction() {
         //set output intentions
         creatureList.values().stream()
                 .parallel()
@@ -83,6 +86,11 @@ public class CoordinateMap {
         this.nextMapStep.clear();
     }
 
+    @Override
+    public void addElement(Network neuralNetwork) {
+        generateCreature(neuralNetwork);
+    }
+
     public void addCreature(Creature creature) {
         creatureList.put(creature.getPosition(), creature);
         nextMapStep.put(creature.getPosition(), creature);
@@ -90,5 +98,14 @@ public class CoordinateMap {
 
     public Collection<Creature> getCreatures() {
         return creatureList.values();
+    }
+
+    @Override
+    public Collection getValues() {
+        return getCreatures();
+    }
+
+    public void endRun(){
+        clearMap();
     }
 }

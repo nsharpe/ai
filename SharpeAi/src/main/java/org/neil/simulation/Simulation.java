@@ -1,16 +1,13 @@
 package org.neil.simulation;
 
-import org.neil.map.CoordinateMap;
-import org.neil.map.Coordinates;
+
 import org.neil.neural.Network;
+import org.neil.neural.NetworkOwner;
 import org.neil.neural.RandomNetworkBuilder;
-import org.neil.object.Creature;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -23,20 +20,18 @@ import java.util.stream.IntStream;
 /**
  *
  */
-public class Simulation<E> {
+public class Simulation<K,E extends NetworkOwner> {
     private static Random random = new Random();
 
     private final int runTime;
     private final Function<Simulation,Integer> numberOfCreatures;
     private final int numberOfRuns;
-    private CoordinateMap coordinateMap;
-    private final Predicate<Creature> acceptanceCriteria;
+    private SimulationEnvironment<K,E> coordinateMap;
+    private final Predicate<E> acceptanceCriteria;
     private RandomNetworkBuilder randomNetworkBuilder;
-    private final Comparator<Creature> survivorPriority;
+    private final Comparator<E> survivorPriority;
 
     private int runsCompleted = 0;
-
-    private Map<Creature, Coordinates> creatureInitialPosition = new HashMap<>();
 
     private Consumer<Simulation> stepCompleteListener = x -> { // noop
     };
@@ -45,7 +40,7 @@ public class Simulation<E> {
     private final Function<Simulation,Integer> numberOfSurvivors;
 
     public Simulation(SimulationInput simulationInput,
-                      CoordinateMap coordinateMap,
+                      SimulationEnvironment coordinateMap,
                       RandomNetworkBuilder randomNetworkBuilder) {
 
         this.coordinateMap = Objects.requireNonNull(coordinateMap, "coordinateMap");
@@ -78,26 +73,31 @@ public class Simulation<E> {
     public void startRun() {
         resetRun();
         for (int i = 0; i < runTime; i++) {
-            coordinateMap.activateAllNeuralNets();
+            coordinateMap.preStepAction();
+            coordinateMap.getValues()
+                    .stream()
+                    .parallel()
+                    .forEach(x -> x.getNeuralNetwork().increment());
+            coordinateMap.postStepAction();
             stepCompleteListener.accept(this);
         }
         runsCompleted++;
         runCompletionListener.accept(this);
     }
 
-    private void createCreatures() {
-        createCreatures(numberOfCreatures.apply(this));
+    private void createElements() {
+        createElements(numberOfCreatures.apply(this));
     }
 
-    private void createCreatures(int total) {
+    private void createElements(int total) {
         for (int i = 0; i < total; i++) {
-            coordinateMap.generateCreature(randomNetworkBuilder.build());
+            coordinateMap.addElement(randomNetworkBuilder.build());
         }
     }
 
     private void resetRun() {
         // copy neural networks that match criteria
-        List<Network> networks = coordinateMap.getCreatures()
+        List<Network> networks = coordinateMap.getValues()
                 .stream()
                 .filter(acceptanceCriteria)
                 .sorted(survivorPriority)
@@ -106,12 +106,12 @@ public class Simulation<E> {
                 .collect(Collectors.toCollection(() -> new ArrayList<>()));
 
         //kill all creatures
-        coordinateMap.clearMap();
+        coordinateMap.endRun();
 
         // create creatures based off of neural networks
         if (networks.isEmpty()) {
             // in the event that all creatures died create random creatures
-            createCreatures();
+            createElements();
         } else {
             IntStream.range(0, numberOfCreatures.apply(this))
                     .mapToObj(x -> networks.get(x % networks.size()))
@@ -119,14 +119,11 @@ public class Simulation<E> {
                     .map(x -> randomNetworkBuilder.copyWithChanceToMutate(x))
                     .collect(Collectors.toList())
                     .stream()
-                    .forEach(x -> coordinateMap.generateCreature(x));
+                    .forEach(x -> coordinateMap.addElement(x));
         }
-        creatureInitialPosition.clear();
-        creatureInitialPosition.putAll(coordinateMap.getCreatures().stream()
-                .collect(Collectors.toMap(x -> x, x -> x.getPosition())));
     }
 
-    public CoordinateMap getCoordinateMap() {
+    public SimulationEnvironment<K, E> getCoordinateMap() {
         return coordinateMap;
     }
 

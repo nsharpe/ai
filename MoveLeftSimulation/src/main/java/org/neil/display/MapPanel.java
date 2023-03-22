@@ -47,10 +47,9 @@ public class MapPanel extends JPanel {
         simulationInput.outputNodeGenerator = new CreatureOutputs();
         simulationInput.inputNodeGenerator = new CreatureInputs();
         simulationInput.survivorPriority =  ReproductionPrioritization.xCompare();
-        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
-
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
+        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives(this.coordinateMap);
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
