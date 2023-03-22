@@ -3,7 +3,7 @@ package org.neil.neural.output;
 import org.neil.neural.NodeDefault;
 import org.neil.object.Creature;
 
-public class RightDirectionOutputNode extends NodeDefault implements OutputNode {
+public class RightDirectionOutputNode extends NodeDefault implements OutputNode<Creature> {
 
     public RightDirectionOutputNode(int id, int capacity) {
         super(id, capacity);

@@ -2,7 +2,7 @@ package org.neil.neural.input;
 
 import org.neil.neural.NodeDefault;
 
-public class ProximityInputNode extends NodeDefault implements InputNode {
+public class ProximityInputNode extends NodeDefault implements InputNode<Inputs> {
     public ProximityInputNode(int id, int capacity) {
         super(id, capacity);
     }

@@ -2,7 +2,7 @@ package org.neil.neural.input;
 
 import org.neil.neural.NodeDefault;
 
-public class MovementBlockedInputNode extends NodeDefault implements InputNode {
+public class MovementBlockedInputNode extends NodeDefault implements InputNode<Inputs> {
     public MovementBlockedInputNode(int id, int capacity) {
         super(id, capacity);
     }

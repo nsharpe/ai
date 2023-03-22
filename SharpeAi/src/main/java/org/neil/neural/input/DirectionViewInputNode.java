@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DirectionViewInputNode extends NodeDefault implements InputNode {
+public class DirectionViewInputNode extends NodeDefault implements InputNode<Inputs> {
     public DirectionViewInputNode(int id, int capacity) {
         super(id, capacity);
     }

@@ -2,7 +2,7 @@ package org.neil.neural.input;
 
 import org.neil.neural.NodeDefault;
 
-public class XDirectionInputNode extends NodeDefault implements InputNode {
+public class XDirectionInputNode extends NodeDefault implements InputNode<Inputs> {
     public XDirectionInputNode(int id, int capacity) {
         super(id, capacity);
     }

@@ -4,14 +4,14 @@ import org.neil.neural.NodeDefault;
 
 import java.util.Random;
 
-public class RandomInputNode extends NodeDefault implements InputNode {
+public class RandomInputNode<E> extends NodeDefault implements InputNode<E> {
     private static Random random = new Random();
     public RandomInputNode(int id, int capacity) {
         super(id, capacity);
     }
 
     @Override
-    public void input(Inputs toAdd) {
+    public void input(E toAdd) {
         try {
             clearStorage();
             addToStorage(random.nextInt(availableCapacity()));

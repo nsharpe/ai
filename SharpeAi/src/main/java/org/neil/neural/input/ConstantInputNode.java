@@ -4,7 +4,7 @@ import org.neil.neural.NodeDefault;
 
 import java.util.Random;
 
-public class ConstantInputNode extends NodeDefault implements InputNode {
+public class ConstantInputNode<E> extends NodeDefault implements InputNode<E> {
     private static Random random = new Random();
 
     public ConstantInputNode(int id, int capacity) {
@@ -12,7 +12,7 @@ public class ConstantInputNode extends NodeDefault implements InputNode {
     }
 
     @Override
-    public void input(Inputs toAdd) {
+    public void input(E toAdd) {
         try {
             clearStorage();
             addToStorage(availableCapacity());

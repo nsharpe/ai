@@ -2,7 +2,7 @@ package org.neil.neural.input;
 
 import org.neil.neural.NodeDefault;
 
-public class XPositionInputNode extends NodeDefault implements InputNode {
+public class XPositionInputNode extends NodeDefault implements InputNode<Inputs> {
     public XPositionInputNode(int id, int capacity) {
         super(id, capacity);
     }

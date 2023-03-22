@@ -4,7 +4,7 @@ import org.neil.map.Coordinates;
 import org.neil.neural.NodeDefault;
 import org.neil.object.Creature;
 
-public class MoveOutputNode extends NodeDefault implements OutputNode {
+public class MoveOutputNode extends NodeDefault implements OutputNode<Creature> {
 
     public MoveOutputNode(int id, int capacity) {
         super(id, capacity);
