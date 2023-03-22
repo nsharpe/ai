@@ -52,7 +52,7 @@ public class ChessBoardTest {
 
         Assertions.assertTrue(chessBoard.isEmpty(Coordinates.of(7,7)));
 
-        chessBoard.addPiece(piece(7,7));
+        chessBoard.addPiece(whitePiece(7,7));
 
         Assertions.assertFalse(chessBoard.isEmpty(Coordinates.of(7,7)));
     }
@@ -62,18 +62,22 @@ public class ChessBoardTest {
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.clearBoard();
 
-        Collection<Coordinates> available = chessBoard.availableBishopLikeMoves(Coordinates.of(0,0));
+        Collection<Coordinates> available = chessBoard.availableBishopLikeMoves(Coordinates.of(0,0),PlayerType.WHITE);
 
         Assertions.assertEquals(7,available.size());
         Assertions.assertEquals(true,available.contains(Coordinates.of(7,7)));
 
-        available = chessBoard.availableBishopLikeMoves(Coordinates.of(3,3));
+        available = chessBoard.availableBishopLikeMoves(Coordinates.of(3,3),PlayerType.WHITE);
 //        Assertions.assertEquals(13, available.size());
 
-        chessBoard.addPiece(piece(7,7));
-        available = chessBoard.availableBishopLikeMoves(Coordinates.of(0,0));
+        chessBoard.addPiece(whitePiece(7,7));
+        available = chessBoard.availableBishopLikeMoves(Coordinates.of(0,0),PlayerType.WHITE);
         Assertions.assertEquals(6,available.size());
-        Assertions.assertEquals(false,available.contains(Coordinates.of(7,7)));
+        Assertions.assertFalse(available.contains(Coordinates.of(7,7)));
+
+        available = chessBoard.availableBishopLikeMoves(Coordinates.of(0,0),PlayerType.BLACK);
+        Assertions.assertEquals(7,available.size());
+        Assertions.assertTrue(available.contains(Coordinates.of(7,7)));
     }
 
     @Test
@@ -81,12 +85,12 @@ public class ChessBoardTest {
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.clearBoard();
 
-        Collection<Coordinates> available = chessBoard.availableBishopLikeMoves(Coordinates.of(3,3));
+        Collection<Coordinates> available = chessBoard.availableBishopLikeMoves(Coordinates.of(3,3),PlayerType.WHITE);
 
         Assertions.assertEquals(13, available.size());
     }
 
-    private Piece piece(int x, int y){
+    private Piece whitePiece(int x, int y){
         return new Piece(PieceType.ROOK,PlayerType.WHITE,Coordinates.of(x,y));
     }
 }
