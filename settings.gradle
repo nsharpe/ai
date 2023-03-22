@@ -1,3 +1,5 @@
 rootProject.name = 'neuralNet'
 
 include 'SharpeAi'
+include 'MoveLeftSimulation'
+
