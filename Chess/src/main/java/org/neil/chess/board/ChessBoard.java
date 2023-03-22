@@ -2,6 +2,7 @@ package org.neil.chess.board;
 
 import org.neil.board.Board;
 import org.neil.board.Coordinates;
+import org.neil.chess.pieces.Piece;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,11 @@ import java.util.stream.Collectors;
 
 public class ChessBoard {
     Board board = new Board(8,8);
+
+    public ChessBoard() {
+        Piece.boardInit()
+                .forEach( x -> board.place(x.coordinates,x));
+    }
 
     public List<Coordinates> availableRookLikeMoves(Coordinates coordinates){
         List<Coordinates> toReturn = new ArrayList<>();
