@@ -1,10 +1,9 @@
 package org.neil.neural.input;
 
-import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
-public class XPositionInput extends NodeDefault implements Input {
-    public XPositionInput(int id, int capacity) {
+public class YPositionInputNode extends NodeDefault implements InputNode {
+    public YPositionInputNode(int id, int capacity) {
         super(id, capacity);
     }
 
@@ -12,10 +11,10 @@ public class XPositionInput extends NodeDefault implements Input {
     public void input(Inputs toAdd) {
         try {
             clearStorage();
-            if (availableCapacity() < toAdd.coordinates.x) {
+            if (availableCapacity() < toAdd.coordinates.y) {
                 addToStorage(availableCapacity());
             } else {
-                addToStorage(toAdd.coordinates.x);
+                addToStorage(toAdd.coordinates.y);
             }
         }catch (Exception e){
             throw new IllegalStateException(e);
@@ -23,7 +22,7 @@ public class XPositionInput extends NodeDefault implements Input {
     }
 
     @Override
-    public Input copy() {
-        return new XPositionInput(getId(), getCapacity());
+    public InputNode copy() {
+        return new YPositionInputNode(getId(),getCapacity());
     }
 }

@@ -1,10 +1,9 @@
 package org.neil.neural.input;
 
-import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
-public class MovementBlockedInput extends NodeDefault implements Input {
-    public MovementBlockedInput(int id, int capacity) {
+public class MovementBlockedInputNode extends NodeDefault implements InputNode {
+    public MovementBlockedInputNode(int id, int capacity) {
         super(id, capacity);
     }
 
@@ -19,7 +18,7 @@ public class MovementBlockedInput extends NodeDefault implements Input {
     }
 
     @Override
-    public Input copy() {
-        return new MovementBlockedInput(getId(), getCapacity());
+    public InputNode copy() {
+        return new MovementBlockedInputNode(getId(), getCapacity());
     }
 }

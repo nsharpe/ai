@@ -1,12 +1,11 @@
 package org.neil.neural.output;
 
 import org.neil.neural.NodeDefault;
-import org.neil.neural.Output;
 import org.neil.object.Creature;
 
-public class LeftDirectionOutput extends NodeDefault implements Output {
+public class LeftDirectionOutputNode extends NodeDefault implements OutputNode {
 
-    public LeftDirectionOutput(int id, int capacity) {
+    public LeftDirectionOutputNode(int id, int capacity) {
         super(id, capacity);
     }
 
@@ -19,7 +18,7 @@ public class LeftDirectionOutput extends NodeDefault implements Output {
     }
 
     @Override
-    public Output copy() {
-        return new LeftDirectionOutput(getId(), getCapacity());
+    public OutputNode copy() {
+        return new LeftDirectionOutputNode(getId(), getCapacity());
     }
 }

@@ -2,13 +2,14 @@ package org.neil.neural;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.neil.neural.output.OutputNode;
 import org.neil.object.Creature;
 
-public class OutputTest {
+public class OutputNodeTest {
 
     @Test
     public void testConsume(){
-        Output toTest = new OutputNodeTester();
+        OutputNode toTest = new OutputNodeNodeTester();
 
         toTest.addToStorage(101);
         Assertions.assertEquals(100, toTest.getStored());
@@ -16,8 +17,8 @@ public class OutputTest {
         Assertions.assertEquals(0, toTest.getStored());
     }
 
-    private static class OutputNodeTester extends NodeDefault implements Output{
-        public OutputNodeTester() {
+    private static class OutputNodeNodeTester extends NodeDefault implements OutputNode {
+        public OutputNodeNodeTester() {
             super(1, 100);
         }
 
@@ -26,7 +27,7 @@ public class OutputTest {
             clearStorage();
         }
 
-        public Output copy(){
+        public OutputNode copy(){
             return this;
         }
     }

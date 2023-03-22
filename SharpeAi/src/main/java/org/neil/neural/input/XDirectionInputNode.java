@@ -1,10 +1,9 @@
 package org.neil.neural.input;
 
-import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
-public class XDirectionInput extends NodeDefault implements Input {
-    public XDirectionInput(int id, int capacity) {
+public class XDirectionInputNode extends NodeDefault implements InputNode {
+    public XDirectionInputNode(int id, int capacity) {
         super(id, capacity);
     }
 
@@ -19,7 +18,7 @@ public class XDirectionInput extends NodeDefault implements Input {
     }
 
     @Override
-    public Input copy() {
-        return new XDirectionInput(getId(),getCapacity());
+    public InputNode copy() {
+        return new XDirectionInputNode(getId(),getCapacity());
     }
 }

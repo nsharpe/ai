@@ -19,7 +19,7 @@ These assumptions state intended interactions for this code base but may not ref
 * All code commits should come with the goal of generalizing input and output
 * The Neural Networks will be generated via a [Evolutionary Algorithm](https://en.wikipedia.org/wiki/Evolutionary_algorithm).  As such the networks generated from this project will work best with short quick actions.
 * There will be no jars required to run this application
-* Number of inputs and output are consistent for all Neural Networks running in a given simulation
+* Number of inputNodes and output are consistent for all Neural Networks running in a given simulation
 
 ## Definitions
 

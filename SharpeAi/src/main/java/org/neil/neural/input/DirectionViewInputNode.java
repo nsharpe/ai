@@ -1,7 +1,6 @@
 package org.neil.neural.input;
 
 import org.neil.map.Coordinates;
-import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 import org.neil.object.Direction;
 
@@ -9,8 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DirectionViewInput extends NodeDefault implements Input {
-    public DirectionViewInput(int id, int capacity) {
+public class DirectionViewInputNode extends NodeDefault implements InputNode {
+    public DirectionViewInputNode(int id, int capacity) {
         super(id, capacity);
     }
 
@@ -42,7 +41,7 @@ public class DirectionViewInput extends NodeDefault implements Input {
     }
 
     @Override
-    public Input copy() {
-        return new DirectionViewInput(getId(), getCapacity());
+    public InputNode copy() {
+        return new DirectionViewInputNode(getId(), getCapacity());
     }
 }

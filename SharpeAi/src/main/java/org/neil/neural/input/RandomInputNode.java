@@ -1,13 +1,12 @@
 package org.neil.neural.input;
 
-import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
 import java.util.Random;
 
-public class RandomInput extends NodeDefault implements Input {
+public class RandomInputNode extends NodeDefault implements InputNode {
     private static Random random = new Random();
-    public RandomInput(int id, int capacity) {
+    public RandomInputNode(int id, int capacity) {
         super(id, capacity);
     }
 
@@ -22,7 +21,7 @@ public class RandomInput extends NodeDefault implements Input {
     }
 
     @Override
-    public Input copy() {
-        return new RandomInput(getId(), getCapacity());
+    public InputNode copy() {
+        return new RandomInputNode(getId(), getCapacity());
     }
 }

@@ -1,16 +1,7 @@
 package org.neil.neural;
 
-import org.neil.neural.input.ConstantInput;
-import org.neil.neural.input.MovementBlockedInput;
-import org.neil.neural.input.ProximityInput;
-import org.neil.neural.input.RandomInput;
-import org.neil.neural.input.XDirectionInput;
-import org.neil.neural.input.XPositionInput;
-import org.neil.neural.input.YDirectionInput;
-import org.neil.neural.input.YPositionInput;
-import org.neil.neural.output.LeftDirectionOutput;
-import org.neil.neural.output.MoveOutput;
-import org.neil.neural.output.RightDirectionOutput;
+import org.neil.neural.input.InputNode;
+import org.neil.neural.output.OutputNode;
 import org.neil.simulation.SimulationInput;
 
 import java.util.*;
@@ -21,8 +12,8 @@ import java.util.stream.Stream;
 public class RandomNetworkBuilder {
     private static Random random = new Random();
 
-    private List<Input> inputs;
-    private List<Output> outputs;
+    private List<InputNode> inputNodes;
+    private List<OutputNode> outputNodes;
     private int minNodes = 1;
     private final int maxNodes;
     private int minConnection = 1;
@@ -50,8 +41,8 @@ public class RandomNetworkBuilder {
 
         // The safe copying of lists is to protect against accidental duplication
         // Review later.  I might not be smart enough to not make that mistake?
-        inputs = simulationInput.inputNodes.inputs(1).stream().toList();
-        outputs = simulationInput.outputNodes.outputs(inputs.size()+1).stream().toList();
+        inputNodes = simulationInput.inputNodeGenerator.inputs(1).stream().toList();
+        outputNodes = simulationInput.outputNodeGenerator.outputs(inputNodes.size()+1).stream().toList();
     }
 
     public Network build() {
@@ -193,8 +184,8 @@ public class RandomNetworkBuilder {
             nodes.add(new NodeDefault(i + 1000, storage));
         }
 
-        nodes.addAll(inputs.stream().map(x -> x.copy()).collect(Collectors.toList()));
-        nodes.addAll(outputs.stream().map(x -> x.copy()).collect(Collectors.toList()));
+        nodes.addAll(inputNodes.stream().map(x -> x.copy()).collect(Collectors.toList()));
+        nodes.addAll(outputNodes.stream().map(x -> x.copy()).collect(Collectors.toList()));
         return nodes;
     }
 
@@ -206,9 +197,9 @@ public class RandomNetworkBuilder {
     }
 
     private List<Connection> generateConnections(Collection<Node> intermediateNodes) {
-        List<Node> sources = Stream.concat(inputs.stream(), intermediateNodes.stream())
+        List<Node> sources = Stream.concat(inputNodes.stream(), intermediateNodes.stream())
                 .collect(Collectors.toList());
-        List<Node> destinations = Stream.concat(outputs.stream(), intermediateNodes.stream())
+        List<Node> destinations = Stream.concat(outputNodes.stream(), intermediateNodes.stream())
                 .collect(Collectors.toList());
 
         List<Connection> connections = new ArrayList<>();
@@ -232,21 +223,21 @@ public class RandomNetworkBuilder {
     }
 
     public void validate() {
-        Objects.requireNonNull(inputs, "input");
-        Objects.requireNonNull(outputs, "outputs");
+        Objects.requireNonNull(inputNodes, "input");
+        Objects.requireNonNull(outputNodes, "outputs");
     }
 
-    public RandomNetworkBuilder inputs(List<Input> inputs) {
-        this.inputs = inputs;
-        if (inputs.isEmpty()) {
+    public RandomNetworkBuilder inputs(List<InputNode> inputNodes) {
+        this.inputNodes = inputNodes;
+        if (inputNodes.isEmpty()) {
             throw new IllegalStateException("inputs can't be empty");
         }
         return this;
     }
 
-    public RandomNetworkBuilder outputs(List<Output> outputs) {
-        this.outputs = outputs;
-        if (outputs.isEmpty()) {
+    public RandomNetworkBuilder outputs(List<OutputNode> outputNodes) {
+        this.outputNodes = outputNodes;
+        if (outputNodes.isEmpty()) {
             throw new IllegalStateException("outputs can't be empty");
         }
         return this;

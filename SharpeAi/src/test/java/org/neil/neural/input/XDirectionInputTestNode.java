@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.neil.object.Direction;
 
-public class XDirectionInputTest {
+public class XDirectionInputTestNode {
 
     @Test
     public void testEastInput(){
-        XDirectionInput xDirectionInput = new XDirectionInput(1,128);
+        XDirectionInputNode xDirectionInput = new XDirectionInputNode(1,128);
 
         xDirectionInput.input(input(Direction.NEUTRAL_EAST));
         Assertions.assertEquals(128,xDirectionInput.getStored());
@@ -16,7 +16,7 @@ public class XDirectionInputTest {
 
     @Test
     public void testNeutralInput(){
-        XDirectionInput xDirectionInput = new XDirectionInput(1,128);
+        XDirectionInputNode xDirectionInput = new XDirectionInputNode(1,128);
 
         xDirectionInput.input(input(Direction.NORTH_NEUTRAL));
         Assertions.assertEquals(64,xDirectionInput.getStored());
@@ -24,7 +24,7 @@ public class XDirectionInputTest {
 
     @Test
     public void testWestInput(){
-        XDirectionInput xDirectionInput = new XDirectionInput(1,128);
+        XDirectionInputNode xDirectionInput = new XDirectionInputNode(1,128);
 
         xDirectionInput.input(input(Direction.NORTH_WEST));
         Assertions.assertEquals(0,xDirectionInput.getStored());

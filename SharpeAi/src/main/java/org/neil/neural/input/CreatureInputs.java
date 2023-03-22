@@ -1,26 +1,24 @@
 package org.neil.neural.input;
 
-import org.neil.neural.Input;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CreatureInputs implements InputNodes {
+public class CreatureInputs implements InputNodeGenerator {
     private final int defaultCapacity = 256;
 
     @Override
-    public Collection<Input> inputs(int startingIndex) {
+    public Collection<InputNode> inputs(int startingIndex) {
         return Stream.of(
-                new ConstantInput(startingIndex++, defaultCapacity),
-                new DirectionViewInput(startingIndex++, defaultCapacity),
-                new MovementBlockedInput(startingIndex++, defaultCapacity),
-                new ProximityInput(startingIndex++, defaultCapacity),
-                new RandomInput(startingIndex++, defaultCapacity),
-                new XDirectionInput(startingIndex++, defaultCapacity),
-                new XPositionInput(startingIndex++, defaultCapacity),
-                new YDirectionInput(startingIndex++,defaultCapacity),
-                new YPositionInput(startingIndex++, defaultCapacity)
+                new ConstantInputNode(startingIndex++, defaultCapacity),
+                new DirectionViewInputNode(startingIndex++, defaultCapacity),
+                new MovementBlockedInputNode(startingIndex++, defaultCapacity),
+                new ProximityInputNode(startingIndex++, defaultCapacity),
+                new RandomInputNode(startingIndex++, defaultCapacity),
+                new XDirectionInputNode(startingIndex++, defaultCapacity),
+                new XPositionInputNode(startingIndex++, defaultCapacity),
+                new YDirectionInputNode(startingIndex++,defaultCapacity),
+                new YPositionInputNode(startingIndex++, defaultCapacity)
         ).collect(Collectors.toList());
     }
 }
