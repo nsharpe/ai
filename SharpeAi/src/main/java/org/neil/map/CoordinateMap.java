@@ -105,7 +105,7 @@ public class CoordinateMap implements SimulationEnvironment<Coordinates,Creature
         return getCreatures();
     }
 
-    public void endRun(){
+    public void generationEnds(){
         clearMap();
     }
 }

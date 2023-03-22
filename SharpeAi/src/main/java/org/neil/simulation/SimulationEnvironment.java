@@ -19,5 +19,5 @@ public interface SimulationEnvironment <K,V extends NetworkOwner>{
 
     void addElement(Network neuralNetwork);
 
-    public void endRun();
+    public void generationEnds();
 }

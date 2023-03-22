@@ -24,9 +24,9 @@ public class Simulation<K,E extends NetworkOwner> {
     private static Random random = new Random();
 
     private final int runTime;
-    private final Function<Simulation,Integer> numberOfCreatures;
+    private final Function<Simulation,Integer> numberOfElementsForGeneration;
     private final int numberOfRuns;
-    private SimulationEnvironment<K,E> coordinateMap;
+    private SimulationEnvironment<K,E> simulationEnvironment;
     private final Predicate<E> acceptanceCriteria;
     private RandomNetworkBuilder randomNetworkBuilder;
     private final Comparator<E> survivorPriority;
@@ -35,20 +35,21 @@ public class Simulation<K,E extends NetworkOwner> {
 
     private Consumer<Simulation> stepCompleteListener = x -> { // noop
     };
-    private Consumer<Simulation> runCompletionListener;
+    private Consumer<Simulation> runCompletionListener = x -> { //noop
+    };
 
     private final Function<Simulation,Integer> numberOfSurvivors;
 
     public Simulation(SimulationInput simulationInput,
-                      SimulationEnvironment coordinateMap,
+                      SimulationEnvironment simulationEnvironment,
                       RandomNetworkBuilder randomNetworkBuilder) {
 
-        this.coordinateMap = Objects.requireNonNull(coordinateMap, "coordinateMap");
+        this.simulationEnvironment = Objects.requireNonNull(simulationEnvironment, "simulationEnvironment");
         this.randomNetworkBuilder = Objects.requireNonNull(randomNetworkBuilder, "randomNetworkBuilder");
 
         Objects.requireNonNull(simulationInput, "simulationInput");
         this.runTime = simulationInput.runTime;
-        this.numberOfCreatures = simulationInput.numberOfCreatures;
+        this.numberOfElementsForGeneration = simulationInput.numberOfElements;
         this.numberOfRuns = simulationInput.numberOfRuns;
         this.survivorPriority = simulationInput.survivorPriority;
         this.acceptanceCriteria = x -> simulationInput.surviveLogic.survives(this, x);
@@ -73,12 +74,12 @@ public class Simulation<K,E extends NetworkOwner> {
     public void startRun() {
         resetRun();
         for (int i = 0; i < runTime; i++) {
-            coordinateMap.preStepAction();
-            coordinateMap.getValues()
+            simulationEnvironment.preStepAction();
+            simulationEnvironment.getValues()
                     .stream()
                     .parallel()
                     .forEach(x -> x.getNeuralNetwork().increment());
-            coordinateMap.postStepAction();
+            simulationEnvironment.postStepAction();
             stepCompleteListener.accept(this);
         }
         runsCompleted++;
@@ -86,18 +87,18 @@ public class Simulation<K,E extends NetworkOwner> {
     }
 
     private void createElements() {
-        createElements(numberOfCreatures.apply(this));
+        createElements(numberOfElementsForGeneration.apply(this));
     }
 
     private void createElements(int total) {
         for (int i = 0; i < total; i++) {
-            coordinateMap.addElement(randomNetworkBuilder.build());
+            simulationEnvironment.addElement(randomNetworkBuilder.build());
         }
     }
 
     private void resetRun() {
         // copy neural networks that match criteria
-        List<Network> networks = coordinateMap.getValues()
+        List<Network> networks = simulationEnvironment.getValues()
                 .stream()
                 .filter(acceptanceCriteria)
                 .sorted(survivorPriority)
@@ -105,26 +106,25 @@ public class Simulation<K,E extends NetworkOwner> {
                 .limit(numberOfSurvivors.apply(this))
                 .collect(Collectors.toCollection(() -> new ArrayList<>()));
 
-        //kill all creatures
-        coordinateMap.endRun();
+        simulationEnvironment.generationEnds();
 
-        // create creatures based off of neural networks
+        // create elements based off of neural networks
         if (networks.isEmpty()) {
-            // in the event that all creatures died create random creatures
+            // in the event that all elements did not pass criteria create random elements
             createElements();
         } else {
-            IntStream.range(0, numberOfCreatures.apply(this))
+            IntStream.range(0, numberOfElementsForGeneration.apply(this))
                     .mapToObj(x -> networks.get(x % networks.size()))
                     .parallel()
                     .map(x -> randomNetworkBuilder.copyWithChanceToMutate(x))
                     .collect(Collectors.toList())
                     .stream()
-                    .forEach(x -> coordinateMap.addElement(x));
+                    .forEach(x -> simulationEnvironment.addElement(x));
         }
     }
 
-    public SimulationEnvironment<K, E> getCoordinateMap() {
-        return coordinateMap;
+    public SimulationEnvironment<K, E> getSimulationEnvironment() {
+        return simulationEnvironment;
     }
 
     public void setStepCompleteListener(Consumer<Simulation> stepCompleteListener) {

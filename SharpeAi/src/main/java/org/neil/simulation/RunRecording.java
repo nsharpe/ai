@@ -1,9 +1,6 @@
 package org.neil.simulation;
 
-import org.neil.map.Coordinates;
 import org.neil.neural.NetworkOwner;
-import org.neil.object.Creature;
-import org.neil.object.Life;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +33,7 @@ public class RunRecording<K,V extends NetworkOwner> {
     }
 
     public void stepConsumer(Simulation simulation) {
-        createFrame(simulation.getCoordinateMap().getValues());
+        createFrame(simulation.getSimulationEnvironment().getValues());
     }
 
     public List<Map<K,V>> getRecording(){

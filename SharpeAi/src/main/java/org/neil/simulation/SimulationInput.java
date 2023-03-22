@@ -20,7 +20,7 @@ public class SimulationInput<I,O> {
     public Comparator<O> survivorPriority;
     public Survive surviveLogic;
 
-    public Function<Simulation,Integer> numberOfCreatures = x -> 2500;
+    public Function<Simulation,Integer> numberOfElements = x -> 2500;
     public Function<Simulation,Integer> numberOfSurvivors = x -> 1500;
 
     public InputNodeGenerator<I> inputNodeGenerator;
