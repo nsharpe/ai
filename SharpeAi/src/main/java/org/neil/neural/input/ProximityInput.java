@@ -4,8 +4,8 @@ import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
 public class ProximityInput extends NodeDefault implements Input {
-    public ProximityInput(int capacity) {
-        super(7, capacity);
+    public ProximityInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -20,6 +20,6 @@ public class ProximityInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new ProximityInput(getCapacity());
+        return new ProximityInput(getId(), getCapacity());
     }
 }

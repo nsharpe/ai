@@ -6,8 +6,8 @@ import org.neil.object.Creature;
 
 public class LeftDirectionOutput extends NodeDefault implements Output {
 
-    public LeftDirectionOutput(int capacity) {
-        super(1, capacity);
+    public LeftDirectionOutput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -20,6 +20,6 @@ public class LeftDirectionOutput extends NodeDefault implements Output {
 
     @Override
     public Output copy() {
-        return new LeftDirectionOutput(getCapacity());
+        return new LeftDirectionOutput(getId(), getCapacity());
     }
 }

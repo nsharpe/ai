@@ -4,8 +4,8 @@ import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
 public class YPositionInput extends NodeDefault implements Input {
-    public YPositionInput(int capacity) {
-        super(10, capacity);
+    public YPositionInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -24,6 +24,6 @@ public class YPositionInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new YPositionInput(getCapacity());
+        return new YPositionInput(getId(),getCapacity());
     }
 }

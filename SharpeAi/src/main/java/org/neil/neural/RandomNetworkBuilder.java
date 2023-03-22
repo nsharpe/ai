@@ -48,22 +48,10 @@ public class RandomNetworkBuilder {
         this.maxNodes = simulationInput.maxNumberOfNodes;
         this.maxConnection = simulationInput.maxNumberOfConnections;
 
-        inputs = new ArrayList<>();
-        inputs.add(new XDirectionInput(256));
-        inputs.add(new YDirectionInput(256));
-        inputs.add(new XPositionInput(256));
-        inputs.add(new YPositionInput(256));
-        inputs.add(new ProximityInput(256));
-        inputs.add(new MovementBlockedInput(256));
-        //inputs.add(new DirectionViewInput(256));
-        inputs.add(new ConstantInput(256));
-        inputs.add(new RandomInput(256));
-
-
-        outputs = new ArrayList<>();
-        outputs.add(new LeftDirectionOutput(32));
-        outputs.add(new RightDirectionOutput(32));
-        outputs.add(new MoveOutput(32));
+        // The safe copying of lists is to protect against accidental duplication
+        // Review later.  I might not be smart enough to not make that mistake?
+        inputs = simulationInput.inputNodes.inputs(1).stream().toList();
+        outputs = simulationInput.outputNodes.outputs(inputs.size()+1).stream().toList();
     }
 
     public Network build() {

@@ -4,8 +4,8 @@ import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
 public class YDirectionInput extends NodeDefault implements Input {
-    public YDirectionInput(int capacity) {
-        super(5, capacity);
+    public YDirectionInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -20,6 +20,6 @@ public class YDirectionInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new YDirectionInput(getCapacity());
+        return new YDirectionInput(getId(),getCapacity());
     }
 }

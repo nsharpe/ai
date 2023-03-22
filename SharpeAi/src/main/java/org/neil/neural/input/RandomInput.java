@@ -7,8 +7,8 @@ import java.util.Random;
 
 public class RandomInput extends NodeDefault implements Input {
     private static Random random = new Random();
-    public RandomInput(int capacity) {
-        super(11, capacity);
+    public RandomInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -23,6 +23,6 @@ public class RandomInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new RandomInput(getCapacity());
+        return new RandomInput(getId(), getCapacity());
     }
 }

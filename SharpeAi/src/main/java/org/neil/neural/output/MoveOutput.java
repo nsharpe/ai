@@ -7,8 +7,8 @@ import org.neil.object.Creature;
 
 public class MoveOutput extends NodeDefault implements Output {
 
-    public MoveOutput(int capacity) {
-        super(3, capacity);
+    public MoveOutput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -25,6 +25,6 @@ public class MoveOutput extends NodeDefault implements Output {
 
     @Override
     public Output copy(){
-        return new MoveOutput(getCapacity());
+        return new MoveOutput(getId(), getCapacity());
     }
 }

@@ -4,8 +4,8 @@ import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
 
 public class MovementBlockedInput extends NodeDefault implements Input {
-    public MovementBlockedInput(int capacity) {
-        super(8, capacity);
+    public MovementBlockedInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -20,6 +20,6 @@ public class MovementBlockedInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new MovementBlockedInput(getCapacity());
+        return new MovementBlockedInput(getId(), getCapacity());
     }
 }

@@ -1,5 +1,9 @@
 package org.neil.simulation;
 
+import org.neil.neural.input.CreatureInputs;
+import org.neil.neural.input.InputNodes;
+import org.neil.neural.output.CreatureOutputs;
+import org.neil.neural.output.OutputNodes;
 import org.neil.object.Creature;
 
 import java.util.Comparator;
@@ -21,6 +25,9 @@ public class SimulationInput {
 
     public Function<Simulation,Integer> numberOfCreatures = x -> 2500;
     public Function<Simulation,Integer> numberOfSurvivors = x -> 1500;
+
+    public InputNodes inputNodes = new CreatureInputs();
+    public OutputNodes outputNodes = new CreatureOutputs();
 
 //    public Function<Simulation,Integer> numberOfCreatures = x -> x.getRunsCompleted() % 1000 > 900 ? 400 : 1400;
 //    public Function<Simulation,Integer> numberOfSurvivors

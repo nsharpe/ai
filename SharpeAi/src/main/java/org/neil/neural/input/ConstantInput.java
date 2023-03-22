@@ -7,8 +7,9 @@ import java.util.Random;
 
 public class ConstantInput extends NodeDefault implements Input {
     private static Random random = new Random();
-    public ConstantInput(int capacity) {
-        super(12, capacity);
+
+    public ConstantInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -16,7 +17,7 @@ public class ConstantInput extends NodeDefault implements Input {
         try {
             clearStorage();
             addToStorage(availableCapacity());
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
@@ -33,6 +34,6 @@ public class ConstantInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new ConstantInput(getCapacity());
+        return new ConstantInput(getId(), getCapacity());
     }
 }

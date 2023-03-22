@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DirectionViewInput extends NodeDefault implements Input {
-    public DirectionViewInput(int capacity) {
-        super(9, capacity);
+    public DirectionViewInput(int id, int capacity) {
+        super(id, capacity);
     }
 
     @Override
@@ -43,6 +43,6 @@ public class DirectionViewInput extends NodeDefault implements Input {
 
     @Override
     public Input copy() {
-        return new DirectionViewInput(getCapacity());
+        return new DirectionViewInput(getId(), getCapacity());
     }
 }
