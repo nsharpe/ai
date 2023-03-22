@@ -39,16 +39,16 @@ public class Piece {
             toReturn.add(white(PieceType.PAWN,1,i));
         }
 
-        toReturn.add(white(PieceType.ROOK,7,0));
-        toReturn.add(white(PieceType.KNIGHT,7,1));
-        toReturn.add(white(PieceType.BISHOP,7,2));
-        toReturn.add(white(PieceType.KING,7,3));
-        toReturn.add(white(PieceType.QUEEN,7,4));
-        toReturn.add(white(PieceType.BISHOP,7,5));
-        toReturn.add(white(PieceType.KNIGHT,7,6));
-        toReturn.add(white(PieceType.ROOK,7,7));
+        toReturn.add(black(PieceType.ROOK,7,0));
+        toReturn.add(black(PieceType.KNIGHT,7,1));
+        toReturn.add(black(PieceType.BISHOP,7,2));
+        toReturn.add(black(PieceType.KING,7,3));
+        toReturn.add(black(PieceType.QUEEN,7,4));
+        toReturn.add(black(PieceType.BISHOP,7,5));
+        toReturn.add(black(PieceType.KNIGHT,7,6));
+        toReturn.add(black(PieceType.ROOK,7,7));
         for(int i = 0; i < 8; i++){
-            toReturn.add(white(PieceType.PAWN,6,i));
+            toReturn.add(black(PieceType.PAWN,6,i));
         }
 
         return toReturn;

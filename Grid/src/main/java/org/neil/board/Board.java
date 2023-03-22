@@ -1,5 +1,7 @@
 package org.neil.board;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +38,15 @@ public class Board <V>{
         }
     }
 
+    public Collection<V> getPieces(){
+        return Collections.unmodifiableCollection(boardState.values());
+    }
+
     public void remove(Coordinates coordinates){
         boardState.remove(coordinates);
+    }
+
+    public void clear(){
+        boardState.clear();
     }
 }
