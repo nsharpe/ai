@@ -1,4 +1,4 @@
-package org.neil.map;
+package org.neil.board;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +23,22 @@ public class Coordinates {
     public static Coordinates of(final int x, final int y) {
         return cache.computeIfAbsent(x, (key) -> Collections.synchronizedMap(new HashMap<>()))
                 .computeIfAbsent(y, key -> new Coordinates(x, y));
+    }
+
+    public Coordinates incrementX(){
+        return of(x+1,y);
+    }
+
+    public Coordinates decrementX(){
+        return of(x-1,y);
+    }
+
+    public Coordinates incrementY(){
+        return of(x,y+1);
+    }
+
+    public Coordinates decrementY(){
+        return of(x,y-1);
     }
 
     public Set<Coordinates> adjacent() {

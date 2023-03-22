@@ -1,11 +1,11 @@
 package org.neil.map;
 
+import org.neil.board.Coordinates;
 import org.neil.neural.Network;
 import org.neil.object.Creature;
 import org.neil.simulation.SimulationEnvironment;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CoordinateMap implements SimulationEnvironment<Coordinates,Creature> {
     public final int xRange;
