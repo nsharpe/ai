@@ -52,7 +52,7 @@ public class Simulation<K,E extends NetworkOwner> {
         this.numberOfElementsForGeneration = simulationInput.numberOfElements;
         this.numberOfRuns = simulationInput.numberOfRuns;
         this.survivorPriority = simulationInput.survivorPriority;
-        this.acceptanceCriteria = x -> simulationInput.surviveLogic.survives(this, x);
+        this.acceptanceCriteria = x -> simulationInput.surviveLogic.survives(simulationEnvironment, x);
         this.numberOfSurvivors = simulationInput.numberOfSurvivors;
 
         this.runCompletionListener = x -> { //noop

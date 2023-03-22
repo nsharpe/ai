@@ -50,7 +50,7 @@ public class MapPanel extends JPanel {
         simulationInput.survivorPriority =  ReproductionPrioritization.xCompare();
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
-        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives(this.coordinateMap);
+        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
