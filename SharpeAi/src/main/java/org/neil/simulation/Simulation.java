@@ -21,9 +21,9 @@ import java.util.stream.IntStream;
 
 
 /**
- * A Run is defined as a completion of steps that represent
+ *
  */
-public class Simulation {
+public class Simulation<E> {
     private static Random random = new Random();
 
     private final int runTime;

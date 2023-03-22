@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SimulationOutput {
+public class SimulationOutput<E> {
     private List<RunRecording> recordings = new ArrayList<>();
-    private Simulation simulation;
+    private Simulation<E> simulation;
     private final int maxRuns;
     private AtomicInteger numberOfRuns = new AtomicInteger();
 
-    public SimulationOutput(Simulation simulation) {
-        this(simulation, 0);
-    }
-
-    public SimulationOutput(Simulation simulation, int maxRuns) {
+    public SimulationOutput(Simulation<E> simulation, int maxRuns) {
         this.maxRuns = maxRuns;
         this.simulation = Objects.requireNonNull(simulation, "simulation");
         recordings.add(new RunRecording());

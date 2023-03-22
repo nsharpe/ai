@@ -2,7 +2,6 @@ package org.neil.simulation;
 
 import org.neil.neural.input.InputNodeGenerator;
 import org.neil.neural.output.OutputNodeGenerator;
-import org.neil.object.Creature;
 
 import java.util.Comparator;
 import java.util.function.Function;
@@ -18,8 +17,8 @@ public class SimulationInput<I,O> {
 
     public double mutationRate = 0.015;
 
-    public Comparator<Creature> survivorPriority = ReproductionPrioritization.xCompare();
-    public Survive surviveLogic = Survive.leftMostSurvives();
+    public Comparator<O> survivorPriority;
+    public Survive surviveLogic;
 
     public Function<Simulation,Integer> numberOfCreatures = x -> 2500;
     public Function<Simulation,Integer> numberOfSurvivors = x -> 1500;

@@ -7,9 +7,12 @@ import org.neil.neural.input.CreatureInputs;
 import org.neil.neural.input.Inputs;
 import org.neil.neural.output.CreatureOutputs;
 import org.neil.object.Creature;
+import org.neil.simulation.ReproductionPrioritization;
 import org.neil.simulation.Simulation;
 import org.neil.simulation.SimulationInput;
 import org.neil.simulation.SimulationOutput;
+import org.neil.simulation.Survive;
+import org.neil.simulation.SurviveHelperFunctions;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,6 +46,8 @@ public class MapPanel extends JPanel {
         SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
         simulationInput.outputNodeGenerator = new CreatureOutputs();
         simulationInput.inputNodeGenerator = new CreatureInputs();
+        simulationInput.survivorPriority =  ReproductionPrioritization.xCompare();
+        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
 
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
@@ -122,10 +127,6 @@ public class MapPanel extends JPanel {
                 gridSize * coordinates.y,
                 gridSize,
                 gridSize);
-    }
-
-    public Simulation getSimulation() {
-        return simulation;
     }
 
     public void addFrameListener(Supplier<MainFrame> mainFrameUpdater) {
