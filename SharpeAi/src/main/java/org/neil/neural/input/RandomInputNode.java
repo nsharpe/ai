@@ -4,6 +4,13 @@ import org.neil.neural.NodeDefault;
 
 import java.util.Random;
 
+
+/**
+ * An input node that will be filled randomly from zero to capacity inclusive
+ *
+ * @Author Neil Sharpe
+ *
+ */
 public class RandomInputNode<E> extends NodeDefault implements InputNode<E> {
     private static Random random = new Random();
     public RandomInputNode(int id, int capacity) {
@@ -14,7 +21,7 @@ public class RandomInputNode<E> extends NodeDefault implements InputNode<E> {
     public void input(E toAdd) {
         try {
             clearStorage();
-            addToStorage(random.nextInt(availableCapacity()));
+            addToStorage(random.nextInt(availableCapacity()+1));
         }catch (Exception e){
             throw new IllegalStateException(e);
         }

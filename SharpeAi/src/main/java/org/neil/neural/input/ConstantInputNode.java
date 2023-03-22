@@ -4,6 +4,12 @@ import org.neil.neural.NodeDefault;
 
 import java.util.Random;
 
+/**
+ * An input node that at the start of a tick for a neural network fills to capacity
+ *
+ * @Author Neil Sharpe
+ *
+ */
 public class ConstantInputNode<E> extends NodeDefault implements InputNode<E> {
     private static Random random = new Random();
 
