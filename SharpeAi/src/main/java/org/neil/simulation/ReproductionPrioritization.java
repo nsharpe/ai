@@ -5,7 +5,6 @@ import org.neil.object.Creature;
 
 import java.util.Comparator;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class ReproductionPrioritization {
 

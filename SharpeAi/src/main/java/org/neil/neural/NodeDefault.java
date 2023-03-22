@@ -1,8 +1,6 @@
 package org.neil.neural;
 
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class NodeDefault implements Node {
     private final int id;
     private final int capacity;

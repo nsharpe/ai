@@ -3,7 +3,6 @@ package org.neil.display;
 import org.neil.map.CoordinateMap;
 import org.neil.map.Coordinates;
 import org.neil.neural.RandomNetworkBuilder;
-import org.neil.object.Creature;
 import org.neil.simulation.Simulation;
 import org.neil.simulation.SimulationInput;
 import org.neil.simulation.SimulationOutput;

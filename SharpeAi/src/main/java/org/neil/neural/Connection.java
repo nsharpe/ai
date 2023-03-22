@@ -1,7 +1,5 @@
 package org.neil.neural;
 
-import java.util.stream.IntStream;
-
 public class Connection {
     private final Node source;
     private final Node destination;

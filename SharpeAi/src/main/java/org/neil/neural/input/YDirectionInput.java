@@ -2,9 +2,6 @@ package org.neil.neural.input;
 
 import org.neil.neural.Input;
 import org.neil.neural.NodeDefault;
-import org.neil.neural.Output;
-import org.neil.neural.output.LeftDirectionOutput;
-import org.neil.object.Direction;
 
 public class YDirectionInput extends NodeDefault implements Input {
     public YDirectionInput(int capacity) {

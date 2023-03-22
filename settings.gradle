@@ -1,2 +1,3 @@
 rootProject.name = 'neuralNet'
 
+include 'SharpeAi'

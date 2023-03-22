@@ -1,7 +1,6 @@
 package org.neil.neural;
 
 import org.neil.neural.input.ConstantInput;
-import org.neil.neural.input.DirectionViewInput;
 import org.neil.neural.input.MovementBlockedInput;
 import org.neil.neural.input.ProximityInput;
 import org.neil.neural.input.RandomInput;

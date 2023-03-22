@@ -1,7 +1,6 @@
 package org.neil.map;
 
 import org.neil.neural.Network;
-import org.neil.neural.RandomNetworkBuilder;
 import org.neil.object.Creature;
 
 import java.util.*;

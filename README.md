@@ -4,6 +4,7 @@ ___
 
 * [Introduction](#Introduction)
 * [Assumptions](#Assumptions)
+* [Definitions](#Definitions)
 * [Requirements](#Requirements)
 
 ## Introduction
@@ -17,6 +18,23 @@ These assumptions state intended interactions for this code base but may not ref
 * All code commits should come with the goal of generalizing input and output
 * The Neural Networks will be generated via a [Evolutionary Algorithm](https://en.wikipedia.org/wiki/Evolutionary_algorithm).  As such the networks generated from this project will work best with short quick actions.
 * There will be no jars required to run this application
+* Number of inputs and output are consistent for all Neural Networks running in a given simulation
+
+## Definitions
+
+#### Tick
+All nodes of a given neural network being activated.  There is probably a better word.  To be reviewed.
+#### Step
+All neural networks in a given simultation activating a tick along with any pre or post step actions. For example giving out a specific output
+#### Generation
+All neural networks in the simultation have taken a certain number of steps.
+
+#### Simulation
+A series of generations.  The initial generation may be random or predetermined.  Subsequent generations are populated by neural networks that satisfy some condition.  When moving from one generation to another any neural networks offspring have a change to be slightly and randomly modified.  
+
+
+#### 
+  
 
 ## Requirements
 * Java 16
