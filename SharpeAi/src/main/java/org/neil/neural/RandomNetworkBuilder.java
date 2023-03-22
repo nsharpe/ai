@@ -9,11 +9,11 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RandomNetworkBuilder {
+public class RandomNetworkBuilder<I,O>{
     private static Random random = new Random();
 
-    private List<InputNode> inputNodes;
-    private List<OutputNode> outputNodes;
+    private List<InputNode<I>> inputNodes;
+    private List<OutputNode<O>> outputNodes;
     private int minNodes = 1;
     private final int maxNodes;
     private int minConnection = 1;
@@ -225,22 +225,6 @@ public class RandomNetworkBuilder {
     public void validate() {
         Objects.requireNonNull(inputNodes, "input");
         Objects.requireNonNull(outputNodes, "outputs");
-    }
-
-    public RandomNetworkBuilder inputs(List<InputNode> inputNodes) {
-        this.inputNodes = inputNodes;
-        if (inputNodes.isEmpty()) {
-            throw new IllegalStateException("inputs can't be empty");
-        }
-        return this;
-    }
-
-    public RandomNetworkBuilder outputs(List<OutputNode> outputNodes) {
-        this.outputNodes = outputNodes;
-        if (outputNodes.isEmpty()) {
-            throw new IllegalStateException("outputs can't be empty");
-        }
-        return this;
     }
 
     public RandomNetworkBuilder minNodes(int minNodes) {

@@ -3,6 +3,10 @@ package org.neil.display;
 import org.neil.map.CoordinateMap;
 import org.neil.map.Coordinates;
 import org.neil.neural.RandomNetworkBuilder;
+import org.neil.neural.input.CreatureInputs;
+import org.neil.neural.input.Inputs;
+import org.neil.neural.output.CreatureOutputs;
+import org.neil.object.Creature;
 import org.neil.simulation.Simulation;
 import org.neil.simulation.SimulationInput;
 import org.neil.simulation.SimulationOutput;
@@ -36,7 +40,10 @@ public class MapPanel extends JPanel {
     Collection<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        SimulationInput simulationInput = new SimulationInput();
+        SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
+        simulationInput.outputNodeGenerator = new CreatureOutputs();
+        simulationInput.inputNodeGenerator = new CreatureInputs();
+
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
 

@@ -1,15 +1,13 @@
 package org.neil.simulation;
 
-import org.neil.neural.input.CreatureInputs;
 import org.neil.neural.input.InputNodeGenerator;
-import org.neil.neural.output.CreatureOutputs;
 import org.neil.neural.output.OutputNodeGenerator;
 import org.neil.object.Creature;
 
 import java.util.Comparator;
 import java.util.function.Function;
 
-public class SimulationInput {
+public class SimulationInput<I,O> {
     public int x = 150;
     public int y = 150;
 
@@ -26,8 +24,8 @@ public class SimulationInput {
     public Function<Simulation,Integer> numberOfCreatures = x -> 2500;
     public Function<Simulation,Integer> numberOfSurvivors = x -> 1500;
 
-    public InputNodeGenerator inputNodeGenerator = new CreatureInputs();
-    public OutputNodeGenerator outputNodeGenerator = new CreatureOutputs();
+    public InputNodeGenerator<I> inputNodeGenerator;
+    public OutputNodeGenerator<O> outputNodeGenerator;
 
 //    public Function<Simulation,Integer> numberOfCreatures = x -> x.getRunsCompleted() % 1000 > 900 ? 400 : 1400;
 //    public Function<Simulation,Integer> numberOfSurvivors

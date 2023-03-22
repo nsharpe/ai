@@ -2,6 +2,6 @@ package org.neil.neural.input;
 
 import java.util.Collection;
 
-public interface InputNodeGenerator {
-    Collection<InputNode> inputs(int startingIndex);
+public interface InputNodeGenerator<I> {
+    Collection<InputNode<I>> inputs(int startingIndex);
 }
