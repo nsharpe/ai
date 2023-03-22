@@ -11,13 +11,14 @@ import org.neil.simulation.ReproductionPrioritization;
 import org.neil.simulation.Simulation;
 import org.neil.simulation.SimulationInput;
 import org.neil.simulation.SimulationOutput;
-import org.neil.simulation.Survive;
 import org.neil.simulation.SurviveHelperFunctions;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,8 +37,8 @@ public class MapPanel extends JPanel {
 
     Queue<Collection<Coordinates>> frames = new LinkedBlockingQueue<>();
 
-    private final Simulation simulation;
-    private final SimulationOutput output;
+    private final Simulation<Coordinates,Creature> simulation;
+    private final SimulationOutput<Coordinates,Creature> output;
     Supplier<MainFrame> mainFrameUpdater = () -> null;
 
     Collection<Coordinates> previousFrame = Collections.emptyList();
@@ -54,7 +55,9 @@ public class MapPanel extends JPanel {
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
                 new RandomNetworkBuilder(simulationInput));
-        this.output = new SimulationOutput(simulation, 20);
+        this.output = new SimulationOutput<>(simulation,
+                Creature::getPosition,
+                20);
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
 
@@ -78,7 +81,9 @@ public class MapPanel extends JPanel {
         if(frames.isEmpty()){
             int numOfRuns = output.numberOfRuns()-1;
             if(numOfRuns > 0) {
-                frames.addAll(output.getRun(numOfRuns).getRecording()
+                List<Map<Coordinates,Creature>> recordings = output.getRun(numOfRuns).getRecording();
+
+                frames.addAll(recordings
                         .stream()
                         .map(x->x.keySet())
                 .toList());

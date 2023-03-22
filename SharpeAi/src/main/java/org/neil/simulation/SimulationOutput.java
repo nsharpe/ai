@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class SimulationOutput<K,E extends NetworkOwner> {
     private List<RunRecording> recordings = new ArrayList<>();
@@ -13,15 +14,17 @@ public class SimulationOutput<K,E extends NetworkOwner> {
     private final int maxRuns;
     private AtomicInteger numberOfRuns = new AtomicInteger();
 
-    public SimulationOutput(Simulation<K,E> simulation, int maxRuns) {
+    public SimulationOutput(Simulation<K,E> simulation,
+                            Function<E,K> networkOwnerKey,
+                            int maxRuns) {
         this.maxRuns = maxRuns;
         this.simulation = Objects.requireNonNull(simulation, "simulation");
-        recordings.add(new RunRecording());
+        recordings.add(new RunRecording<K,E>(networkOwnerKey));
         numberOfRuns.getAndIncrement();
 
         simulation.setRunCompletionListener(x -> {
             synchronized (recordings) {
-                recordings.add(new RunRecording());
+                recordings.add(new RunRecording<K,E>(networkOwnerKey));
                 numberOfRuns.getAndIncrement();
                 if (maxRuns > 0 && recordings.size() > maxRuns) {
                     recordings.remove(0);

@@ -12,28 +12,40 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
-public class RunRecording {
+public class RunRecording<K,V extends NetworkOwner> {
 
-    private List<Map<Coordinates, Creature>> recordings = new ArrayList<>();
+    private List<Map<K, V>> recordings = new ArrayList<>();
 
-    public Map<Coordinates, Creature> frame(int i) {
+    private Function<V,K> mapper;
+
+    public RunRecording(Function<V, K> mapper) {
+        this.mapper = Objects.requireNonNull(mapper);
+    }
+
+    public Map<K, V> frame(int i) {
         return recordings.get(i);
     }
 
-    public void createFrame(Collection<? extends Creature> frame) {
-        recordings.add(frame.stream().collect(Collectors.toMap(x -> x.getPosition(), x -> x)));
+    public void createFrame(Collection<? extends V> frame) {
+        recordings.add(frame.stream().collect(Collectors.toMap(mapper, Function.identity())));
     }
 
     public void stepConsumer(Simulation simulation) {
         createFrame(simulation.getCoordinateMap().getValues());
     }
 
-    public List<Map<Coordinates,Creature>> getRecording(){
+    public List<Map<K,V>> getRecording(){
         return recordings.stream()
                 .map( x -> Collections.unmodifiableMap(x))
                 .toList();
+    }
+
+    public Map<K,V> getRecording(int index){
+        return Collections.unmodifiableMap(recordings.get(index));
     }
 }
