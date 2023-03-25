@@ -6,7 +6,7 @@ ___
 * [Assumptions](#Assumptions)
 * [Definitions](#Definitions)
 * [Requirements](#Requirements)
-* [Running The Application](#Running The Application)
+* [Running The Application](#Running-The-Application)
 
 ## Introduction
 This application is intended to be a personal learning tool in how a Neural Network (and evolution in general) works.   You man not copy, distribute, or modify the code shared in this repo.
@@ -31,7 +31,7 @@ All neural networks in a given simultation activating a tick along with any pre 
 All neural networks in the simultation have taken a certain number of steps.
 
 #### Simulation
-A series of generations.  The initial generation may be random or predetermined.  Subsequent generations are populated by neural networks that satisfy some condition.  When moving from one generation to another any neural networks offspring have a change to be slightly and randomly modified.  
+A series of generations.  The initial generation may be random or predetermined.  Subsequent generations are populated by neural networks that satisfy some condition.  When moving from one generation to another any neural networks offspring have a chance to be slightly and randomly modified.  
 
 
 ## Requirements
