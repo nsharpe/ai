@@ -1,7 +1,7 @@
 package org.neil.display;
 
 import org.neil.map.CoordinateMap;
-import org.neil.map.Coordinates;
+import org.neil.board.Coordinates;
 import org.neil.neural.RandomNetworkBuilder;
 import org.neil.neural.input.CreatureInputs;
 import org.neil.neural.input.Inputs;

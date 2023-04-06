@@ -1,6 +1,6 @@
 package org.neil.neural.output;
 
-import org.neil.map.Coordinates;
+import org.neil.board.Coordinates;
 import org.neil.neural.NodeDefault;
 import org.neil.object.Creature;
 

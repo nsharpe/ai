@@ -1,6 +1,6 @@
 package org.neil.object;
 
-import org.neil.map.Coordinates;
+import org.neil.board.Coordinates;
 
 import java.util.HashMap;
 import java.util.Map;

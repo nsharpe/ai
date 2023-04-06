@@ -19,9 +19,9 @@ public class RandomNetworkBuilder<I,O>{
     private int minConnection = 1;
     private final int maxConnection;
     private int minStorage = 0;
-    private int maxStorage = 2^12;
     private int minBandwith = 0;
     private int maxBandwith = 128;
+    private int maxStorage = maxBandwith * 4;
     private int bandwidthModificationIncrements = 10;
     private final double mutationRate;
 
@@ -31,7 +31,7 @@ public class RandomNetworkBuilder<I,O>{
             (id, capacity) -> new NodeDivisor(id, capacity),
             (id, capacity) -> new NodeSink(id),
             (id, capacity) -> new NodeAlwaysFull(id, capacity),
-            (id, capacity) -> new NodeCapacityPastThreshold(id, capacity, randomRange(this.minStorage, capacity))
+            (id, capacity) -> new NodeAlwaysEmpty(id, capacity)
     );
 
     public RandomNetworkBuilder(SimulationInput simulationInput) {
@@ -82,8 +82,11 @@ public class RandomNetworkBuilder<I,O>{
             if (intermediate.size() < maxNodes) {
                 intermediate.add(createIntermediateNode(intermediate));
             }
+        } else if (mutation == MutationType.NODE_TYPE){
+            Node toModify = randomEntry(intermediate);
+            intermediate.remove(toModify);
+            intermediate.add(createIntermediateNode(toModify.getId(), toModify.getCapacity()));
         } else if (mutation == MutationType.NODE_RANDOMIZE_CAPACITY) {
-
             Node toModify = randomEntry(intermediate);
             intermediate.remove(toModify);
             intermediate.add(createIntermediateNode(toModify.getId()));
@@ -128,6 +131,10 @@ public class RandomNetworkBuilder<I,O>{
                 connections.remove(toModify);
                 connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
             }
+        } else if (mutation == MutationType.RANDOMIZE_CONNECTION_BANDWIDTH) {
+            Connection toModify = connections.get(random.nextInt(connections.size()));
+            connections.remove(toModify);
+            connections.add(toModify.copyNewBandWidth(random.nextInt(maxBandwith)));
         } else if (mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY) {
             Collections.shuffle(connections);
         }
@@ -158,11 +165,13 @@ public class RandomNetworkBuilder<I,O>{
     private enum MutationType {
         NODE_ADD,
         NODE_REMOVAL,
+        NODE_TYPE,
         NODE_RANDOMIZE_CAPACITY,
         CONNECTION_ADD,
         CONNECTION_REMOVAL,
         ADD_CONNECTION_BANDWIDTH,
         REDUCE_CONNECTION_BANDWIDTH,
+        RANDOMIZE_CONNECTION_BANDWIDTH,
         SHUFFLE_CONNECTION_PRIORITY,
         NONE;
         private static Random random = new Random();

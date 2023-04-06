@@ -1,6 +1,6 @@
 package org.neil.simulation;
 
-import org.neil.map.Coordinates;
+import org.neil.board.Coordinates;
 import org.neil.object.Creature;
 
 import java.util.Comparator;

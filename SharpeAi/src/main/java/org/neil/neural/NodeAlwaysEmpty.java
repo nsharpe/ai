@@ -1,16 +1,16 @@
 package org.neil.neural;
 
-public class NodeAlwaysFull extends NodeDefault{
+public class NodeAlwaysEmpty extends NodeDefault{
 
-    public NodeAlwaysFull(int id) {
+    public NodeAlwaysEmpty(int id) {
         super(id);
     }
 
-    public NodeAlwaysFull(int id, int capacity) {
+    public NodeAlwaysEmpty(int id, int capacity) {
         super(id, capacity);
     }
 
-    public NodeAlwaysFull(Node node) {
+    public NodeAlwaysEmpty(Node node) {
         super(node);
     }
 
@@ -21,11 +21,11 @@ public class NodeAlwaysFull extends NodeDefault{
 
     @Override
     public int availableCapacity() {
-        return 0;
+        return getCapacity();
     }
 
     @Override
     public Node copy() {
-        return new NodeAlwaysFull(this);
+        return new NodeAlwaysEmpty(this);
     }
 }

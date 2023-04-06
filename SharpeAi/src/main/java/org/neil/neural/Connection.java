@@ -32,6 +32,10 @@ public class Connection {
         return new Connection(this.source, this.destination, bandwith + amount, connectionType);
     }
 
+    public Connection copyNewBandWidth(int amount) {
+        return new Connection(this.source, this.destination, bandwith + amount, connectionType);
+    }
+
     public void activate() {
         if (source == destination) {
             return; // Nothing to move

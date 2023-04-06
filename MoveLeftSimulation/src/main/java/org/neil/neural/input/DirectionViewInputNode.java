@@ -1,6 +1,6 @@
 package org.neil.neural.input;
 
-import org.neil.map.Coordinates;
+import org.neil.board.Coordinates;
 import org.neil.neural.NodeDefault;
 import org.neil.object.Direction;
 

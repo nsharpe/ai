@@ -7,10 +7,10 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 public class SimulationInput<I,O> {
-    public int x = 150;
-    public int y = 150;
+    public int x = 100;
+    public int y = 100;
 
-    public int maxNumberOfNodes = 30;
+    public int maxNumberOfNodes = 10;
     public int maxNumberOfConnections = 100;
     public int runTime = 350;
     public int numberOfRuns = 15000;
@@ -20,8 +20,11 @@ public class SimulationInput<I,O> {
     public Comparator<O> survivorPriority;
     public Survive surviveLogic;
 
-    public Function<Simulation,Integer> numberOfElements = x -> 2500;
-    public Function<Simulation,Integer> numberOfSurvivors = x -> 1500;
+    public Function<Simulation,Integer> numberOfElements = x -> 1500;
+    // every 100 generations ensure that some elements die
+//    public Function<Simulation,Integer> numberOfSurvivors = x -> x.getRunsCompleted() % 100 == 0?
+//            numberOfElements.apply(x) >> 1 :  numberOfElements.apply(x);
+    public Function<Simulation,Integer> numberOfSurvivors = x -> numberOfElements.apply(x);
 
     public InputNodeGenerator<I> inputNodeGenerator;
     public OutputNodeGenerator<O> outputNodeGenerator;

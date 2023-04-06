@@ -2,4 +2,7 @@ rootProject.name = 'neuralNet'
 
 include 'SharpeAi'
 include 'MoveLeftSimulation'
+include 'Chess'
+include 'Chess'
+include 'Grid'
 
