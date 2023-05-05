@@ -22,4 +22,9 @@ public interface InputNode<E> extends Node {
     void input(E input);
 
     InputNode copy();
+
+    @Override
+    default boolean isActivateable() {
+        return true;
+    }
 }

@@ -44,9 +44,13 @@ public class Connection {
         Node lock1 = source.getId() < destination.getId() ? source : destination;
         Node lock2 = source == lock1 ? destination : source;
 
+        if (!source.isActivateable() || source.getCapacity() == 0) {
+            return;
+        }
+
         synchronized (lock1) {
             synchronized (lock2) {
-                if (source.getStored() == 0) {
+                if (!source.isActivateable() || source.getCapacity() == 0) {
                     return;
                 }
                 if (connectionType == ConnectionType.ADD) {

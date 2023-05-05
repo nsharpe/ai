@@ -10,6 +10,11 @@ public class SurviveHelperFunctions {
                 xRangeSurvives(0, simulation.xRange / 2).survives(simulation,creature);
     }
 
+    public static Survive<CoordinateMap,Creature> rightMostSurvives() {
+        return (simulation,creature)->
+                !xRangeSurvives(0, simulation.xRange / 2).survives(simulation,creature);
+    }
+
     public static Survive<CoordinateMap,Creature> xRangeSurvives(int xMin, int xMax) {
         return (simulation, creature) ->
                 creature.getPosition().x >= xMin &&

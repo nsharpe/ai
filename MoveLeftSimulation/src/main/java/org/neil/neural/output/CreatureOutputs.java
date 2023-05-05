@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CreatureOutputs implements OutputNodeGenerator {
-    private int defaultCapacity =32;
+    private int defaultCapacity =64;
     @Override
     public Collection<OutputNode> outputs(int startingIndex) {
         return Stream.of( new LeftDirectionOutputNode(startingIndex++, defaultCapacity),

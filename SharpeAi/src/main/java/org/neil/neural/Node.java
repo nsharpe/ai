@@ -20,4 +20,6 @@ public interface Node {
     void fillStorage();
 
     Node copy();
+
+    boolean isActivateable();
 }

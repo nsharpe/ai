@@ -5,6 +5,7 @@ public class NodeDefault implements Node {
     private final int id;
     private final int capacity;
     private volatile int stored = 0;
+    private volatile boolean activateable;
 
     public NodeDefault(int id) {
         this(id, Integer.MAX_VALUE);
@@ -21,7 +22,7 @@ public class NodeDefault implements Node {
         this.capacity = capacity;
     }
 
-    public NodeDefault(Node node){
+    public NodeDefault(Node node) {
         this(node.getId(), node.getCapacity());
     }
 
@@ -32,10 +33,17 @@ public class NodeDefault implements Node {
             stored = capacity;
         }
 
+        if (stored > capacity / 2) {
+            activateable = true;
+        }
+        if (stored == 0) {
+            activateable = false;
+        }
+
         if (stored < 0) {
             throw new IllegalStateException("stored can't be less then zero");
         }
-        if(stored > capacity){
+        if (stored > capacity) {
             throw new IllegalStateException("stored can't be greater then capacity");
         }
     }
@@ -63,6 +71,10 @@ public class NodeDefault implements Node {
     @Override
     public void fillStorage() {
         stored = capacity;
+    }
+
+    public boolean isActivateable() {
+        return activateable;
     }
 
     @Override

@@ -20,7 +20,7 @@ public class RandomNetworkBuilder<I,O>{
     private final int maxConnection;
     private int minStorage = 0;
     private int minBandwith = 0;
-    private int maxBandwith = 128;
+    private int maxBandwith = 512;
     private int maxStorage = maxBandwith * 4;
     private int bandwidthModificationIncrements = 10;
     private final double mutationRate;
@@ -193,8 +193,8 @@ public class RandomNetworkBuilder<I,O>{
             nodes.add(new NodeDefault(i + 1000, storage));
         }
 
-        nodes.addAll(inputNodes.stream().map(x -> x.copy()).collect(Collectors.toList()));
-        nodes.addAll(outputNodes.stream().map(x -> x.copy()).collect(Collectors.toList()));
+        nodes.addAll(inputNodes.stream().map(x -> x.copy()).toList());
+        nodes.addAll(outputNodes.stream().map(x -> x.copy()).toList());
         return nodes;
     }
 
