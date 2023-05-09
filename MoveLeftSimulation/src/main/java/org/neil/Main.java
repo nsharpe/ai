@@ -6,6 +6,11 @@ import org.neil.display.MainFrame;
 public class Main {
 
     public static void main(String[] args) {
-        new MainFrame();
+        try {
+            new MainFrame();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

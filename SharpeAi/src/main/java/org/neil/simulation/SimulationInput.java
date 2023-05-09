@@ -7,15 +7,15 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 public class SimulationInput<I,O> {
-    public int x = 100;
-    public int y = 100;
+    public int x = 200;
+    public int y = 200;
 
-    public int maxNumberOfNodes = 10;
-    public int maxNumberOfConnections = 100;
-    public int runTime = 350;
+    public int maxNumberOfNodes = 90;
+    public int maxNumberOfConnections = 1200;
+    public int runTime = 300;
     public int numberOfRuns = 15000;
 
-    public double mutationRate = 0.015;
+    public double mutationRate = 0.25;
 
     public Comparator<O> survivorPriority;
     public Survive surviveLogic;

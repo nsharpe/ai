@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,35 +30,24 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public class MapPanel extends JPanel {
-    private final CoordinateMap coordinateMap;
-    private final int gridSize = 10;
+    private CoordinateMap coordinateMap;
+    private int gridSize = 5;
     private final int stepDisplayInMillis = 100;
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
     Queue<Collection<Coordinates>> frames = new LinkedBlockingQueue<>();
 
-    private final Simulation<Coordinates,Creature> simulation;
-    private final SimulationOutput<Coordinates,Creature> output;
+    private Simulation<Coordinates,Creature> simulation;
+    private SimulationOutput<Coordinates,Creature> output;
     Supplier<MainFrame> mainFrameUpdater = () -> null;
 
     Collection<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
-        simulationInput.outputNodeGenerator = new CreatureOutputs();
-        simulationInput.inputNodeGenerator = new CreatureInputs();
-        simulationInput.survivorPriority =  ReproductionPrioritization.xCompare();
+        initLeftDestination();
+        //initMovingDestination();
 
-        this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
-        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
-
-        this.simulation = new Simulation(simulationInput,
-                coordinateMap,
-                new RandomNetworkBuilder(simulationInput));
-        this.output = new SimulationOutput<>(simulation,
-                Creature::getPosition,
-                20);
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
 
@@ -135,5 +125,125 @@ public class MapPanel extends JPanel {
 
     public void addFrameListener(Supplier<MainFrame> mainFrameUpdater) {
         this.mainFrameUpdater = mainFrameUpdater;
+    }
+
+    public Simulation initLeftDestination(){
+        gridSize = 10;
+
+        SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
+        simulationInput.x = 100;
+        simulationInput.y = 100;
+
+        simulationInput.maxNumberOfConnections = 100;
+        simulationInput.maxNumberOfNodes = 10;
+
+        simulationInput.survivorPriority =  ReproductionPrioritization.xCompare();
+
+        simulationInput.outputNodeGenerator = new CreatureOutputs();
+
+        CoordinateSupplier coordinateSupplier = new CoordinateSupplier(simulationInput.x,simulationInput.y);
+
+        System.out.println(coordinateSupplier.get());
+
+        simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
+        simulationInput.numberOfElements = x -> 1000;
+
+        this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
+        simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
+
+
+
+        this.simulation = new Simulation(simulationInput,
+                coordinateMap,
+                new RandomNetworkBuilder(simulationInput));
+
+        this.output = new SimulationOutput<>(simulation,
+                Creature::getPosition,
+                20);
+
+        return simulation;
+    }
+    public Simulation initMovingDestination(){
+        SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
+        simulationInput.outputNodeGenerator = new CreatureOutputs();
+
+        CoordinateSupplier coordinateSupplier = new CoordinateSupplier(simulationInput.x,simulationInput.y);
+
+        System.out.println(coordinateSupplier.get());
+
+        simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
+        simulationInput.numberOfElements = x -> 2000;
+        simulationInput.survivorPriority =  ReproductionPrioritization.euclidianCompare(coordinateSupplier);
+        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() < 600 ? 900 - x.getRunsCompleted() :  300;
+
+        this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
+        //simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
+        simulationInput.surviveLogic = (sim,e) -> true;
+
+        this.simulation = new Simulation(simulationInput,
+                coordinateMap,
+                new RandomNetworkBuilder(simulationInput));
+        this.simulation.addRunCompletionListener( x -> {
+            coordinateSupplier.random(x.getRunsCompleted()/20);
+            System.out.println(coordinateSupplier.get());
+        });
+
+        this.output = new SimulationOutput<>(simulation,
+                Creature::getPosition,
+                20);
+
+        return simulation;
+    }
+
+    public static class CoordinateSupplier implements Supplier<Coordinates>{
+        private static Random random = new Random();
+        private volatile Coordinates coordinates;
+        private final int maxX;
+        private final int maxY;
+
+        public CoordinateSupplier(int xMax, int yMax) {
+            this.coordinates = Coordinates.of(random.nextInt(xMax), random.nextInt(yMax));
+            this.maxX = xMax;
+            this.maxY = yMax;
+        }
+
+
+        public void random(int distance) {
+            int xMin = coordinates.x - distance;
+            int xMax = coordinates.x + distance;
+
+            if (xMin < 0) {
+                xMin = 0;
+            }
+            if (xMax > this.maxX) {
+                xMax = this.maxX;
+            }
+
+            int yMin = coordinates.y - distance;
+            int yMax = coordinates.y + distance;
+
+            if (yMin < 0) {
+                yMin = 0;
+            }
+            if (yMax > this.maxY) {
+                yMax = this.maxY;
+            }
+
+            int x = coordinates.x;
+            if (xMin != xMax) {
+                x = random.nextInt(xMax - xMin) + xMin;
+            }
+            int y = coordinates.y;
+            if (yMin != yMax) {
+                y = random.nextInt(yMax - yMin) + yMin;
+            }
+
+            this.coordinates = Coordinates.of(x, y);
+        }
+
+        @Override
+        public Coordinates get() {
+            return coordinates;
+        }
     }
 }

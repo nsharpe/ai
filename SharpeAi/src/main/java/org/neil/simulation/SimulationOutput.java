@@ -22,7 +22,7 @@ public class SimulationOutput<K,E extends NetworkOwner> {
         recordings.add(new RunRecording<K,E>(networkOwnerKey));
         numberOfRuns.getAndIncrement();
 
-        simulation.setRunCompletionListener(x -> {
+        simulation.addRunCompletionListener(x -> {
             synchronized (recordings) {
                 recordings.add(new RunRecording<K,E>(networkOwnerKey));
                 numberOfRuns.getAndIncrement();

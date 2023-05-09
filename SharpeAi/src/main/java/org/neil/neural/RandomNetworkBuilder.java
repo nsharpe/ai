@@ -100,27 +100,25 @@ public class RandomNetworkBuilder<I,O>{
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if (mutation == MutationType.CONNECTION_ADD) {
-            if (connections.size() < maxConnection) {
-                List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
-                        .collect(Collectors.toList());
-                List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
-                        .collect(Collectors.toList());
+        if (mutation == MutationType.CONNECTION_ADD && connections.size() < maxConnection) {
+            List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
+                    .collect(Collectors.toList());
+            List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
+                    .collect(Collectors.toList());
 
-                Node source;
-                Node destination;
-                do {
-                    source = randomEntry(sources);
-                    destination = randomEntry(destinations);
-                } while (source != destination);
+            Node source;
+            Node destination;
+            do {
+                source = randomEntry(sources);
+                destination = randomEntry(destinations);
+            } while (source != destination);
 
-                connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith),
-                        Connection.ConnectionType.random()));
-            }
-        } else if (mutation == MutationType.CONNECTION_REMOVAL) {
-            if (connections.size() > minConnection) {
-                connections.remove(random.nextInt(connections.size()));
-            }
+            connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith),
+                    Connection.ConnectionType.random()));
+
+        } else if (mutation == MutationType.CONNECTION_REMOVAL && connections.size() > minConnection) {
+            connections.remove(random.nextInt(connections.size()));
+
         } else if (mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
@@ -131,12 +129,43 @@ public class RandomNetworkBuilder<I,O>{
                 connections.remove(toModify);
                 connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
             }
-        } else if (mutation == MutationType.RANDOMIZE_CONNECTION_BANDWIDTH) {
+        } else if (mutation == MutationType.RANDOMIZE_CONNECTION_BANDWIDTH && connections.size() >= 1) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
             connections.add(toModify.copyNewBandWidth(random.nextInt(maxBandwith)));
-        } else if (mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY) {
+        } else if (mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY && connections.size() > 1) {
             Collections.shuffle(connections);
+        }else if (mutation == MutationType.SHUFFLE_ALL_CONNECTIONS && connections.size() > 1) {
+            List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
+                    .collect(Collectors.toList());
+            List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
+                    .collect(Collectors.toList());
+
+            connections = connections.stream()
+                            .map( x ->new Connection(randomEntry(sources),
+                                    randomEntry(destinations),
+                                    x.getBandwith(),
+                                    x.getConnectionType()) )
+                    .toList();
+        }
+        else if (mutation == MutationType.SHUFFLE_CONNECTION && connections.size() > 1) {
+            List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
+                    .collect(Collectors.toList());
+            List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
+                    .collect(Collectors.toList());
+
+            int connectionIndex = random.nextInt(connections.size());
+            Connection toModify = connections.get(connectionIndex);
+            connections.remove(connectionIndex);
+
+            connections.add(new Connection(randomEntry(sources),
+                            randomEntry(destinations),
+                            toModify.getBandwith(),
+                            toModify.getConnectionType()) );
+        }
+
+        if(mutation != MutationType.NONE && random.nextInt(10) == 0){
+            return copyWithChanceToMutate(new Network(allNodes,connections));
         }
 
         return new Network(allNodes, connections);
@@ -173,6 +202,8 @@ public class RandomNetworkBuilder<I,O>{
         REDUCE_CONNECTION_BANDWIDTH,
         RANDOMIZE_CONNECTION_BANDWIDTH,
         SHUFFLE_CONNECTION_PRIORITY,
+        SHUFFLE_ALL_CONNECTIONS,
+        SHUFFLE_CONNECTION,
         NONE;
         private static Random random = new Random();
 

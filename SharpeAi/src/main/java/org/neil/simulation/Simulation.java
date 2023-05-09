@@ -131,7 +131,7 @@ public class Simulation<K,E extends NetworkOwner> {
         this.stepCompleteListener = this.stepCompleteListener.andThen(stepCompleteListener);
     }
 
-    public void setRunCompletionListener(Consumer<Simulation> runCompletionListener) {
+    public void addRunCompletionListener(Consumer<Simulation> runCompletionListener) {
         this.runCompletionListener = this.runCompletionListener.andThen(runCompletionListener);
     }
 

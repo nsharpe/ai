@@ -5,6 +5,7 @@ import org.neil.object.Creature;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class ReproductionPrioritization {
 
@@ -16,6 +17,13 @@ public class ReproductionPrioritization {
         return Comparator.comparing(x -> x.getPosition().y);
     }
 
+    public static Comparator<Creature> euclidianCompare(Supplier<Coordinates> coordinates) {
+        return euclidianCompare(coordinates.get());
+    }
+
+    public static Comparator<Creature> euclidianCompare(Coordinates coordinates) {
+        return euclidianCompare(coordinates.x,coordinates.y);
+    }
     public static Comparator<Creature> euclidianCompare(int x, int y) {
         Coordinates coordinates = Coordinates.of(x, y);
         return Comparator.comparing(creature -> creature.getPosition().distance(coordinates));

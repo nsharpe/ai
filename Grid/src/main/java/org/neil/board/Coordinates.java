@@ -76,4 +76,12 @@ public class Coordinates {
     public int hashCode() {
         return _hash;
     }
+
+    @Override
+    public String toString() {
+        return "Coordinates{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }
