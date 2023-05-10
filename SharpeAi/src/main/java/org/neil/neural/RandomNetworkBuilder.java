@@ -22,11 +22,13 @@ public class RandomNetworkBuilder<I,O>{
     private int minBandwith = 0;
     private int maxBandwith = 512;
     private int maxStorage = maxBandwith * 4;
+
+    private int maxActivation = maxStorage / 2;
     private int bandwidthModificationIncrements = 10;
     private final double mutationRate;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
-            (id, capacity) -> new NodeDefault(id, capacity, capacity/2),
+            (id, capacity) -> new MutateableNodeDefault(id, capacity, capacity/2),
             (id, capacity) -> new NodeMultiplier(id, capacity),
             (id, capacity) -> new NodeDivisor(id, capacity),
             (id, capacity) -> new NodeSink(id),
@@ -81,6 +83,15 @@ public class RandomNetworkBuilder<I,O>{
         } else if (mutation == MutationType.NODE_ADD) {
             if (intermediate.size() < maxNodes) {
                 intermediate.add(createIntermediateNode(intermediate));
+            }
+        } else if (mutation == MutationType.MUTATE_NODE) {
+            Node toModify = randomEntry(intermediate.stream()
+                    .filter( x -> x instanceof MutateableNode)
+                    .collect(Collectors.toList()));
+            if(toModify != null){
+                intermediate.remove(toModify);
+                MutateableNode mutate = (MutateableNode) toModify;
+                intermediate.add(mutate.mutate(minStorage,maxStorage,maxActivation));
             }
         } else if (mutation == MutationType.NODE_TYPE){
             Node toModify = randomEntry(intermediate);
@@ -194,6 +205,7 @@ public class RandomNetworkBuilder<I,O>{
     private enum MutationType {
         NODE_ADD,
         NODE_REMOVAL,
+        MUTATE_NODE,
         NODE_TYPE,
         NODE_RANDOMIZE_CAPACITY,
         CONNECTION_ADD,
@@ -221,7 +233,7 @@ public class RandomNetworkBuilder<I,O>{
         for (int i = 0; i <= numOfNodes; i++) {
             int storage = randomRange(minStorage, maxStorage);
 
-            nodes.add(new NodeDefault(i + 1000, storage, storage / 2));
+            nodes.add(new MutateableNodeDefault(i + 1000, storage, storage / 2));
         }
 
         nodes.addAll(inputNodes.stream().map(x -> x.copy()).toList());
@@ -259,6 +271,9 @@ public class RandomNetworkBuilder<I,O>{
     }
 
     public static Node randomEntry(List<Node> collection) {
+        if(collection.isEmpty()){
+            return null;
+        }
         return collection.get(random.nextInt(collection.size()));
     }
 
