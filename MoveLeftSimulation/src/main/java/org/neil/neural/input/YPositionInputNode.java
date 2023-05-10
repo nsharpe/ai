@@ -4,7 +4,7 @@ import org.neil.neural.NodeDefault;
 
 public class YPositionInputNode extends NodeDefault implements InputNode<Inputs> {
     public YPositionInputNode(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, 0);
     }
 
     @Override

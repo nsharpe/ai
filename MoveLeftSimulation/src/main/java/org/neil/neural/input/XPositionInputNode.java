@@ -4,7 +4,7 @@ import org.neil.neural.NodeDefault;
 
 public class XPositionInputNode extends NodeDefault implements InputNode<Inputs> {
     public XPositionInputNode(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, 0);
     }
 
     @Override

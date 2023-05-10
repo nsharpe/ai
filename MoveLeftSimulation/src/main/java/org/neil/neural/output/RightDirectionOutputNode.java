@@ -6,7 +6,7 @@ import org.neil.object.Creature;
 public class RightDirectionOutputNode extends NodeDefault implements OutputNode<Creature> {
 
     public RightDirectionOutputNode(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, 0);
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.neil.neural;
 public class NodeSink extends NodeDefault{
 
     public NodeSink(int id) {
-        super(id, 1);
+        super(id, Integer.MAX_VALUE - 1, Integer.MAX_VALUE);
     }
 
     public NodeSink(Node node) {

@@ -7,7 +7,7 @@ public class NodeDivisor extends NodeDefault{
     }
 
     public NodeDivisor(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, capacity / 2);
     }
 
     public NodeDivisor(Node node) {

@@ -7,11 +7,13 @@ public class NodeDefault implements Node {
     private volatile int stored = 0;
     private volatile boolean activateable;
 
+    private volatile int activationLimit;
+
     public NodeDefault(int id) {
-        this(id, Integer.MAX_VALUE);
+        this(id, Integer.MAX_VALUE, Integer.MAX_VALUE / 2);
     }
 
-    public NodeDefault(int id, int capacity) {
+    public NodeDefault(int id, int capacity, int activationLimit) {
         if (id <= 0) {
             throw new IllegalStateException("id must be positive");
         }
@@ -20,10 +22,11 @@ public class NodeDefault implements Node {
         }
         this.id = id;
         this.capacity = capacity;
+        this.activationLimit = activationLimit;
     }
 
     public NodeDefault(Node node) {
-        this(node.getId(), node.getCapacity());
+        this(node.getId(), node.getCapacity(), node.getActivationLimit());
     }
 
     @Override
@@ -66,6 +69,9 @@ public class NodeDefault implements Node {
     @Override
     public void clearStorage() {
         stored = 0;
+    }
+    public int getActivationLimit() {
+        return activationLimit;
     }
 
     @Override

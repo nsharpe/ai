@@ -22,4 +22,6 @@ public interface Node {
     Node copy();
 
     boolean isActivateable();
+
+    int getActivationLimit();
 }

@@ -26,7 +26,7 @@ public class RandomNetworkBuilder<I,O>{
     private final double mutationRate;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
-            (id, capacity) -> new NodeDefault(id, capacity),
+            (id, capacity) -> new NodeDefault(id, capacity, capacity/2),
             (id, capacity) -> new NodeMultiplier(id, capacity),
             (id, capacity) -> new NodeDivisor(id, capacity),
             (id, capacity) -> new NodeSink(id),
@@ -221,7 +221,7 @@ public class RandomNetworkBuilder<I,O>{
         for (int i = 0; i <= numOfNodes; i++) {
             int storage = randomRange(minStorage, maxStorage);
 
-            nodes.add(new NodeDefault(i + 1000, storage));
+            nodes.add(new NodeDefault(i + 1000, storage, storage / 2));
         }
 
         nodes.addAll(inputNodes.stream().map(x -> x.copy()).toList());

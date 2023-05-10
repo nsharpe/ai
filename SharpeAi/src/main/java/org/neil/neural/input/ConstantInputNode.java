@@ -14,7 +14,7 @@ public class ConstantInputNode<E> extends NodeDefault implements InputNode<E> {
     private static Random random = new Random();
 
     public ConstantInputNode(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, capacity / 2);
     }
 
     @Override

@@ -7,7 +7,7 @@ public class NodeAlwaysFull extends NodeDefault{
     }
 
     public NodeAlwaysFull(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, capacity / 2);
     }
 
     public NodeAlwaysFull(Node node) {

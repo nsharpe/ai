@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 public class XDestinationInputNode extends NodeDefault implements InputNode<Inputs> {
     private final Supplier<Coordinates> coordinatesSupplier;
     public XDestinationInputNode(int id, int capacity, Supplier<Coordinates> coordinatesSupplier) {
-        super(id, capacity);
+        super(id, capacity, 0);
         this.coordinatesSupplier = coordinatesSupplier;
     }
 

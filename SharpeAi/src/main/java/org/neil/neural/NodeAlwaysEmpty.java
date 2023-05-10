@@ -7,7 +7,7 @@ public class NodeAlwaysEmpty extends NodeDefault{
     }
 
     public NodeAlwaysEmpty(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, capacity / 2);
     }
 
     public NodeAlwaysEmpty(Node node) {

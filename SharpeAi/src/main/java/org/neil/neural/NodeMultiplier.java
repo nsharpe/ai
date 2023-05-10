@@ -7,7 +7,7 @@ public class NodeMultiplier extends NodeDefault{
     }
 
     public NodeMultiplier(int id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, capacity / 2);
     }
 
     public NodeMultiplier(Node node) {

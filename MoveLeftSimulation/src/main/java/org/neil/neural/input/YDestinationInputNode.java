@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 public class YDestinationInputNode extends NodeDefault implements InputNode<Inputs> {
     private final Supplier<Coordinates> coordinatesSupplier;
     public YDestinationInputNode(int id, int capacity, Supplier<Coordinates> coordinatesSupplier) {
-        super(id, capacity);
+        super(id, capacity, 0);
         this.coordinatesSupplier = coordinatesSupplier;
     }
 
