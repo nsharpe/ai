@@ -4,7 +4,10 @@ import org.neil.neural.input.InputNode;
 import org.neil.neural.output.OutputNode;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Network {
 
@@ -13,32 +16,46 @@ public class Network {
     private final List<OutputNode> outputNodes;
     private final List<Node> intermediate;
 
-    public Network(List<Node> nodes,
-                   List<Connection> connections) {
-
-        Objects.requireNonNull(nodes);
+    public Network( List<InputNode> inputNodes,
+                     List<OutputNode> outputNodes,
+                     List<Node> intermediate,
+                    List<Connection> connections) {
+        this.inputNodes = Objects.requireNonNull(inputNodes)
+                .stream()
+                .toList();
+        this.intermediate = Objects.requireNonNull(intermediate)
+                .stream()
+                .toList();
+        this.outputNodes = Objects.requireNonNull(outputNodes)
+                .stream()
+                .toList();;
         Objects.requireNonNull(connections);
+
+        Map<Integer,Node> nodeId = Stream.concat(
+                inputNodes.stream(),Stream.concat(
+                outputNodes.stream(),
+                intermediate.stream())
+        ).collect(Collectors.toMap(x->x.getId(), x->x));
+
+        List<Connection> updatedConnections = connections.stream()
+                .map(x-> new Connection(nodeId.get(x.getSource().getId()),
+                        nodeId.get(x.getDestination().getId()),
+                                x.getBandwith(),
+                                x.getConnectionType()
+                        )).toList();
 
         this.connections = new HashMap<>();
 
-        for (Connection connection : connections) {
+        for (Connection connection : updatedConnections) {
             this.connections.computeIfAbsent(connection.getSource(), x -> new ArrayList<>())
                     .add(connection);
         }
-
-        inputNodes = new ArrayList<>();
-        outputNodes = new ArrayList<>();
-        intermediate = new ArrayList<>();
-
-        for (Node node : nodes) {
-            if (node instanceof InputNode) {
-                inputNodes.add((InputNode) node);
-            } else if (node instanceof OutputNode) {
-                outputNodes.add((OutputNode) node);
-            } else {
-                intermediate.add( node );
-            }
-        }
+    }
+    private Network(NetworkBuilder networkBuilder) {
+        this(networkBuilder.inputNodes,
+                networkBuilder.outputNodes,
+                networkBuilder.intermediate,
+                networkBuilder.connections);
     }
 
     public void increment() {
@@ -51,6 +68,11 @@ public class Network {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public Stream<Connection> connectionsBelongingTo(Node n){
+        return streamConnections()
+                .filter( x -> x.getSource().equals(n) || x.getDestination().equals(n));
     }
 
     public List<InputNode> getInputs() {
@@ -67,5 +89,44 @@ public class Network {
 
     public Stream<Connection> streamConnections(){
         return connections.values().stream().flatMap(x-> x.stream());
+    }
+
+    public static NetworkBuilder builder(){
+        return new NetworkBuilder();
+    }
+
+    public static class NetworkBuilder{
+        private List<InputNode> inputNodes;
+        private List<OutputNode> outputNodes;
+        private List<Node> intermediate;
+        private List<Connection> connections = new ArrayList<>();
+
+        private NetworkBuilder(){
+            //noop
+        }
+
+        public NetworkBuilder input(List<InputNode> nodes) {
+            this.inputNodes = nodes;
+            return this;
+        }
+
+        public NetworkBuilder output(List<OutputNode> nodes) {
+            this.outputNodes = nodes;
+            return this;
+        }
+
+        public NetworkBuilder intermediate(List<Node> nodes) {
+            this.intermediate = nodes;
+            return this;
+        }
+
+        public NetworkBuilder addConnections(List<Connection> connections) {
+            this.connections.addAll(connections);
+            return this;
+        }
+
+        public Network build(){
+            return new Network(this);
+        }
     }
 }

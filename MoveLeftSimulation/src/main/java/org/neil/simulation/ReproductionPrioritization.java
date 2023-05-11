@@ -17,6 +17,20 @@ public class ReproductionPrioritization {
         return Comparator.comparing(x -> x.getPosition().y);
     }
 
+    public static Comparator<Creature> yCompare(int y) {
+        return  Comparator.comparing( pos -> Math.abs(y-pos.getPosition().y));
+    }
+
+    public static Comparator<Creature> xCompare(int x) {
+
+        return Comparator.comparing( pos -> Math.abs(x-pos.getPosition().x));
+    }
+
+    public static Comparator<Creature> closestToStart() {
+
+        return Comparator.comparing(x-> x.getPosition().distance(x.getStartPosition()));
+    }
+
     public static Comparator<Creature> euclidianCompare(Supplier<Coordinates> coordinates) {
         return euclidianCompare(coordinates.get());
     }

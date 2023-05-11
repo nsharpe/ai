@@ -1,5 +1,6 @@
 package org.neil.neural;
 
+import java.util.Objects;
 public class Connection {
     private final Node source;
     private final Node destination;
@@ -10,10 +11,10 @@ public class Connection {
                       Node destination,
                       int bandwith,
                       ConnectionType connectionType) {
-        this.source = source;
-        this.destination = destination;
+        this.source = Objects.requireNonNull(source);
+        this.destination = Objects.requireNonNull(destination);
         this.bandwith = bandwith;
-        this.connectionType = connectionType;
+        this.connectionType = Objects.requireNonNull(connectionType);
     }
 
     public Node getSource() {
@@ -44,13 +45,13 @@ public class Connection {
         Node lock1 = source.getId() < destination.getId() ? source : destination;
         Node lock2 = source == lock1 ? destination : source;
 
-        if (!source.isActivateable() || source.getCapacity() == 0) {
+        if (!source.isActivateable() || source.getStored() == 0) {
             return;
         }
 
         synchronized (lock1) {
             synchronized (lock2) {
-                if (!source.isActivateable() || source.getCapacity() == 0) {
+                if (!source.isActivateable() || source.getStored() == 0) {
                     return;
                 }
                 if (connectionType == ConnectionType.ADD) {

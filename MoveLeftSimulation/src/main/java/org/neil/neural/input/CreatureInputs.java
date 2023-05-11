@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CreatureInputs implements InputNodeGenerator {
-    private final int defaultCapacity = 256;
+    private final int defaultCapacity = Integer.MAX_VALUE;
     Supplier<Coordinates> coordinatesSupplier;
 
     public CreatureInputs(Supplier<Coordinates> coordinatesSupplier) {
@@ -27,6 +27,7 @@ public class CreatureInputs implements InputNodeGenerator {
                 new XPositionInputNode(startingIndex++, defaultCapacity),
                 new YDirectionInputNode(startingIndex++,defaultCapacity),
                 new YPositionInputNode(startingIndex++, defaultCapacity),
+                new DistanceInputNode(startingIndex++, defaultCapacity, coordinatesSupplier),
                 new XDestinationInputNode(startingIndex++, defaultCapacity,coordinatesSupplier),
                 new YDestinationInputNode(startingIndex++, defaultCapacity,coordinatesSupplier)
         ).collect(Collectors.toList());

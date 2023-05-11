@@ -21,7 +21,7 @@ public class RandomInputNode<E> extends NodeDefault implements InputNode<E> {
     public void input(E toAdd) {
         try {
             clearStorage();
-            addToStorage(random.nextInt(availableCapacity()+1));
+            addToStorage(random.nextInt(availableCapacity()));
         }catch (Exception e){
             throw new IllegalStateException(e);
         }

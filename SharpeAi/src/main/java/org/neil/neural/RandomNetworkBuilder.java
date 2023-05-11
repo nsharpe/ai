@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 public class RandomNetworkBuilder<I,O>{
     private static Random random = new Random();
 
-    private List<InputNode<I>> inputNodes;
-    private List<OutputNode<O>> outputNodes;
+    private List<InputNode> inputNodes;
+    private List<OutputNode> outputNodes;
     private int minNodes = 1;
     private final int maxNodes;
-    private int minConnection = 1;
+    private int minConnection = 2;
     private final int maxConnection;
     private int minStorage = 1;
     private int minBandwith = 0;
@@ -25,7 +25,7 @@ public class RandomNetworkBuilder<I,O>{
 
     private int maxActivation = maxStorage / 2;
     private int bandwidthModificationIncrements = 10;
-    private final double mutationRate;
+    private volatile double mutationRate;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
             (id, capacity) -> new MutateableNodeDefault(id, capacity, capacity / 2),
@@ -49,9 +49,15 @@ public class RandomNetworkBuilder<I,O>{
 
     public Network build() {
         validate();
-        List<Node> nodes = generateNodes();
+        List<Node> nodes = generateIntermediateNodes();
 
-        return new Network(nodes, generateConnections(nodes));
+        List<InputNode> inputNodes = this.inputNodes.stream().map(x->x.copy()).toList();
+        List<OutputNode> outputNodes = this.outputNodes.stream().map(x->x.copy()).toList();
+
+        return  new Network(inputNodes,
+                outputNodes,
+                nodes,
+                generateConnections(inputNodes,outputNodes,nodes));
 
     }
 
@@ -70,48 +76,44 @@ public class RandomNetworkBuilder<I,O>{
     }
 
     public Network copyWithChanceToMutate(Network network) {
-        List<Node> inputs = network.getInputs().stream().map(x -> x.copy()).collect(Collectors.toList());
-        List<Node> outputs = network.getOutputs().stream().map(x -> x.copy()).collect(Collectors.toList());
+        List<InputNode> inputs = network.getInputs().stream().map(x -> x.copy()).collect(Collectors.toList());
+        List<OutputNode> outputs = network.getOutputs().stream().map(x -> x.copy()).collect(Collectors.toList());
         List<Node> intermediate = network.getIntermediateNodes().stream().map(x -> x.copy()).collect(Collectors.toList());
 
         final MutationType mutation = MutationType.random(mutationRate);
 
-        if (mutation == MutationType.NODE_REMOVAL) {
-            if (intermediate.size() > minNodes) {
-                intermediate.remove(random.nextInt(intermediate.size()));
-            }
-        } else if (mutation == MutationType.NODE_ADD) {
-            if (intermediate.size() < maxNodes) {
-                intermediate.add(createIntermediateNode(intermediate));
+        List<Connection> connections = network.streamConnections()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (mutation == MutationType.NODE_REMOVAL
+                && intermediate.size() > minNodes) {
+            Node toRemove = randomEntry(intermediate);
+            // Only remove node if it won't bring the number of connections bellow the minimum
+            if(intermediate.size() - network.connectionsBelongingTo(toRemove).count() > minConnection){
+                intermediate.remove(toRemove);
+                //remove connections associated with the node
+                connections = connections.stream()
+                        .filter( x -> x.getSource().getId() != toRemove.getId())
+                        .filter( x -> x.getDestination().getId() != toRemove.getId())
+                        .collect(Collectors.toList());
             }
         } else if (mutation == MutationType.MUTATE_NODE) {
             Node toModify = randomEntry(intermediate.stream()
                     .filter( x -> x instanceof MutateableNode)
                     .collect(Collectors.toList()));
             if(toModify != null){
-                intermediate.remove(toModify);
-                MutateableNode mutate = (MutateableNode) toModify;
-                intermediate.add(mutate.mutate(minStorage,maxStorage,maxActivation));
+                MutateableNode mutate = ((MutateableNode) toModify).mutate(minStorage,maxStorage,maxActivation);
+                intermediate = updateNode(intermediate,mutate);
             }
-        } else if (mutation == MutationType.NODE_TYPE){
+        } else if (mutation == MutationType.NODE_TYPE && !intermediate.isEmpty()){
             Node toModify = randomEntry(intermediate);
-            intermediate.remove(toModify);
-            intermediate.add(createIntermediateNode(toModify.getId(), toModify.getCapacity()));
-        } else if (mutation == MutationType.NODE_RANDOMIZE_CAPACITY) {
+            intermediate = updateNode(intermediate,createIntermediateNode(toModify.getId(), toModify.getCapacity()) );
+        } else if (mutation == MutationType.NODE_RANDOMIZE_CAPACITY && !intermediate.isEmpty()) {
             Node toModify = randomEntry(intermediate);
             intermediate.remove(toModify);
             intermediate.add(createIntermediateNode(toModify.getId()));
-        }
-
-        List<Node> allNodes = Stream.concat(Stream.concat(inputs.stream(), outputs.stream()), intermediate.stream())
-                .collect(Collectors.toList());
-
-        List<Connection> connections = network.streamConnections()
-                .map(x -> copyWithChanceToMutate(allNodes, x))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        if (mutation == MutationType.CONNECTION_ADD && connections.size() < maxConnection) {
+        }else if (mutation == MutationType.CONNECTION_ADD && connections.size() < maxConnection) {
             List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
                     .collect(Collectors.toList());
             List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
@@ -140,13 +142,13 @@ public class RandomNetworkBuilder<I,O>{
                 connections.remove(toModify);
                 connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
             }
-        } else if (mutation == MutationType.RANDOMIZE_CONNECTION_BANDWIDTH && connections.size() >= 1) {
+        } else if (mutation == MutationType.RANDOMIZE_CONNECTION_BANDWIDTH && connections.size() > minConnection) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
             connections.add(toModify.copyNewBandWidth(random.nextInt(maxBandwith)));
         } else if (mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY && connections.size() > 1) {
             Collections.shuffle(connections);
-        }else if (mutation == MutationType.SHUFFLE_ALL_CONNECTIONS && connections.size() > 1) {
+        }else if (mutation == MutationType.SHUFFLE_ALL_CONNECTIONS && connections.size() > minConnection) {
             List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
                     .collect(Collectors.toList());
             List<Node> destinations = Stream.concat(outputs.stream(), intermediate.stream())
@@ -158,6 +160,23 @@ public class RandomNetworkBuilder<I,O>{
                                     x.getBandwith(),
                                     x.getConnectionType()) )
                     .toList();
+        } else if (mutation == MutationType.CONNECTION_TO_NODE
+                && intermediate.size() <= maxNodes
+                && connections.size() <= maxConnection
+                && connections.size() > 1) {
+            Node toAdd = createIntermediateNode(intermediate);
+            intermediate.add(toAdd);
+
+            int index = random.nextInt(connections.size());
+            Connection toModify = connections.get(random.nextInt(connections.size()));
+            connections.remove(index);
+
+            connections.add(new Connection(toModify.getSource(), toAdd,
+                    randomRange(minBandwith, maxBandwith),
+                    Connection.ConnectionType.random()));
+            connections.add(new Connection(toAdd, toModify.getDestination(),
+                    randomRange(minBandwith, maxBandwith),
+                    Connection.ConnectionType.random()));
         }
         else if (mutation == MutationType.SHUFFLE_CONNECTION && connections.size() > 1) {
             List<Node> sources = Stream.concat(inputs.stream(), intermediate.stream())
@@ -175,39 +194,28 @@ public class RandomNetworkBuilder<I,O>{
                             toModify.getConnectionType()) );
         }
 
-        if(mutation != MutationType.NONE && random.nextInt(10) == 0){
-            return copyWithChanceToMutate(new Network(allNodes,connections));
+        if(intermediate.size()<5 && network.getIntermediateNodes().stream().count()>=5
+        && mutation != MutationType.NODE_REMOVAL) {
+            System.out.println(mutation);
         }
 
-        return new Network(allNodes, connections);
+        return new Network(inputs,
+                outputs,
+                intermediate,
+                connections);
     }
 
-    private Connection copyWithChanceToMutate(List<Node> nodes, Connection toCopy) {
-        Node source = nodes.stream()
-                .filter(x -> toCopy.getSource().getId() == x.getId())
-                .findAny().orElse(null);
-
-        if (source == null) {
-            return null;
-        }
-
-        Node destination = nodes.stream()
-                .filter(x -> toCopy.getDestination().getId() == x.getId())
-                .findAny().orElse(null);
-
-        if (destination == null) {
-            return null;
-        }
-
-        return new Connection(source, destination, toCopy.getBandwith(), toCopy.getConnectionType());
+    private static List<Node> updateNode(List<Node> nodes, Node toUpdate){
+        return Stream.concat(nodes.stream()
+                .filter(x->x.getId() != toUpdate.getId()),Stream.of(toUpdate)).toList();
     }
 
     private enum MutationType {
-        NODE_ADD,
         NODE_REMOVAL,
         MUTATE_NODE,
         NODE_TYPE,
         NODE_RANDOMIZE_CAPACITY,
+        CONNECTION_TO_NODE,
         CONNECTION_ADD,
         CONNECTION_REMOVAL,
         ADD_CONNECTION_BANDWIDTH,
@@ -227,17 +235,16 @@ public class RandomNetworkBuilder<I,O>{
         }
     }
 
-    private List<Node> generateNodes() {
+    private List<Node> generateIntermediateNodes() {
         List<Node> nodes = new ArrayList<>();
-        int numOfNodes = randomRange(minNodes, maxNodes);
-        for (int i = 0; i <= numOfNodes; i++) {
+
+        // Always start with the minimum number of nodes.  Done so networks are generated from simplest to more complicated
+        for (int i = 0; i <= minNodes; i++) {
             int storage = randomRange(minStorage, maxStorage);
 
-            nodes.add(new MutateableNodeDefault(i + 1000, storage, storage / 2));
+            nodes.add(new MutateableNodeDefault(i + 1000, storage, 10));
         }
 
-        nodes.addAll(inputNodes.stream().map(x -> x.copy()).toList());
-        nodes.addAll(outputNodes.stream().map(x -> x.copy()).toList());
         return nodes;
     }
 
@@ -248,7 +255,9 @@ public class RandomNetworkBuilder<I,O>{
         return min + random.nextInt(max - min);
     }
 
-    private List<Connection> generateConnections(Collection<Node> intermediateNodes) {
+    private List<Connection> generateConnections(Collection<InputNode> inputNodes,
+                                                 Collection<OutputNode> outputNodes,
+                                                 Collection<Node> intermediateNodes) {
         List<Node> sources = Stream.concat(inputNodes.stream(), intermediateNodes.stream())
                 .collect(Collectors.toList());
         List<Node> destinations = Stream.concat(outputNodes.stream(), intermediateNodes.stream())
@@ -256,9 +265,8 @@ public class RandomNetworkBuilder<I,O>{
 
         List<Connection> connections = new ArrayList<>();
 
-        int numberOfConnections = randomRange(minConnection, maxConnection);
-
-        for (int i = 0; i < numberOfConnections; i++) {
+        // Always start with the minimum number of connections.  This is done as complex models may start with weird behavior
+        for (int i = 0; i < minConnection; i++) {
             Node source = randomEntry(sources);
             Node destination = randomEntry(destinations);
 
@@ -270,7 +278,7 @@ public class RandomNetworkBuilder<I,O>{
         return connections;
     }
 
-    public static Node randomEntry(List<Node> collection) {
+    private static Node randomEntry(List<Node> collection) {
         if(collection.isEmpty()){
             return null;
         }
@@ -310,5 +318,9 @@ public class RandomNetworkBuilder<I,O>{
     public RandomNetworkBuilder maxBandwith(int maxBandwith) {
         this.maxBandwith = maxBandwith;
         return this;
+    }
+
+    public void setMutationRate(double mutationRate) {
+        this.mutationRate = mutationRate;
     }
 }

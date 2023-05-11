@@ -3,6 +3,7 @@ package org.neil.simulation;
 
 import org.neil.neural.Network;
 import org.neil.neural.NetworkOwner;
+import org.neil.neural.Node;
 import org.neil.neural.RandomNetworkBuilder;
 
 import java.util.ArrayList;

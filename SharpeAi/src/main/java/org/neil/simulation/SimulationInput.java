@@ -15,7 +15,7 @@ public class SimulationInput<I,O> {
     public int runTime = 300;
     public int numberOfRuns = 15000;
 
-    public double mutationRate = 0.25;
+    public double mutationRate = 0.3;
 
     public Comparator<O> survivorPriority;
     public Survive surviveLogic;

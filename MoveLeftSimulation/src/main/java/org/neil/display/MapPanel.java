@@ -17,6 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.List;
 import java.util.Queue;
@@ -28,6 +29,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class MapPanel extends JPanel {
     private CoordinateMap coordinateMap;
@@ -166,29 +168,62 @@ public class MapPanel extends JPanel {
     public Simulation initMovingDestination(){
         SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
         simulationInput.outputNodeGenerator = new CreatureOutputs();
+        simulationInput.mutationRate = 0.2;
 
-        CoordinateSupplier coordinateSupplier = new CoordinateSupplier(simulationInput.x,simulationInput.y);
+        CoordinateSupplier coordinateSupplier = new CoordinateSupplier(
+                Coordinates.of(simulationInput.x/2, simulationInput.y/2),
+                simulationInput.x,
+                simulationInput.y);
 
         System.out.println(coordinateSupplier.get());
 
         simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
-        simulationInput.numberOfElements = x -> 1000;
-        simulationInput.survivorPriority =  ReproductionPrioritization.euclidianCompare(coordinateSupplier);
-        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() < 800 ? 900 - x.getRunsCompleted() :  100;
+        simulationInput.numberOfElements = x -> simulation.getRunsCompleted() < 1000 ? 3000 : 1000;
+        simulationInput.survivorPriority =  new TimedComparator(coordinateSupplier,2000);
+        simulationInput.numberOfSurvivors = x -> {
+            int survivors = 900 - x.getRunsCompleted() / 2;
+            if(survivors < 100){
+                survivors = 100;
+            }
+            return survivors;
+        };
 
         simulationInput.maxNumberOfNodes = 120;
         simulationInput.maxNumberOfConnections= 1200;
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
         //simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
-        simulationInput.surviveLogic = (sim,e) -> true;
+        simulationInput.surviveLogic = (sim,x) -> ((Creature)x).hasMoved();
+
+        RandomNetworkBuilder randomNetworkBuilder = new RandomNetworkBuilder(simulationInput)
+                .minConnection(40)
+                .minNodes(4)
+                .maxStorage(300);
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
-                new RandomNetworkBuilder(simulationInput));
+                randomNetworkBuilder);
         this.simulation.addRunCompletionListener( x -> {
-            coordinateSupplier.random(Math.abs((int) (Math.sin(((double) simulation.getRunsCompleted() / 1000.0)) * 20)));
+            if(simulation.getRunsCompleted() > 2000) {
+                coordinateSupplier.random(Math.abs((int) (Math.sin(((double) simulation.getRunsCompleted() / 1000.0)) * 20)));
+            }
+
+
+            if(simulation.getRunsCompleted() < 100){
+                setMinToCurrentMin(randomNetworkBuilder,x);
+            }
+
+            if(simulation.getRunsCompleted() == 100){
+                setMinToCurrentMin(randomNetworkBuilder,x);
+                randomNetworkBuilder.setMutationRate(0.3);
+            }
+
+            if(simulation.getRunsCompleted() == 500){
+                setMinToCurrentMin(randomNetworkBuilder,x);
+                randomNetworkBuilder.setMutationRate(0.1);
+            }
 
             System.out.println(coordinateSupplier.get());
+            reportStats(x);
         });
 
         this.output = new SimulationOutput<>(simulation,
@@ -198,16 +233,77 @@ public class MapPanel extends JPanel {
         return simulation;
     }
 
+    private static void reportStats(Simulation<Coordinates,Creature> simulation){
+        double avgNumberOfNodes = simulation.getSimulationEnvironment()
+                .getValues().stream()
+                .mapToInt(x->x.getNeuralNetwork().getIntermediateNodes().size())
+                .average()
+                .getAsDouble();
+
+        double avgNumberOfConnections = simulation.getSimulationEnvironment()
+                .getValues().stream()
+                .mapToLong(x->x.getNeuralNetwork().streamConnections().count())
+                .average()
+                .getAsDouble();
+
+        System.out.println("avgNumberOfNodes:"+ avgNumberOfNodes + " avgNumberOfConnections:" + avgNumberOfConnections);
+    }
+
+
+    private static void setMinToCurrentMin(RandomNetworkBuilder rnb, Simulation simulation){
+        Stream<Creature> creatureStream = simulation.getSimulationEnvironment().getValues().stream();
+        int minConnection = (int)creatureStream.mapToLong(c -> c.getNeuralNetwork()
+                .streamConnections().count()).min().getAsLong();
+
+        //rnb.minConnection(minConnection);
+
+        creatureStream = simulation.getSimulationEnvironment().getValues().stream();
+        int minNode = creatureStream.mapToInt(c -> c.getNeuralNetwork()
+                .getIntermediateNodes().size()).min().getAsInt();
+
+        //rnb.minNodes(minNode);
+
+        System.out.println("Setting minConnection:" + minConnection + " minNode:"+minNode);
+    }
+
+    public class TimedComparator implements Comparator<Creature>{
+        int switchOver;
+        CoordinateSupplier coordinateSupplier;
+
+        public TimedComparator( CoordinateSupplier coordinateSupplier,int switchOver) {
+            this.switchOver = switchOver;
+            this.coordinateSupplier = coordinateSupplier;
+
+        }
+
+        @Override
+        public int compare(Creature o1, Creature o2) {
+            Coordinates destination = coordinateSupplier.get();
+            if(simulation.getRunsCompleted() < switchOver) {
+                return ReproductionPrioritization.xCompare(destination.x)
+                        .thenComparing(ReproductionPrioritization.closestToStart().reversed())
+                        .thenComparing(ReproductionPrioritization.yCompare(destination.y))
+                        .compare(o1, o2);
+            }
+
+            return ReproductionPrioritization.euclidianCompare(destination).compare(o1,o2);
+        }
+    }
+
     public static class CoordinateSupplier implements Supplier<Coordinates>{
         private static Random random = new Random();
         private volatile Coordinates coordinates;
         private final int maxX;
         private final int maxY;
 
-        public CoordinateSupplier(int xMax, int yMax) {
-            this.coordinates = Coordinates.of(random.nextInt(xMax), random.nextInt(yMax));
+        public CoordinateSupplier(Coordinates init, int xMax, int yMax) {
+            this.coordinates = init;
             this.maxX = xMax;
             this.maxY = yMax;
+        }
+
+        public CoordinateSupplier(int xMax, int yMax) {
+            this( Coordinates.of(random.nextInt(xMax), random.nextInt(yMax)), xMax,yMax);
         }
 
 

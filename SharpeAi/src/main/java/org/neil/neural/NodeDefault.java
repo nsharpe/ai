@@ -1,6 +1,8 @@
 package org.neil.neural;
 
 
+import java.util.Objects;
+
 public class NodeDefault implements Node {
     private final int id;
     private final int capacity;
@@ -94,5 +96,18 @@ public class NodeDefault implements Node {
     @Override
     public Node copy() {
         return new NodeDefault(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NodeDefault that = (NodeDefault) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
