@@ -7,7 +7,9 @@ public class NodeDefault implements Node {
     private volatile int stored = 0;
     private volatile boolean activateable;
 
-    private volatile int activationLimit;
+    private final int activationLimit;
+
+    private final int depreciate;
 
     public NodeDefault(int id) {
         this(id, Integer.MAX_VALUE, Integer.MAX_VALUE / 2);
@@ -23,6 +25,7 @@ public class NodeDefault implements Node {
         this.id = id;
         this.capacity = capacity;
         this.activationLimit = activationLimit;
+        this .depreciate = activationLimit / 10;
     }
 
     public NodeDefault(Node node) {
@@ -81,6 +84,11 @@ public class NodeDefault implements Node {
 
     public boolean isActivateable() {
         return activateable;
+    }
+
+    @Override
+    public void depreciate() {
+        this.stored -= Math.min(this.stored,this.depreciate);
     }
 
     @Override

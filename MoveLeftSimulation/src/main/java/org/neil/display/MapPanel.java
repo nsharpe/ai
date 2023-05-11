@@ -172,10 +172,12 @@ public class MapPanel extends JPanel {
         System.out.println(coordinateSupplier.get());
 
         simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
-        simulationInput.numberOfElements = x -> 2000;
+        simulationInput.numberOfElements = x -> 1000;
         simulationInput.survivorPriority =  ReproductionPrioritization.euclidianCompare(coordinateSupplier);
-        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() < 600 ? 900 - x.getRunsCompleted() :  300;
+        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() < 800 ? 900 - x.getRunsCompleted() :  100;
 
+        simulationInput.maxNumberOfNodes = 120;
+        simulationInput.maxNumberOfConnections= 1200;
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
         //simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
         simulationInput.surviveLogic = (sim,e) -> true;
@@ -184,7 +186,8 @@ public class MapPanel extends JPanel {
                 coordinateMap,
                 new RandomNetworkBuilder(simulationInput));
         this.simulation.addRunCompletionListener( x -> {
-            coordinateSupplier.random(x.getRunsCompleted()/20);
+            coordinateSupplier.random(Math.abs((int) (Math.sin(((double) simulation.getRunsCompleted() / 1000.0)) * 20)));
+
             System.out.println(coordinateSupplier.get());
         });
 

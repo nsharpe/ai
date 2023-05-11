@@ -24,4 +24,6 @@ public interface Node {
     boolean isActivateable();
 
     int getActivationLimit();
+
+    void depreciate();
 }

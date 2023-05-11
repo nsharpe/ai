@@ -1,13 +1,13 @@
 package org.neil.neural;
 
-public class NodeDivisor extends NodeDefault{
+public class NodeDivisor extends NodeDefault implements MutateableNode{
 
     public NodeDivisor(int id) {
         super(id);
     }
 
-    public NodeDivisor(int id, int capacity) {
-        super(id, capacity, capacity / 2);
+    public NodeDivisor(int id, int capacity, int activationLimit) {
+        super(id, capacity, activationLimit);
     }
 
     public NodeDivisor(Node node) {
@@ -23,6 +23,12 @@ public class NodeDivisor extends NodeDefault{
             toAdd = getCapacity() - getStored();
         }
         super.addToStorage(toAdd);
+    }
+
+    @Override
+    public MutateableNode mutate(int capacityMin, int capacityMax, int activationMax) {
+        int capacity = generateNewCapacity(capacityMin,capacityMax);
+        return new NodeDivisor(this.getId(),capacity,generateNewActivation(capacity,activationMax));
     }
 
     @Override

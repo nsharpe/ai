@@ -79,6 +79,9 @@ public class Simulation<K,E extends NetworkOwner> {
                     .stream()
                     .parallel()
                     .forEach(x -> x.getNeuralNetwork().increment());
+            simulationEnvironment.getValues()
+                            .stream()
+                                    .forEach(x -> x.getNeuralNetwork().getIntermediateNodes().forEach(y->y.depreciate()));
             simulationEnvironment.postStepAction();
             stepCompleteListener.accept(this);
         }

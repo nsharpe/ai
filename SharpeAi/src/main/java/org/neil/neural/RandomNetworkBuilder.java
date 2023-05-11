@@ -18,7 +18,7 @@ public class RandomNetworkBuilder<I,O>{
     private final int maxNodes;
     private int minConnection = 1;
     private final int maxConnection;
-    private int minStorage = 0;
+    private int minStorage = 1;
     private int minBandwith = 0;
     private int maxBandwith = 512;
     private int maxStorage = maxBandwith * 4;
@@ -28,9 +28,9 @@ public class RandomNetworkBuilder<I,O>{
     private final double mutationRate;
 
     private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
-            (id, capacity) -> new MutateableNodeDefault(id, capacity, capacity/2),
-            (id, capacity) -> new NodeMultiplier(id, capacity),
-            (id, capacity) -> new NodeDivisor(id, capacity),
+            (id, capacity) -> new MutateableNodeDefault(id, capacity, capacity / 2),
+            (id, capacity) -> new NodeMultiplier(id, capacity, capacity / 2),
+            (id, capacity) -> new NodeDivisor(id, capacity, capacity / 2),
             (id, capacity) -> new NodeSink(id),
             (id, capacity) -> new NodeAlwaysFull(id, capacity),
             (id, capacity) -> new NodeAlwaysEmpty(id, capacity)
