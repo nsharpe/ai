@@ -126,12 +126,16 @@ public class RandomNetworkBuilder<I,O>{
                 destination = randomEntry(destinations);
             } while (source != destination);
 
-            connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith),
-                    Connection.ConnectionType.random()));
+            connections.add(new Connection(source, destination, randomRange(minBandwith, maxBandwith)
+                    ,randomConnectionMultipler()
+                    ,Connection.ConnectionType.random()));
 
         } else if (mutation == MutationType.CONNECTION_REMOVAL && connections.size() > minConnection) {
             connections.remove(random.nextInt(connections.size()));
-
+        } else if (mutation == MutationType.CONNECTION_RANDOMIZE_MULTIPLIER) {
+            Connection toModify = connections.get(random.nextInt(connections.size()));
+            connections.remove(toModify);
+            connections.add(toModify.copyNewMultipler(randomConnectionMultipler()));
         } else if (mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
@@ -158,6 +162,7 @@ public class RandomNetworkBuilder<I,O>{
                             .map( x ->new Connection(randomEntry(sources),
                                     randomEntry(destinations),
                                     x.getBandwith(),
+                                    randomConnectionMultipler(),
                                     x.getConnectionType()) )
                     .toList();
         } else if (mutation == MutationType.CONNECTION_TO_NODE
@@ -173,9 +178,11 @@ public class RandomNetworkBuilder<I,O>{
 
             connections.add(new Connection(toModify.getSource(), toAdd,
                     randomRange(minBandwith, maxBandwith),
+                    randomConnectionMultipler(),
                     Connection.ConnectionType.random()));
             connections.add(new Connection(toAdd, toModify.getDestination(),
                     randomRange(minBandwith, maxBandwith),
+                    randomConnectionMultipler(),
                     Connection.ConnectionType.random()));
         }
         else if (mutation == MutationType.SHUFFLE_CONNECTION && connections.size() > 1) {
@@ -191,6 +198,7 @@ public class RandomNetworkBuilder<I,O>{
             connections.add(new Connection(randomEntry(sources),
                             randomEntry(destinations),
                             toModify.getBandwith(),
+                            randomConnectionMultipler(),
                             toModify.getConnectionType()) );
         }
 
@@ -218,6 +226,7 @@ public class RandomNetworkBuilder<I,O>{
         CONNECTION_TO_NODE,
         CONNECTION_ADD,
         CONNECTION_REMOVAL,
+        CONNECTION_RANDOMIZE_MULTIPLIER,
         ADD_CONNECTION_BANDWIDTH,
         REDUCE_CONNECTION_BANDWIDTH,
         RANDOMIZE_CONNECTION_BANDWIDTH,
@@ -248,6 +257,10 @@ public class RandomNetworkBuilder<I,O>{
         return nodes;
     }
 
+    private double randomConnectionMultipler(){
+        return random.nextDouble() * 5;
+    }
+
     private static int randomRange(int min, int max) {
         if (min == max) {
             return min;
@@ -273,6 +286,7 @@ public class RandomNetworkBuilder<I,O>{
             connections.add(new Connection(source,
                     destination,
                     randomRange(minBandwith, maxBandwith),
+                    randomConnectionMultipler(),
                     Connection.ConnectionType.random()));
         }
         return connections;

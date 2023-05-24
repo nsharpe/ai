@@ -1,20 +1,27 @@
 package org.neil.neural;
 
 import java.util.Objects;
+import java.util.Random;
+
 public class Connection {
+    private static Random random = new Random();
     private final Node source;
     private final Node destination;
     private final int bandwith;
+
+    private final double multipler;
     private final ConnectionType connectionType;
 
     public Connection(Node source,
                       Node destination,
                       int bandwith,
+                      double multipler,
                       ConnectionType connectionType) {
         this.source = Objects.requireNonNull(source);
         this.destination = Objects.requireNonNull(destination);
         this.bandwith = bandwith;
         this.connectionType = Objects.requireNonNull(connectionType);
+        this.multipler = multipler;
     }
 
     public Node getSource() {
@@ -29,12 +36,21 @@ public class Connection {
         return bandwith;
     }
 
+    public Connection copyNewMultipler(double newMultipler)
+    {
+        return new Connection(this.source, this.destination, this.bandwith, newMultipler, this.connectionType);
+    }
+
     public Connection copyModifyBandWidth(int amount) {
-        return new Connection(this.source, this.destination, bandwith + amount, connectionType);
+        return new Connection(this.source, this.destination, bandwith + amount, multipler, connectionType);
     }
 
     public Connection copyNewBandWidth(int amount) {
-        return new Connection(this.source, this.destination, bandwith + amount, connectionType);
+        return new Connection(this.source, this.destination, bandwith + amount, multipler, connectionType);
+    }
+
+    public double getMultiplier() {
+        return multipler;
     }
 
     public void activate() {
@@ -71,10 +87,10 @@ public class Connection {
             return; //Destination is at capacity
         }
 
-        toMove = -toMove;
-
-        destination.addToStorage(toMove);
-        source.addToStorage(toMove);
+        source.addToStorage(-toMove);
+        toMove *= multipler;
+        toMove = toMove < destination.getStored() ? toMove : destination.getStored();
+        destination.addToStorage(-toMove);
     }
 
     private void addLogic() {
@@ -90,8 +106,9 @@ public class Connection {
             toMove = source.getStored();
         }
 
-        destination.addToStorage(toMove);
         source.addToStorage(-toMove);
+        toMove *= multipler;
+        destination.addToStorage(toMove);
     }
 
     public ConnectionType getConnectionType() {
@@ -102,7 +119,7 @@ public class Connection {
         ADD, SUBTRACT;
 
         public static ConnectionType random() {
-            if (Math.random() > 0.5) {
+            if (random.nextBoolean()) {
                 return ADD;
             }
             return SUBTRACT;

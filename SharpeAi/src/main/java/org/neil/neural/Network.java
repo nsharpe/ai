@@ -41,6 +41,7 @@ public class Network {
                 .map(x-> new Connection(nodeId.get(x.getSource().getId()),
                         nodeId.get(x.getDestination().getId()),
                                 x.getBandwith(),
+                                x.getMultiplier(),
                                 x.getConnectionType()
                         )).toList();
 

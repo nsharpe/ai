@@ -47,8 +47,8 @@ public class MapPanel extends JPanel {
     Collection<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        initLeftDestination();
-        //initMovingDestination();
+        //initLeftDestination();
+        initMovingDestination();
 
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();
@@ -168,7 +168,7 @@ public class MapPanel extends JPanel {
     public Simulation initMovingDestination(){
         SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
         simulationInput.outputNodeGenerator = new CreatureOutputs();
-        simulationInput.mutationRate = 0.2;
+        simulationInput.mutationRate = 0.02;
 
         CoordinateSupplier coordinateSupplier = new CoordinateSupplier(
                 Coordinates.of(simulationInput.x/2, simulationInput.y/2),
@@ -178,10 +178,10 @@ public class MapPanel extends JPanel {
         System.out.println(coordinateSupplier.get());
 
         simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
-        simulationInput.numberOfElements = x -> simulation.getRunsCompleted() < 1000 ? 3000 : 1000;
-        simulationInput.survivorPriority =  new TimedComparator(coordinateSupplier,2000);
+        simulationInput.numberOfElements = x -> simulation.getRunsCompleted() < 1000 ? 2000 : 1000;
+        simulationInput.survivorPriority =  new TimedComparator(coordinateSupplier,100);
         simulationInput.numberOfSurvivors = x -> {
-            int survivors = 900 - x.getRunsCompleted() / 2;
+            int survivors = 500 - x.getRunsCompleted() ;
             if(survivors < 100){
                 survivors = 100;
             }
@@ -195,9 +195,9 @@ public class MapPanel extends JPanel {
         simulationInput.surviveLogic = (sim,x) -> ((Creature)x).hasMoved();
 
         RandomNetworkBuilder randomNetworkBuilder = new RandomNetworkBuilder(simulationInput)
-                .minConnection(40)
-                .minNodes(4)
-                .maxStorage(300);
+                .minConnection(140)
+                .minNodes(10)
+                .maxStorage(600);
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
@@ -205,21 +205,6 @@ public class MapPanel extends JPanel {
         this.simulation.addRunCompletionListener( x -> {
             if(simulation.getRunsCompleted() > 2000) {
                 coordinateSupplier.random(Math.abs((int) (Math.sin(((double) simulation.getRunsCompleted() / 1000.0)) * 20)));
-            }
-
-
-            if(simulation.getRunsCompleted() < 100){
-                setMinToCurrentMin(randomNetworkBuilder,x);
-            }
-
-            if(simulation.getRunsCompleted() == 100){
-                setMinToCurrentMin(randomNetworkBuilder,x);
-                randomNetworkBuilder.setMutationRate(0.3);
-            }
-
-            if(simulation.getRunsCompleted() == 500){
-                setMinToCurrentMin(randomNetworkBuilder,x);
-                randomNetworkBuilder.setMutationRate(0.1);
             }
 
             System.out.println(coordinateSupplier.get());
@@ -279,14 +264,14 @@ public class MapPanel extends JPanel {
         @Override
         public int compare(Creature o1, Creature o2) {
             Coordinates destination = coordinateSupplier.get();
-            if(simulation.getRunsCompleted() < switchOver) {
-                return ReproductionPrioritization.xCompare(destination.x)
-                        .thenComparing(ReproductionPrioritization.closestToStart().reversed())
-                        .thenComparing(ReproductionPrioritization.yCompare(destination.y))
-                        .compare(o1, o2);
-            }
+            return score(o1,destination) - score(o2,destination);
+        }
 
-            return ReproductionPrioritization.euclidianCompare(destination).compare(o1,o2);
+        private int score(Creature creature, Coordinates destination) {
+            if( simulation.getRunsCompleted() > switchOver) {
+                return (int) creature.getPosition().distance(destination);
+            }
+            return Math.abs(destination.x - creature.getPosition().x);
         }
     }
 

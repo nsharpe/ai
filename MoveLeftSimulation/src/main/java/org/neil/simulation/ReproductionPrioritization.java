@@ -18,13 +18,14 @@ public class ReproductionPrioritization {
     }
 
     public static Comparator<Creature> yCompare(int y) {
-        return  Comparator.comparing( pos -> Math.abs(y-pos.getPosition().y));
+        return  Comparator.comparing( pos ->  Math.abs(y-pos.getPosition().y) ^ 2);
     }
 
     public static Comparator<Creature> xCompare(int x) {
 
-        return Comparator.comparing( pos -> Math.abs(x-pos.getPosition().x));
+        return Comparator.comparing( pos -> Math.abs(x-pos.getPosition().x) ^ 2);
     }
+
 
     public static Comparator<Creature> closestToStart() {
 
