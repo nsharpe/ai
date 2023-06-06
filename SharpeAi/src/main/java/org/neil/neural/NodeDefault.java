@@ -27,7 +27,7 @@ public class NodeDefault implements Node {
         this.id = id;
         this.capacity = capacity;
         this.activationLimit = activationLimit;
-        this .depreciate = activationLimit / 10;
+        this .depreciate = activationLimit / 5;
     }
 
     public NodeDefault(Node node) {

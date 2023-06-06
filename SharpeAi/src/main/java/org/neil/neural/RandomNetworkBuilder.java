@@ -1,7 +1,9 @@
 package org.neil.neural;
 
 import org.neil.neural.input.InputNode;
+import org.neil.neural.input.InputNodeGenerator;
 import org.neil.neural.output.OutputNode;
+import org.neil.neural.output.OutputNodeGenerator;
 import org.neil.simulation.SimulationInput;
 
 import java.util.*;
@@ -9,17 +11,17 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RandomNetworkBuilder<I,O>{
+public final class RandomNetworkBuilder<I extends InputNode,O extends OutputNode>{
     private static Random random = new Random();
 
-    private List<InputNode> inputNodes;
-    private List<OutputNode> outputNodes;
+    private final InputNodeGenerator inputs;
+    private final OutputNodeGenerator outputs;
     private int minNodes = 1;
-    private final int maxNodes;
-    private int minConnection = 2;
-    private final int maxConnection;
-    private int minStorage = 1;
-    private int minBandwith = 0;
+    private int maxNodes = 10;
+    private int minConnection = 1;
+    private int maxConnection = 100;
+    private int minStorage = 10;
+    private int minBandwith = 1;
     private int maxBandwith = 512;
     private int maxStorage = maxBandwith * 4;
 
@@ -31,28 +33,32 @@ public class RandomNetworkBuilder<I,O>{
             (id, capacity) -> new MutateableNodeDefault(id, capacity, capacity / 2),
             (id, capacity) -> new NodeMultiplier(id, capacity, capacity / 2),
             (id, capacity) -> new NodeDivisor(id, capacity, capacity / 2),
+            (id, capacity) -> new NodeMax(id, capacity, capacity / 2),
             (id, capacity) -> new NodeSink(id),
             (id, capacity) -> new NodeAlwaysFull(id, capacity),
             (id, capacity) -> new NodeAlwaysEmpty(id, capacity)
     );
 
     public RandomNetworkBuilder(SimulationInput simulationInput) {
-        this.mutationRate = simulationInput.mutationRate;
-        this.maxNodes = simulationInput.maxNumberOfNodes;
-        this.maxConnection = simulationInput.maxNumberOfConnections;
 
         // The safe copying of lists is to protect against accidental duplication
-        // Review later.  I might not be smart enough to not make that mistake?
-        inputNodes = simulationInput.inputNodeGenerator.inputs(1).stream().toList();
-        outputNodes = simulationInput.outputNodeGenerator.outputs(inputNodes.size()+1).stream().toList();
+        //TODO: Review later.  I might not be smart enough to not make that mistake?
+        this(simulationInput.inputNodeGenerator,simulationInput.outputNodeGenerator);
+    }
+
+    public RandomNetworkBuilder(InputNodeGenerator inputs, OutputNodeGenerator outputs) {
+
+        // The safe copying of lists is to protect against accidental duplication
+        //TODO: Review later.  I might not be smart enough to not make that mistake?
+        this.inputs = Objects.requireNonNull(inputs);
+        this.outputs = Objects.requireNonNull(outputs);
     }
 
     public Network build() {
-        validate();
         List<Node> nodes = generateIntermediateNodes();
 
-        List<InputNode> inputNodes = this.inputNodes.stream().map(x->x.copy()).toList();
-        List<OutputNode> outputNodes = this.outputNodes.stream().map(x->x.copy()).toList();
+        List<InputNode> inputNodes = inputs.inputs(1).stream().toList();
+        List<OutputNode> outputNodes = outputs.outputs(inputNodes.size() + 1).stream().toList();
 
         return  new Network(inputNodes,
                 outputNodes,
@@ -75,12 +81,33 @@ public class RandomNetworkBuilder<I,O>{
         return nodeSupplier.get(random.nextInt(nodeSupplier.size())).apply(id, capacity);
     }
 
-    public Network copyWithChanceToMutate(Network network) {
-        List<InputNode> inputs = network.getInputs().stream().map(x -> x.copy()).collect(Collectors.toList());
-        List<OutputNode> outputs = network.getOutputs().stream().map(x -> x.copy()).collect(Collectors.toList());
-        List<Node> intermediate = network.getIntermediateNodes().stream().map(x -> x.copy()).collect(Collectors.toList());
 
-        final MutationType mutation = MutationType.random(mutationRate);
+
+    public Network copyWithChanceToMutate(Network network) {
+        return copyWithChanceToMutate(network, this.mutationRate);
+    }
+
+    public Network copyWithChanceToMutate(Network network, double mutationRate) {
+        return copyWithChanceToMutate(network, MutationType.random(mutationRate));
+    }
+
+    public Network copyWithChanceToMutate(Network network, List<MutationType> mutationTypes, double mutationRate) {
+        return copyWithChanceToMutate(network, MutationType.random(mutationRate, mutationTypes));
+    }
+
+    public Network copyWithChanceToMutate(Network network, List<MutationType> mutationTypes) {
+        return copyWithChanceToMutate(network, MutationType.random(mutationRate, mutationTypes));
+    }
+
+    public Network copyWithChanceToMutate(Network network, final MutationType mutation){
+
+        if(mutation == MutationType.REBUILD){
+            return build();
+        }
+
+        List<InputNode> inputs = this.inputs.inputs(1).stream().toList();
+        List<OutputNode> outputs = this.outputs.outputs(inputs.size() + 1).stream().toList();
+        List<Node> intermediate = network.getIntermediateNodes().stream().map(x -> x.copy()).collect(Collectors.toList());
 
         List<Connection> connections = network.streamConnections()
                 .filter(Objects::nonNull)
@@ -166,8 +193,8 @@ public class RandomNetworkBuilder<I,O>{
                                     x.getConnectionType()) )
                     .toList();
         } else if (mutation == MutationType.CONNECTION_TO_NODE
-                && intermediate.size() <= maxNodes
-                && connections.size() <= maxConnection
+                && intermediate.size() < maxNodes
+                && connections.size() < maxConnection
                 && connections.size() > 1) {
             Node toAdd = createIntermediateNode(intermediate);
             intermediate.add(toAdd);
@@ -218,7 +245,7 @@ public class RandomNetworkBuilder<I,O>{
                 .filter(x->x.getId() != toUpdate.getId()),Stream.of(toUpdate)).toList();
     }
 
-    private enum MutationType {
+    public enum MutationType {
         NODE_REMOVAL,
         MUTATE_NODE,
         NODE_TYPE,
@@ -233,22 +260,40 @@ public class RandomNetworkBuilder<I,O>{
         SHUFFLE_CONNECTION_PRIORITY,
         SHUFFLE_ALL_CONNECTIONS,
         SHUFFLE_CONNECTION,
+        REBUILD,
         NONE;
         private static Random random = new Random();
 
+        public static List<MutationType> connectionWeights = List.of(
+                ADD_CONNECTION_BANDWIDTH,
+                REDUCE_CONNECTION_BANDWIDTH,
+                CONNECTION_RANDOMIZE_MULTIPLIER);
+        private static final List<MutationType> defaultMutationTypes = List.of(MutationType.values())
+                .stream()
+                .filter( x -> x != NONE)
+                .toList();
+
         public static MutationType random(double mutationRate) {
+            return random(mutationRate, defaultMutationTypes);
+        }
+
+        public static MutationType random(double mutationRate, List<MutationType> mutationTypes) {
             if (random.nextDouble() > mutationRate) {
                 return NONE;
             }
-            return MutationType.values()[random.nextInt(MutationType.values().length)];
+            return random(mutationTypes);
+        }
+
+        public static MutationType random(List<MutationType> mutationTypes) {
+            return mutationTypes.get(random.nextInt(mutationTypes.size()));
         }
     }
 
     private List<Node> generateIntermediateNodes() {
         List<Node> nodes = new ArrayList<>();
 
-        // Always start with the minimum number of nodes.  Done so networks are generated from simplest to more complicated
-        for (int i = 0; i <= minNodes; i++) {
+        int numberOfNodes = randomRange(minNodes,maxNodes);
+        for (int i = 0; i <= numberOfNodes; i++) {
             int storage = randomRange(minStorage, maxStorage);
 
             nodes.add(new MutateableNodeDefault(i + 1000, storage, 10));
@@ -278,8 +323,9 @@ public class RandomNetworkBuilder<I,O>{
 
         List<Connection> connections = new ArrayList<>();
 
-        // Always start with the minimum number of connections.  This is done as complex models may start with weird behavior
-        for (int i = 0; i < minConnection; i++) {
+        int numberOfConnections = randomRange(minConnection,maxConnection);
+
+        for (int i = 0; i < numberOfConnections; i++) {
             Node source = randomEntry(sources);
             Node destination = randomEntry(destinations);
 
@@ -299,18 +345,35 @@ public class RandomNetworkBuilder<I,O>{
         return collection.get(random.nextInt(collection.size()));
     }
 
-    public void validate() {
-        Objects.requireNonNull(inputNodes, "input");
-        Objects.requireNonNull(outputNodes, "outputs");
-    }
-
     public RandomNetworkBuilder minNodes(int minNodes) {
+        if(maxNodes < minNodes){
+            throw new IllegalStateException("Min cannot be bigger then max");
+        }
         this.minNodes = minNodes;
         return this;
     }
 
+    public RandomNetworkBuilder maxNodes(int maxNodes) {
+        if(maxNodes < minNodes){
+            throw new IllegalStateException("Max cannot be less then min");
+        }
+        this.maxNodes = maxNodes;
+        return this;
+    }
+
     public RandomNetworkBuilder minConnection(int minConnection) {
+        if(maxConnection < minConnection){
+            throw new IllegalStateException("Max cannot be less then min");
+        }
         this.minConnection = minConnection;
+        return this;
+    }
+
+    public RandomNetworkBuilder maxConnection(int maxConnection) {
+        if(maxConnection < minConnection){
+            throw new IllegalStateException("Max cannot be less then min");
+        }
+        this.maxConnection = maxConnection;
         return this;
     }
 
@@ -334,7 +397,13 @@ public class RandomNetworkBuilder<I,O>{
         return this;
     }
 
-    public void setMutationRate(double mutationRate) {
+    public RandomNetworkBuilder mutationRate(double mutationRate) {
         this.mutationRate = mutationRate;
+        return this;
+    }
+
+    public RandomNetworkBuilder maxActivation(int maxActivation) {
+        this.maxActivation = maxActivation;
+        return this;
     }
 }

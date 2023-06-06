@@ -7,6 +7,7 @@ import org.neil.neural.input.CreatureInputs;
 import org.neil.neural.input.Inputs;
 import org.neil.neural.output.CreatureOutputs;
 import org.neil.object.Creature;
+import org.neil.simulation.MutationStrategy;
 import org.neil.simulation.ReproductionPrioritization;
 import org.neil.simulation.Simulation;
 import org.neil.simulation.SimulationInput;
@@ -18,6 +19,8 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.IntSummaryStatistics;
+import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.List;
 import java.util.Queue;
@@ -34,7 +37,7 @@ import java.util.stream.Stream;
 public class MapPanel extends JPanel {
     private CoordinateMap coordinateMap;
     private int gridSize = 5;
-    private final int stepDisplayInMillis = 100;
+    private static final int STEP_DISPLAY_IN_MILLIS = 100;
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
@@ -59,7 +62,7 @@ public class MapPanel extends JPanel {
             this.removeAll();
             this.revalidate();
             this.repaint();
-        }, stepDisplayInMillis, stepDisplayInMillis, TimeUnit.MILLISECONDS);
+        }, STEP_DISPLAY_IN_MILLIS, STEP_DISPLAY_IN_MILLIS, TimeUnit.MILLISECONDS);
         this.setPreferredSize(new Dimension(coordinateMap.xRange * gridSize,
                 coordinateMap.yRange * gridSize));
     }
@@ -77,7 +80,7 @@ public class MapPanel extends JPanel {
 
                 frames.addAll(recordings
                         .stream()
-                        .map(x->x.keySet())
+                        .map(Map::keySet)
                 .toList());
 
                 mainFrameUpdater.get().setTitle("RUN: " + numOfRuns);
@@ -136,24 +139,27 @@ public class MapPanel extends JPanel {
         simulationInput.x = 100;
         simulationInput.y = 100;
 
-        simulationInput.maxNumberOfConnections = 100;
-        simulationInput.maxNumberOfNodes = 10;
-
         simulationInput.survivorPriority =  ReproductionPrioritization.xCompare();
 
         simulationInput.outputNodeGenerator = new CreatureOutputs();
 
-        CoordinateSupplier coordinateSupplier = new CoordinateSupplier(simulationInput.x,simulationInput.y);
+        simulationInput.inputNodeGenerator = new CreatureInputs();
+        simulationInput.numberOfElements = x -> 2000;
+        simulationInput.mutationStrategy = MutationStrategy.ALWAYS_ALLOW;
 
-        System.out.println(coordinateSupplier.get());
-
-        simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
-        simulationInput.numberOfElements = x -> 1000;
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
         simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
 
-
+        RandomNetworkBuilder randomNetworkBuilder = new RandomNetworkBuilder(simulationInput)
+                .maxNodes(10)
+                .mutationRate(0.1)
+                .minConnection(1)
+                .maxConnection(100)
+                .minBandwith(1)
+                .maxBandwith(2048)
+                .minNodes(1)
+                .maxStorage(600);
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
@@ -168,41 +174,77 @@ public class MapPanel extends JPanel {
     public Simulation initMovingDestination(){
         SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
         simulationInput.outputNodeGenerator = new CreatureOutputs();
-        simulationInput.mutationRate = 0.02;
 
         CoordinateSupplier coordinateSupplier = new CoordinateSupplier(
-                Coordinates.of(simulationInput.x/2, simulationInput.y/2),
+                Coordinates.of(0, 100),
                 simulationInput.x,
                 simulationInput.y);
 
-        System.out.println(coordinateSupplier.get());
-
         simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
-        simulationInput.numberOfElements = x -> simulation.getRunsCompleted() < 1000 ? 2000 : 1000;
+        simulationInput.numberOfElements = x -> 3000;
         simulationInput.survivorPriority =  new TimedComparator(coordinateSupplier,100);
-        simulationInput.numberOfSurvivors = x -> {
-            int survivors = 500 - x.getRunsCompleted() ;
-            if(survivors < 100){
-                survivors = 100;
-            }
-            return survivors;
-        };
+        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() % 100 > 50 ? 100 : 1000;
 
-        simulationInput.maxNumberOfNodes = 120;
-        simulationInput.maxNumberOfConnections= 1200;
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
-        //simulationInput.surviveLogic = SurviveHelperFunctions.leftMostSurvives();
         simulationInput.surviveLogic = (sim,x) -> ((Creature)x).hasMoved();
 
         RandomNetworkBuilder randomNetworkBuilder = new RandomNetworkBuilder(simulationInput)
-                .minConnection(140)
-                .minNodes(10)
-                .maxStorage(600);
+                .maxConnection(20)
+                .minConnection(10)
+                .minNodes(7)
+                .maxNodes(10)
+                .maxActivation(2048)
+                .minBandwith(1)
+                .maxBandwith(2048)
+                .mutationRate(0.75)
+                .minStorage(100)
+                .maxStorage(10000);
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
                 randomNetworkBuilder);
+
+        System.out.println(coordinateSupplier.get());
+
+        this.simulation.addRunCompletionListener( x -> coordinateSupplier.runCompleteRun(x));
+
         this.simulation.addRunCompletionListener( x -> {
+            if(simulation.getRunsCompleted() % 10 == 0) {
+                int avgNodes = (int)simulation.getSimulationEnvironment()
+                        .getValues()
+                        .stream()
+                        .mapToInt(y->y.getNeuralNetwork().getIntermediateNodes().size())
+                        .average()
+                        .getAsDouble();
+
+                int newMaxNodes = (int) (avgNodes * 1.8);
+                newMaxNodes = newMaxNodes < 200 ? newMaxNodes : 200;
+
+                int minNodes = (int) (avgNodes * 0.5);
+                minNodes = minNodes < 7 ? 7 : minNodes;
+
+                int newMinConnection = (int)(simulation.getSimulationEnvironment().getValues()
+                        .stream()
+                        .map( y -> y.getNeuralNetwork())
+                        .mapToLong( y -> y.streamConnections().count())
+                        .average().getAsDouble() * 0.5);
+
+                int newMaxConnection = (int)(simulation.getSimulationEnvironment().getValues()
+                        .stream()
+                        .map( y -> y.getNeuralNetwork())
+                        .mapToLong( y -> y.streamConnections().count())
+                        .average().getAsDouble() * 1.5);
+                newMaxConnection = newMaxConnection < 2000 ? newMaxConnection : 2000;
+
+                newMinConnection = newMinConnection < 10 ? 10 : newMinConnection;
+
+                randomNetworkBuilder.maxConnection(newMaxConnection)
+                        .minConnection(minNodes)
+                        .minConnection(newMinConnection)
+                        .maxNodes(newMaxNodes);
+
+            }
+
             if(simulation.getRunsCompleted() > 2000) {
                 coordinateSupplier.random(Math.abs((int) (Math.sin(((double) simulation.getRunsCompleted() / 1000.0)) * 20)));
             }
@@ -219,19 +261,18 @@ public class MapPanel extends JPanel {
     }
 
     private static void reportStats(Simulation<Coordinates,Creature> simulation){
-        double avgNumberOfNodes = simulation.getSimulationEnvironment()
+        IntSummaryStatistics nodeSummaryStatistics = simulation.getSimulationEnvironment()
                 .getValues().stream()
                 .mapToInt(x->x.getNeuralNetwork().getIntermediateNodes().size())
-                .average()
-                .getAsDouble();
+                .summaryStatistics();
 
-        double avgNumberOfConnections = simulation.getSimulationEnvironment()
+        LongSummaryStatistics connectionStats = simulation.getSimulationEnvironment()
                 .getValues().stream()
                 .mapToLong(x->x.getNeuralNetwork().streamConnections().count())
-                .average()
-                .getAsDouble();
+                .summaryStatistics();
 
-        System.out.println("avgNumberOfNodes:"+ avgNumberOfNodes + " avgNumberOfConnections:" + avgNumberOfConnections);
+        System.out.println("nodeStats:"+ nodeSummaryStatistics
+                + " connectionStats:" + connectionStats);
     }
 
 
@@ -275,7 +316,7 @@ public class MapPanel extends JPanel {
         }
     }
 
-    public static class CoordinateSupplier implements Supplier<Coordinates>{
+    public class CoordinateSupplier implements Supplier<Coordinates>{
         private static Random random = new Random();
         private volatile Coordinates coordinates;
         private final int maxX;
@@ -323,6 +364,29 @@ public class MapPanel extends JPanel {
             }
 
             this.coordinates = Coordinates.of(x, y);
+        }
+
+        public int randomY(){
+            return random.nextInt(maxY) ;
+        }
+
+        public int randomX(){
+            return random.nextInt(maxX);
+        }
+
+        public void runCompleteRun(Simulation simulation){
+            int x = 20;
+            if(simulation.getRunsCompleted() > 200 && random.nextBoolean()){
+                x = 50;
+            }
+            int y;
+            if(simulation.getRunsCompleted() > 400){
+                y = random.nextInt(maxY / 2) + maxY / 4;
+            }else {
+                y = random.nextBoolean() ? 0 : maxY;
+            }
+            coordinates = Coordinates.of(x,randomY());
+
         }
 
         @Override

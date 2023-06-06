@@ -3,7 +3,6 @@ package org.neil.simulation;
 
 import org.neil.neural.Network;
 import org.neil.neural.NetworkOwner;
-import org.neil.neural.Node;
 import org.neil.neural.RandomNetworkBuilder;
 
 import java.util.ArrayList;
@@ -34,12 +33,15 @@ public class Simulation<K,E extends NetworkOwner> {
 
     private int runsCompleted = 0;
 
-    private Consumer<Simulation> stepCompleteListener = x -> { // noop
+    private Consumer<Simulation<K,E>> stepCompleteListener = x -> { //noop
     };
     private Consumer<Simulation> runCompletionListener = x -> { //noop
     };
 
     private final Function<Simulation,Integer> numberOfSurvivors;
+
+    private MutationStrategy mutationStrategy;
+    private int mutationAttempts = 10;
 
     public Simulation(SimulationInput simulationInput,
                       SimulationEnvironment simulationEnvironment,
@@ -47,6 +49,7 @@ public class Simulation<K,E extends NetworkOwner> {
 
         this.simulationEnvironment = Objects.requireNonNull(simulationEnvironment, "simulationEnvironment");
         this.randomNetworkBuilder = Objects.requireNonNull(randomNetworkBuilder, "randomNetworkBuilder");
+        this.mutationStrategy = simulationInput.mutationStrategy;
 
         Objects.requireNonNull(simulationInput, "simulationInput");
         this.runTime = simulationInput.runTime;
@@ -118,9 +121,26 @@ public class Simulation<K,E extends NetworkOwner> {
             createElements();
         } else {
             IntStream.range(0, numberOfElementsForGeneration.apply(this))
-                    .mapToObj(x -> networks.get(x % networks.size()))
+                    .mapToObj(x -> {
+                        Network network = networks.get(x % networks.size());
+
+                        //  Allows stabilility with high mutation rates
+                        if(mutationStrategy == MutationStrategy.FIRST_CHILD_NO_MUTATIONS && x > networks.size()){
+                            return randomNetworkBuilder.copyWithChanceToMutate(network, RandomNetworkBuilder.MutationType.NONE);
+                        }
+                        Network toReturn = network;
+                        toReturn = randomNetworkBuilder.copyWithChanceToMutate(toReturn, mutationStrategy.getMutationTypes());
+
+                        int numberOfConnectionMutationAttempts = 0;
+                        int mutationAttempts = (int)network.streamConnections().count() / this.mutationAttempts;
+                        while( numberOfConnectionMutationAttempts < mutationAttempts){
+                            toReturn = randomNetworkBuilder.copyWithChanceToMutate(toReturn,
+                                    RandomNetworkBuilder.MutationType.connectionWeights);
+                            numberOfConnectionMutationAttempts++;
+                        }
+                        return toReturn;
+                    })
                     .parallel()
-                    .map(x -> randomNetworkBuilder.copyWithChanceToMutate(x))
                     .collect(Collectors.toList())
                     .stream()
                     .forEach(x -> simulationEnvironment.addElement(x));

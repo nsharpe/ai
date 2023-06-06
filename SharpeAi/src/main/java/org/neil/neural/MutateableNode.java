@@ -12,6 +12,6 @@ public interface MutateableNode extends Node{
     }
 
     default int generateNewActivation(int capacity, int activationMax){
-        return random.nextInt(Math.min(capacity,activationMax));
+        return random.nextInt(Math.min(capacity/2,activationMax));
     }
 }

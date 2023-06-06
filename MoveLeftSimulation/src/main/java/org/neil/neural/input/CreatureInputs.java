@@ -9,14 +9,33 @@ import java.util.stream.Stream;
 
 public class CreatureInputs implements InputNodeGenerator {
     private final int defaultCapacity = Integer.MAX_VALUE;
-    Supplier<Coordinates> coordinatesSupplier;
+    private Supplier<Coordinates> coordinatesSupplier = null;
 
     public CreatureInputs(Supplier<Coordinates> coordinatesSupplier) {
         this.coordinatesSupplier = coordinatesSupplier;
     }
 
+    public CreatureInputs() {
+        // noop
+    }
+
+
     @Override
     public Collection<InputNode> inputs(int startingIndex) {
+
+        if(coordinatesSupplier == null){
+            return defaultInputs(startingIndex);
+        }
+
+        Collection<InputNode> toReturn = defaultInputs(startingIndex);
+
+        return Stream.concat(
+                toReturn.stream(),
+                destinationInputs(toReturn.size() + startingIndex)
+        ).toList();
+    }
+
+    public Collection<InputNode> defaultInputs(int startingIndex) {
         return Stream.of(
                 new ConstantInputNode(startingIndex++, defaultCapacity),
                 new DirectionViewInputNode(startingIndex++, defaultCapacity),
@@ -26,10 +45,17 @@ public class CreatureInputs implements InputNodeGenerator {
                 new XDirectionInputNode(startingIndex++, defaultCapacity),
                 new XPositionInputNode(startingIndex++, defaultCapacity),
                 new YDirectionInputNode(startingIndex++,defaultCapacity),
-                new YPositionInputNode(startingIndex++, defaultCapacity),
+                new YPositionInputNode(startingIndex++, defaultCapacity)
+        ).collect(Collectors.toList());
+    }
+
+    public Stream<InputNode> destinationInputs(int startingIndex){
+        return Stream.of(
                 new DistanceInputNode(startingIndex++, defaultCapacity, coordinatesSupplier),
                 new XDestinationInputNode(startingIndex++, defaultCapacity,coordinatesSupplier),
                 new YDestinationInputNode(startingIndex++, defaultCapacity,coordinatesSupplier)
-        ).collect(Collectors.toList());
+        );
     }
+
+
 }

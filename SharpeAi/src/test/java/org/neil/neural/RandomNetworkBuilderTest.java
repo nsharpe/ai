@@ -10,7 +10,6 @@ public class RandomNetworkBuilderTest {
     @Test
     public void testCopyDoesNotUseSourceInputNodes() {
         SimulationInput simulationInput = new SimulationInput();
-        simulationInput.maxNumberOfNodes = 200;
 
         RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
         builder.minNodes(200);
@@ -26,7 +25,6 @@ public class RandomNetworkBuilderTest {
     @Test
     public void testCopyDoesNotUseSourceIntermediateNodes() {
         SimulationInput simulationInput = new SimulationInput();
-        simulationInput.maxNumberOfNodes = 200;
 
         RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
         builder.minNodes(200);
@@ -42,7 +40,6 @@ public class RandomNetworkBuilderTest {
     @Test
     public void testCopyDoesNotUseSourceOutputNodes() {
         SimulationInput simulationInput = new SimulationInput();
-        simulationInput.maxNumberOfNodes = 200;
 
         RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
         builder.minNodes(200);
