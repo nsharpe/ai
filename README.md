@@ -9,7 +9,7 @@ ___
 * [Running The Application](#Running-The-Application)
 
 ## Introduction
-This application is intended to be a personal learning tool in how a Neural Network (and evolution in general) works.   You man not copy, distribute, or modify the code shared in this repo.
+This application is intended to be a personal learning tool in how a Neural Network (and evolution in general) works.   You may not copy, distribute, or modify the code shared in this repo.
 
 Currently, the application tests how a neural network would move an object from left to right in a competative environment where individual Neural Networks try to acheive the same goal.
 
