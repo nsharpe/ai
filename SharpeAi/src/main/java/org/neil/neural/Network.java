@@ -71,11 +71,6 @@ public class Network {
         }
     }
 
-    public Stream<Connection> connectionsBelongingTo(Node n){
-        return streamConnections()
-                .filter( x -> x.getSource().equals(n) || x.getDestination().equals(n));
-    }
-
     public List<InputNode> getInputs() {
         return Collections.unmodifiableList(inputNodes);
     }

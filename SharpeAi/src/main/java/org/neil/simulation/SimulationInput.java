@@ -7,8 +7,8 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 public class SimulationInput<I,O> {
-    public int x = 200;
-    public int y = 200;
+    public int x = 100;
+    public int y = 100;
 
     public int runTime = 300;
     public int numberOfRuns = 15000;
@@ -22,7 +22,7 @@ public class SimulationInput<I,O> {
     public InputNodeGenerator<I> inputNodeGenerator;
     public OutputNodeGenerator<O> outputNodeGenerator;
 
-    public MutationStrategy mutationStrategy = MutationStrategy.FIRST_CHILD_NO_MUTATIONS;
+    public MutationStrategy mutationStrategy = MutationStrategy.WEIGHTS_ONLY;
 
 
 }

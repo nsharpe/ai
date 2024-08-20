@@ -72,6 +72,7 @@ public class MapPanel extends JPanel {
 
         drawGrid(graphics);
         drawMidPointLine(graphics);
+        drawXPointLine(graphics,20);
 
         if(frames.isEmpty()){
             int numOfRuns = output.numberOfRuns()-1;
@@ -97,12 +98,15 @@ public class MapPanel extends JPanel {
         }
     }
 
-    private void drawMidPointLine(Graphics2D graphics2D) {
-        int x = coordinateMap.xRange / 2;
+    private void drawXPointLine(Graphics2D graphics2D, int x) {
         graphics2D.setColor(Color.gray);
         IntStream.range(0, coordinateMap.yRange)
                 .forEach(y -> populateMap(graphics2D, Coordinates.of(x, y)));
         graphics2D.setColor(Color.black);
+
+    }
+    private void drawMidPointLine(Graphics2D graphics2D) {
+        drawXPointLine(graphics2D, coordinateMap.xRange / 2);
 
     }
 
@@ -163,7 +167,7 @@ public class MapPanel extends JPanel {
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
-                new RandomNetworkBuilder(simulationInput));
+                randomNetworkBuilder);
 
         this.output = new SimulationOutput<>(simulation,
                 Creature::getPosition,
@@ -173,7 +177,11 @@ public class MapPanel extends JPanel {
     }
     public Simulation initMovingDestination(){
         SimulationInput<Inputs, Creature> simulationInput = new SimulationInput();
+
         simulationInput.outputNodeGenerator = new CreatureOutputs();
+
+        simulationInput.x = 150;
+        simulationInput.y = 150;
 
         CoordinateSupplier coordinateSupplier = new CoordinateSupplier(
                 Coordinates.of(0, 100),
@@ -181,24 +189,25 @@ public class MapPanel extends JPanel {
                 simulationInput.y);
 
         simulationInput.inputNodeGenerator = new CreatureInputs(coordinateSupplier);
-        simulationInput.numberOfElements = x -> 3000;
+        simulationInput.numberOfElements = x -> 1000;
         simulationInput.survivorPriority =  new TimedComparator(coordinateSupplier,100);
-        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() % 100 > 50 ? 100 : 1000;
+        simulationInput.numberOfSurvivors = x -> x.getRunsCompleted() % 150 > 75 ? 100 : 750;
 
         this.coordinateMap = new CoordinateMap(simulationInput.x,simulationInput.y);
         simulationInput.surviveLogic = (sim,x) -> ((Creature)x).hasMoved();
 
         RandomNetworkBuilder randomNetworkBuilder = new RandomNetworkBuilder(simulationInput)
-                .maxConnection(20)
+                .maxConnection(500)
                 .minConnection(10)
-                .minNodes(7)
-                .maxNodes(10)
+                .maxNodes(100)
+                .minNodes(15)
                 .maxActivation(2048)
                 .minBandwith(1)
                 .maxBandwith(2048)
-                .mutationRate(0.75)
+                .mutationRate(0.25)
                 .minStorage(100)
-                .maxStorage(10000);
+                .maxStorage(10000)
+                .mutationStrategy(MutationStrategy.ALWAYS_ALLOW);
 
         this.simulation = new Simulation(simulationInput,
                 coordinateMap,
@@ -209,7 +218,19 @@ public class MapPanel extends JPanel {
         this.simulation.addRunCompletionListener( x -> coordinateSupplier.runCompleteRun(x));
 
         this.simulation.addRunCompletionListener( x -> {
-            if(simulation.getRunsCompleted() % 10 == 0) {
+            if(simulation.getRunsCompleted() % 200 == 80) {
+                randomNetworkBuilder.mutationStrategy(MutationStrategy.REMOVE_ONLY);
+            }
+
+            if(simulation.getRunsCompleted() % 200 == 120) {
+                randomNetworkBuilder.mutationStrategy(MutationStrategy.MODIFY_WEIGHTS);
+            }
+
+            if(simulation.getRunsCompleted() % 200 == 0) {
+                randomNetworkBuilder.mutationStrategy(MutationStrategy.ALWAYS_ALLOW);
+            }
+
+            if(simulation.getRunsCompleted() % 10 == 9) {
                 int avgNodes = (int)simulation.getSimulationEnvironment()
                         .getValues()
                         .stream()
@@ -376,16 +397,16 @@ public class MapPanel extends JPanel {
 
         public void runCompleteRun(Simulation simulation){
             int x = 20;
-            if(simulation.getRunsCompleted() > 200 && random.nextBoolean()){
+            if(simulation.getRunsCompleted() > 1000 && random.nextBoolean()){
                 x = 50;
             }
             int y;
             if(simulation.getRunsCompleted() > 400){
-                y = random.nextInt(maxY / 2) + maxY / 4;
+                y = random.nextInt(maxY / 2) * maxY + maxY / 4;
             }else {
                 y = random.nextBoolean() ? 0 : maxY;
             }
-            coordinates = Coordinates.of(x,randomY());
+            coordinates = Coordinates.of(x,y);
 
         }
 

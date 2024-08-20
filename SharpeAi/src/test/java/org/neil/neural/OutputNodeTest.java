@@ -18,7 +18,7 @@ public class OutputNodeTest {
 
     private static class OutputNodeNodeTester extends NodeDefault implements OutputNode<Integer> {
         public OutputNodeNodeTester() {
-            super(1, 100);
+            super(1, 100,1);
         }
 
         @Override

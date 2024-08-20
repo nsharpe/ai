@@ -5,15 +5,23 @@ import org.neil.neural.RandomNetworkBuilder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Stream;
+
 import org.neil.neural.RandomNetworkBuilder.MutationType;
 
 public enum MutationStrategy {
-    FIRST_CHILD_NO_MUTATIONS(allBut(
+    NONE(Collections.emptyList()),
+    WEIGHTS_ONLY(allBut(
             MutationType.connectionWeights
     )),
+    REMOVE_ONLY(MutationType.NODE_REMOVAL,
+            MutationType.CONNECTION_REMOVAL),
+    ADD_ONLY(MutationType.CONNECTION_ADD,
+            MutationType.CONNECTION_TO_NODE),
+    MODIFY_WEIGHTS(MutationType.CONNECTION_RANDOMIZE_MULTIPLIER,
+            MutationType.ADD_CONNECTION_BANDWIDTH,
+            MutationType.REDUCE_CONNECTION_BANDWIDTH,
+            MutationType.NODE_RANDOMIZE_CAPACITY),
     ALWAYS_ALLOW(allBut(Collections.singleton(MutationType.REBUILD)));
 
     private List<MutationType> mutationTypes;

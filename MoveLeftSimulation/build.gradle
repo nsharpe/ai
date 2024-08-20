@@ -7,7 +7,7 @@ application {
     mainClass = 'org.neil.Main'
 }
 
-sourceCompatibility = '1.16'
+sourceCompatibility = '1.17'
 
 repositories {
     mavenCentral()

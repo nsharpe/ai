@@ -1,9 +1,12 @@
 package org.neil.neural;
 
 import org.junit.jupiter.api.Test;
+import org.neil.simulation.MutationStrategy;
 import org.neil.simulation.SimulationInput;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomNetworkBuilderTest {
 
@@ -11,8 +14,12 @@ public class RandomNetworkBuilderTest {
     public void testCopyDoesNotUseSourceInputNodes() {
         SimulationInput simulationInput = new SimulationInput();
 
+        simulationInput.inputNodeGenerator = x -> Arrays.asList();
+        simulationInput.outputNodeGenerator = x -> Arrays.asList();
+
         RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
-        builder.minNodes(200);
+        builder.maxNodes(201)
+                .minNodes(200);
 
         Network source = builder.build();
         Network copy = builder.copyWithChanceToMutate(source);
@@ -26,14 +33,21 @@ public class RandomNetworkBuilderTest {
     public void testCopyDoesNotUseSourceIntermediateNodes() {
         SimulationInput simulationInput = new SimulationInput();
 
-        RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
-        builder.minNodes(200);
+        simulationInput.inputNodeGenerator = x -> Arrays.asList();
+        simulationInput.outputNodeGenerator = x -> Arrays.asList();
+        simulationInput.mutationStrategy = MutationStrategy.NONE;
 
+        RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
+        builder.maxNodes(201)
+                .minNodes(200);
         Network source = builder.build();
         Network copy = builder.copyWithChanceToMutate(source);
 
-        for (Node node : source.getIntermediateNodes()) {
-            assertFalse(copy.getIntermediateNodes().contains(node));
+        for(int i = 0; i < source.getIntermediateNodes().size(); i++){
+            Node sourceNode = source.getIntermediateNodes().get(i);
+            Node copyNode = copy.getIntermediateNodes().get(i);
+            assertEquals(sourceNode, copyNode);
+            assertFalse(sourceNode == copyNode);
         }
     }
 
@@ -41,8 +55,13 @@ public class RandomNetworkBuilderTest {
     public void testCopyDoesNotUseSourceOutputNodes() {
         SimulationInput simulationInput = new SimulationInput();
 
+        simulationInput.inputNodeGenerator = x -> Arrays.asList();
+        simulationInput.outputNodeGenerator = x -> Arrays.asList();
+
         RandomNetworkBuilder builder = new RandomNetworkBuilder(simulationInput);
-        builder.minNodes(200);
+
+        builder.maxNodes(201)
+                .minNodes(200);
 
         Network source = builder.build();
         Network copy = builder.copyWithChanceToMutate(source);

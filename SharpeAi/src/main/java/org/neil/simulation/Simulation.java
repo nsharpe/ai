@@ -125,20 +125,10 @@ public class Simulation<K,E extends NetworkOwner> {
                         Network network = networks.get(x % networks.size());
 
                         //  Allows stabilility with high mutation rates
-                        if(mutationStrategy == MutationStrategy.FIRST_CHILD_NO_MUTATIONS && x > networks.size()){
+                        if(mutationStrategy == MutationStrategy.WEIGHTS_ONLY && x > networks.size()){
                             return randomNetworkBuilder.copyWithChanceToMutate(network, RandomNetworkBuilder.MutationType.NONE);
                         }
-                        Network toReturn = network;
-                        toReturn = randomNetworkBuilder.copyWithChanceToMutate(toReturn, mutationStrategy.getMutationTypes());
-
-                        int numberOfConnectionMutationAttempts = 0;
-                        int mutationAttempts = (int)network.streamConnections().count() / this.mutationAttempts;
-                        while( numberOfConnectionMutationAttempts < mutationAttempts){
-                            toReturn = randomNetworkBuilder.copyWithChanceToMutate(toReturn,
-                                    RandomNetworkBuilder.MutationType.connectionWeights);
-                            numberOfConnectionMutationAttempts++;
-                        }
-                        return toReturn;
+                        return randomNetworkBuilder.copyWithChanceToMutate(network);
                     })
                     .parallel()
                     .collect(Collectors.toList())

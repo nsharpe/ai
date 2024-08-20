@@ -1,6 +1,8 @@
 package org.neil.neural.input;
 
+import org.neil.board.Coordinates;
 import org.neil.neural.NodeDefault;
+import org.neil.object.Direction;
 
 public class MovementBlockedInputNode extends NodeDefault implements InputNode<Inputs> {
     public MovementBlockedInputNode(int id, int capacity) {
@@ -11,7 +13,10 @@ public class MovementBlockedInputNode extends NodeDefault implements InputNode<I
     public void input(Inputs inputs) {
         clearStorage();
 
-        if(!inputs.coordinateMap.isEmpty(inputs.direction.position(inputs.coordinates)))
+        Direction direction = inputs.direction;
+        Coordinates currentLocation = inputs.coordinates;
+
+        if(!inputs.coordinateMap.isEmpty(direction.position(currentLocation)))
         {
             addToStorage(availableCapacity());
         }
