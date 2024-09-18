@@ -2,6 +2,8 @@ plugins {
     id 'java'
 }
 
+sourceCompatibility = '1.17'
+
 group 'org.example'
 version 'unspecified'
 
