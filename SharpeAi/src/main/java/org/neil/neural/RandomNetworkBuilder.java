@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
-public final class RandomNetworkBuilder<I extends InputNode,O extends OutputNode>{
+public final class RandomNetworkBuilder{
     private static Random random = new Random();
 
     private final InputNodeGenerator inputs;
