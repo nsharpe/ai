@@ -41,3 +41,8 @@ A series of generations.  The initial generation may be random or predetermined.
 From the root directory you can run
 
 `./gradlew clean build run`
+
+## Publishing to maven
+run
+
+`./gradlew clean SharpeAi:publishToMavenLocal`

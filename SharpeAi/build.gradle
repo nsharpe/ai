@@ -1,8 +1,28 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.neil.ai'
+            artifactId = 'ai'
+            version = '1.1'
+
+            from components.java
+        }
+    }
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
