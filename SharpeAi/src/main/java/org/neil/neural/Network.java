@@ -14,11 +14,11 @@ public class Network {
     private Map<Node, List<Connection>> connections;
     private final List<InputNode> inputNodes;
     private final List<OutputNode> outputNodes;
-    private final List<Node> intermediate;
+    private final List<? extends Node> intermediate;
 
     public Network( List<InputNode> inputNodes,
                      List<OutputNode> outputNodes,
-                     List<Node> intermediate,
+                     List<? extends Node> intermediate,
                     List<Connection> connections) {
         this.inputNodes = Objects.requireNonNull(inputNodes)
                 .stream()
