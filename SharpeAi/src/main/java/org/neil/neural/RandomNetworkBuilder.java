@@ -40,7 +40,6 @@ public final class RandomNetworkBuilder{
             (id, capacity) -> new NodeMultiplier(id, capacity, capacity / 2),
             (id, capacity) -> new NodeDivisor(id, capacity, capacity / 2),
             (id, capacity) -> new NodeMax(id, capacity, capacity / 2),
-            (id, capacity) -> new NodeSink(id),
             (id, capacity) -> new NodeAlwaysFull(id, capacity),
             (id, capacity) -> new NodeAlwaysEmpty(id, capacity)
     );
