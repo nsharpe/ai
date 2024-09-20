@@ -8,6 +8,7 @@ public class NodeAlwaysFull extends NodeDefault{
 
     public NodeAlwaysFull(int id, int capacity) {
         super(id, capacity, capacity / 2);
+        super.addToStorage(capacity);
     }
 
     public NodeAlwaysFull(Node node) {
@@ -17,11 +18,6 @@ public class NodeAlwaysFull extends NodeDefault{
     @Override
     public void addToStorage(int toAdd) {
         // noop
-    }
-
-    @Override
-    public int availableCapacity() {
-        return 0;
     }
 
     @Override
