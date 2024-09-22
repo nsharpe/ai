@@ -1,7 +1,11 @@
 package org.neil.neural.serializer;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,10 +15,10 @@ import org.neil.neural.NodeAlwaysEmpty;
 import org.neil.neural.NodeAlwaysFull;
 import org.neil.neural.NodeDefault;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 public class ConnectionJsonSerializerTest {
@@ -27,9 +31,10 @@ public class ConnectionJsonSerializerTest {
     ObjectMapper objectMapper;
 
     @BeforeEach
-    public void before(){
+    public void before() {
         objectMapper = new ObjectMapper();
-        objectMapper.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION.mappedFeature(),true);
+        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        objectMapper.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION.mappedFeature(), true);
 
     }
 
@@ -69,9 +74,7 @@ public class ConnectionJsonSerializerTest {
                 11,
                 Connection.ConnectionType.ADD);
 
-        TestSerializerCollection collection = new TestSerializerCollection();
-
-        collection.listS = List.of(
+        List<TestSerializer> collection = List.of(
                 new TestSerializer(first),
                 new TestSerializer(second)
         );
@@ -80,34 +83,53 @@ public class ConnectionJsonSerializerTest {
 
         System.out.println(json);
 
-        assertEquals("{\"listS\":[{\"input\":{\"type\":\"default\",\"id\":1,\"capacity\":20,\"stored\":0,\"activateable\":false,\"activationLimit\":100,\"depreciate\":20},\"output\":{\"type\":\"default\",\"id\":2,\"capacity\":20,\"stored\":0,\"activateable\":false,\"activationLimit\":100,\"depreciate\":20},\"connection\":{\"source\":1,\"destination\":2,\"bandwidth\":3,\"multiplier\":5.0,\"connectionType\":\"ADD\"}},{\"input\":{\"type\":\"default\",\"id\":1,\"capacity\":10,\"stored\":0,\"activateable\":false,\"activationLimit\":50,\"depreciate\":10},\"output\":{\"type\":\"default\",\"id\":2,\"capacity\":30,\"stored\":0,\"activateable\":false,\"activationLimit\":60,\"depreciate\":12},\"connection\":{\"source\":1,\"destination\":2,\"bandwidth\":7,\"multiplier\":11.0,\"connectionType\":\"ADD\"}}]}",
+        assertEquals("[{\"connection\":{\"bandwidth\":3,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":5.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0}},{\"connection\":{\"bandwidth\":7,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":11.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":50,\"capacity\":10,\"depreciate\":10,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":60,\"capacity\":30,\"depreciate\":12,\"stored\":0}}]",
                 json);
 
 
     }
 
     @Test
-    public void deserializeConnectionArray() throws Exception{
-        String json = "{\"listS\":[{\"input\":{\"type\":\"default\",\"id\":1,\"capacity\":20,\"stored\":0,\"activateable\":false,\"activationLimit\":100,\"depreciate\":20},\"output\":{\"type\":\"default\",\"id\":2,\"capacity\":20,\"stored\":0,\"activateable\":false,\"activationLimit\":100,\"depreciate\":20},\"connection\":{\"source\":1,\"destination\":2,\"bandwidth\":3,\"multiplier\":5.0,\"connectionType\":\"ADD\"}},{\"input\":{\"type\":\"default\",\"id\":1,\"capacity\":10,\"stored\":0,\"activateable\":false,\"activationLimit\":50,\"depreciate\":10},\"output\":{\"type\":\"default\",\"id\":2,\"capacity\":30,\"stored\":0,\"activateable\":false,\"activationLimit\":60,\"depreciate\":12},\"connection\":{\"source\":1,\"destination\":2,\"bandwidth\":7,\"multiplier\":11.0,\"connectionType\":\"ADD\"}}]}";
+    public void deserializeConnectionArray() throws Exception {
+        Node input = new NodeDefault(1);
+        Connection connection = new Connection(input,
+                input,
+                1,
+                1,
+                Connection.ConnectionType.SUBTRACT);
+        String json = objectMapper.writeValueAsString(new TestSerializer(connection));
 
-        TestSerializerCollection testSerializers = objectMapper.readValue(json,TestSerializerCollection.class);
+        System.out.println(json);
 
-        assertEquals(2,testSerializers.listS.size());
-
-        TestSerializer first = testSerializers.listS.get(0);
-        assertEquals(first.connection.getSource(),first.input);
-        assertEquals(first.connection.getDestination(),first.output);
-
-        TestSerializer second = testSerializers.listS.get(1);
-        assertEquals(second.connection.getSource(),second.input);
-        assertEquals(second.connection.getDestination(),second.output);
+        try {
+            Connection deserialized = objectMapper.readValue(json, Connection.class);
+            // Currently connections can only be deserialized within the context of the Network class.
+            // This is to handle circular references.  See NetworkDeserializer
+            fail();
+        } catch (Exception e) {
+            // Exception expected
+        }
     }
 
-    private static class TestSerializerCollection{
-        @JsonProperty
-        List<TestSerializer> listS = new ArrayList<>();
+
+    @Test
+    public void deserializeSingleConnection() throws Exception {
+        String json = "{\"connection\":{\"bandwidth\":3,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":5.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0}}";
+
+        try {
+            TestSerializer ser = objectMapper.readValue(json, TestSerializer.class);
+
+            // Currently connections can only be deserialized within the context of the Network class.
+            // This is to handle circular references.  See NetworkDeserializer
+            fail();
+        } catch (Exception e) {
+            // Exception expected
+        }
     }
 
+
+    @JsonTypeName("testSerializerConnection")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class TestSerializer {
 
         @JsonProperty
@@ -116,6 +138,15 @@ public class ConnectionJsonSerializerTest {
         Node output;
         @JsonProperty
         Connection connection;
+
+        @JsonCreator
+        public TestSerializer(@JsonProperty("input") Node input,
+                              @JsonProperty("output") Node output,
+                              @JsonProperty("connection") Connection connection) {
+            this.input = input;
+            this.output = output;
+            this.connection = connection;
+        }
 
         public TestSerializer(Connection connection) {
             this.connection = connection;

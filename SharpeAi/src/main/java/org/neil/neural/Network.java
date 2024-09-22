@@ -2,9 +2,11 @@ package org.neil.neural;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.neil.neural.input.InputNode;
 import org.neil.neural.output.OutputNode;
+import org.neil.neural.serializer.NetworkDeserializer;
 import org.neil.neural.serializer.NetworkSerializer;
 
 import java.util.*;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @JsonSerialize(using = NetworkSerializer.class)
+@JsonDeserialize(using = NetworkDeserializer.class)
 public class Network {
 
     private Map<Node, List<Connection>> connections;

@@ -319,7 +319,7 @@ public final class RandomNetworkBuilder{
         List<Node> nodes = new ArrayList<>();
 
         int numberOfNodes = randomRange(minNodes,maxNodes);
-        for (int i = 0; i <= numberOfNodes; i++) {
+        for (int i = 0; i < numberOfNodes; i++) {
             int storage = randomRange(minStorage, maxStorage);
 
             nodes.add(new MutateableNodeDefault(i + 1000, storage, 10));
@@ -333,10 +333,7 @@ public final class RandomNetworkBuilder{
     }
 
     private static int randomRange(int min, int max) {
-        if (min == max) {
-            return min;
-        }
-        return min + random.nextInt(max - min);
+        return random.nextInt(min,max+1);
     }
 
     private List<Connection> generateConnections(Collection<InputNode> inputNodes,

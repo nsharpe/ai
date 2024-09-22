@@ -19,6 +19,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
 @JsonDeserialize(as= NodeDefault.class)
+@JsonIdentityInfo( generator= ObjectIdGenerators.PropertyGenerator.class,scope = Node.class)
 public class NodeDefault implements Node {
 
     private final int id;

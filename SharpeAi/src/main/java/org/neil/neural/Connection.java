@@ -13,10 +13,8 @@ import java.util.Random;
 public class Connection {
     private static Random random = new Random();
 
-    @JsonProperty
     private final Node source;
 
-    @JsonProperty
     private final Node destination;
 
     @JsonProperty
@@ -44,10 +42,21 @@ public class Connection {
         return source;
     }
 
+    @JsonProperty("source")
+    public int getSourceId(){
+        return source.getId();
+    }
+
     @JsonIgnore
     public Node getDestination() {
         return destination;
     }
+
+    @JsonProperty("destination")
+    public int getDestinationId(){
+        return destination.getId();
+    }
+
 
     public int getBandwidth() {
         return bandwidth;
