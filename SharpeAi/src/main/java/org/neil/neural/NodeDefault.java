@@ -1,23 +1,62 @@
 package org.neil.neural;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
+import org.neil.neural.serializer.NodeDeserializer;
+
 import java.util.Objects;
 
+@JsonTypeName("default")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonPropertyOrder(alphabetic = true)
+@JsonDeserialize(as= NodeDefault.class)
 public class NodeDefault implements Node {
+
     private final int id;
+    @JsonProperty("capacity")
     private final int capacity;
+    @JsonProperty("stored")
     private volatile int stored = 0;
+    @JsonProperty("activateable")
     private volatile boolean activateable;
 
+    @JsonProperty("activationLimit")
     private final int activationLimit;
 
+    @JsonProperty("depreciate")
     private final int depreciate;
 
     public NodeDefault(int id) {
         this(id, Integer.MAX_VALUE, Integer.MAX_VALUE / 2);
     }
 
-    public NodeDefault(int id, int capacity, int activationLimit) {
+    public NodeDefault(int id,
+                       int capacity,
+                       int activationLimit) {
+        this(id,
+                capacity,
+                0,
+                false,
+                activationLimit,
+                activationLimit/5);
+    }
+
+    @JsonCreator()
+    public NodeDefault(@JsonProperty("@id") int id,
+                       @JsonProperty("capacity")int capacity,
+                       @JsonProperty("stored")int stored,
+                       @JsonProperty("activateable") boolean activateable,
+                       @JsonProperty("activationLimit") int activationLimit,
+                       @JsonProperty("depreciate") int depreciate) {
         if (id <= 0) {
             throw new IllegalStateException("id must be positive");
         }
@@ -26,8 +65,10 @@ public class NodeDefault implements Node {
         }
         this.id = id;
         this.capacity = capacity;
+        this.stored = stored;
+        this.activateable = activateable;
         this.activationLimit = activationLimit;
-        this .depreciate = activationLimit / 5;
+        this.depreciate = depreciate;
     }
 
     public NodeDefault(Node node) {

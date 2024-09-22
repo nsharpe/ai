@@ -188,14 +188,14 @@ public final class RandomNetworkBuilder{
         } else if (mutation == MutationType.CONNECTION_RANDOMIZE_MULTIPLIER) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
-            connections.add(toModify.copyNewMultipler(randomConnectionMultipler()));
+            connections.add(toModify.copyNewMultiplier(randomConnectionMultipler()));
         } else if (mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
             connections.remove(toModify);
             connections.add(toModify.copyModifyBandWidth(bandwidthModificationIncrements));
         } else if (mutation == MutationType.REDUCE_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
             Connection toModify = connections.get(random.nextInt(connections.size()));
-            if (toModify.getBandwith() > bandwidthModificationIncrements) {
+            if (toModify.getBandwidth() > bandwidthModificationIncrements) {
                 connections.remove(toModify);
                 connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
             }
@@ -214,7 +214,7 @@ public final class RandomNetworkBuilder{
             connections = connections.stream()
                     .map( x ->new Connection(randomEntry(sources),
                             randomEntry(destinations),
-                            x.getBandwith(),
+                            x.getBandwidth(),
                             randomConnectionMultipler(),
                             x.getConnectionType()) )
                     .toList();
@@ -250,7 +250,7 @@ public final class RandomNetworkBuilder{
 
             connections.add(new Connection(randomEntry(sources),
                     randomEntry(destinations),
-                    toModify.getBandwith(),
+                    toModify.getBandwidth(),
                     randomConnectionMultipler(),
                     toModify.getConnectionType()) );
         }

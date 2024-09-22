@@ -1,8 +1,34 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.neil.neural.serializer.NodeDeserializer;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = NodeAlwaysEmpty.class, name = "alwaysEmpty"),
+        @JsonSubTypes.Type(value = NodeAlwaysFull.class, name = "alwaysFull"),
+        @JsonSubTypes.Type(value = NodeDefault.class, name = "default"),
+        @JsonSubTypes.Type(value = NodeDivisor.class,name = "nodeDivisor"),
+        @JsonSubTypes.Type(value = NodeMultiplier.class,name="nodeMultiplier"),
+        @JsonSubTypes.Type(value = NodeMax.class, name="nodeMax"),
+}
+)
+@JsonDeserialize(using = NodeDeserializer.class)
+@JsonIdentityInfo( generator= ObjectIdGenerators.PropertyGenerator.class,scope = Node.class)
 public interface Node {
     void addToStorage(int toAdd);
 
+    @JsonProperty("@id")
     int getId();
 
     int getCapacity();
@@ -21,7 +47,9 @@ public interface Node {
 
     Node copy();
 
-    boolean isActivateable();
+    default boolean isActivateable(){
+        return getActivationLimit() < getStored();
+    }
 
     int getActivationLimit();
 

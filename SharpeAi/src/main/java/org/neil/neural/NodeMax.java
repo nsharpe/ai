@@ -1,13 +1,26 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonTypeName("nodeMax")
+@JsonDeserialize(as= NodeMax.class)
 public class NodeMax extends NodeDefault implements MutateableNode{
 
+    @JsonProperty
     private int numberOfInputsKept = 5;
+    @JsonProperty
     private List<Integer> lastInputs = new ArrayList<>();
 
+    @JsonProperty
     private volatile Integer currentMax = 0;
 
     public NodeMax(int id) {
@@ -16,6 +29,22 @@ public class NodeMax extends NodeDefault implements MutateableNode{
 
     public NodeMax(int id, int capacity, int activation) {
         super(id, capacity, activation);
+    }
+
+    @JsonCreator
+    public NodeMax(@JsonProperty("@id") int id,
+                   @JsonProperty("capacity")int capacity,
+                   @JsonProperty("stored")int stored,
+                   @JsonProperty("activateable") boolean activateable,
+                   @JsonProperty("activationLimit") int activationLimit,
+                   @JsonProperty("depreciate") int depreciate,
+                   @JsonProperty("numberOfInputsKept") int numberOfInputsKept,
+                   @JsonProperty("lastInputs") List<Integer> lastInputs,
+                   @JsonProperty("currentMax") Integer currentMax) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate);
+        this.numberOfInputsKept = numberOfInputsKept;
+        this.lastInputs = lastInputs;
+        this.currentMax = currentMax;
     }
 
     public NodeMax(Node node) {

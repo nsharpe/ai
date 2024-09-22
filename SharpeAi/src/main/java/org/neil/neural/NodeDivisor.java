@@ -1,5 +1,14 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonTypeName("nodeDivisor")
+@JsonDeserialize(as=NodeDivisor.class)
 public class NodeDivisor extends NodeDefault implements MutateableNode{
 
     public NodeDivisor(int id) {
@@ -8,6 +17,16 @@ public class NodeDivisor extends NodeDefault implements MutateableNode{
 
     public NodeDivisor(int id, int capacity, int activationLimit) {
         super(id, capacity, activationLimit);
+    }
+
+    @JsonCreator
+    public NodeDivisor(@JsonProperty("@id") int id,
+                       @JsonProperty("capacity")int capacity,
+                       @JsonProperty("stored")int stored,
+                       @JsonProperty("activateable") boolean activateable,
+                       @JsonProperty("activationLimit") int activationLimit,
+                       @JsonProperty("depreciate") int depreciate) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate);
     }
 
     public NodeDivisor(Node node) {

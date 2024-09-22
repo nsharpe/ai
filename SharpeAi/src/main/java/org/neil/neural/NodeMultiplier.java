@@ -1,5 +1,13 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonTypeName("nodeMultiplier")
+@JsonDeserialize(as=NodeMultiplier.class)
 public class NodeMultiplier extends NodeDefault implements MutateableNode{
 
     public NodeMultiplier(int id) {
@@ -8,6 +16,15 @@ public class NodeMultiplier extends NodeDefault implements MutateableNode{
 
     public NodeMultiplier(int id, int capacity, int activation) {
         super(id, capacity, activation);
+    }
+
+    public NodeMultiplier(@JsonProperty("@id") int id,
+                          @JsonProperty("capacity")int capacity,
+                          @JsonProperty("stored")int stored,
+                          @JsonProperty("activateable") boolean activateable,
+                          @JsonProperty("activationLimit") int activationLimit,
+                          @JsonProperty("depreciate") int depreciate) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate);
     }
 
     public NodeMultiplier(Node node) {

@@ -1,56 +1,73 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.Objects;
 import java.util.Random;
 
+
 public class Connection {
     private static Random random = new Random();
-    private final Node source;
-    private final Node destination;
-    private final int bandwith;
 
-    private final double multipler;
+    @JsonProperty
+    private final Node source;
+
+    @JsonProperty
+    private final Node destination;
+
+    @JsonProperty
+    private final int bandwidth;
+    @JsonProperty
+    private final double multiplier;
+    @JsonProperty
     private final ConnectionType connectionType;
 
-    public Connection(Node source,
-                      Node destination,
-                      int bandwith,
-                      double multipler,
-                      ConnectionType connectionType) {
+    @JsonCreator
+    public Connection(@JsonProperty("source") Node source,
+                      @JsonProperty("destination") Node destination,
+                      @JsonProperty("bandwidth") int bandwidth,
+                      @JsonProperty("multiplier") double multiplier,
+                      @JsonProperty("connectionType") ConnectionType connectionType) {
         this.source = Objects.requireNonNull(source);
         this.destination = Objects.requireNonNull(destination);
-        this.bandwith = bandwith;
+        this.bandwidth = bandwidth;
         this.connectionType = Objects.requireNonNull(connectionType);
-        this.multipler = multipler;
+        this.multiplier = multiplier;
     }
 
+    @JsonIgnore
     public Node getSource() {
         return source;
     }
 
+    @JsonIgnore
     public Node getDestination() {
         return destination;
     }
 
-    public int getBandwith() {
-        return bandwith;
+    public int getBandwidth() {
+        return bandwidth;
     }
 
-    public Connection copyNewMultipler(double newMultipler)
+    public Connection copyNewMultiplier(double newMultipler)
     {
-        return new Connection(this.source, this.destination, this.bandwith, newMultipler, this.connectionType);
+        return new Connection(this.source, this.destination, this.bandwidth, newMultipler, this.connectionType);
     }
 
     public Connection copyModifyBandWidth(int amount) {
-        return new Connection(this.source, this.destination, bandwith + amount, multipler, connectionType);
+        return new Connection(this.source, this.destination, bandwidth + amount, multiplier, connectionType);
     }
 
     public Connection copyNewBandWidth(int amount) {
-        return new Connection(this.source, this.destination, bandwith + amount, multipler, connectionType);
+        return new Connection(this.source, this.destination, bandwidth + amount, multiplier, connectionType);
     }
 
     public double getMultiplier() {
-        return multipler;
+        return multiplier;
     }
 
     public void activate() {
@@ -70,17 +87,17 @@ public class Connection {
                 if (!source.isActivateable() || source.getStored() == 0) {
                     return;
                 }
-                if (connectionType == ConnectionType.ADD) {
-                    addLogic();
-                } else {
-                    subtractLogic();
+                switch (connectionType){
+                    case ADD -> addLogic();
+                    case SUBTRACT -> subtractLogic();
+                    default -> throw new IllegalStateException("Not supported");
                 }
             }
         }
     }
 
     private void subtractLogic() {
-        int toMove = bandwith < destination.getStored() ? bandwith : destination.getStored();
+        int toMove = bandwidth < destination.getStored() ? bandwidth : destination.getStored();
         toMove = toMove < source.getStored() ? toMove : source.getStored();
 
         if (toMove == 0) {
@@ -88,7 +105,7 @@ public class Connection {
         }
 
         source.addToStorage(-toMove);
-        toMove *= multipler;
+        toMove *= multiplier;
         toMove = toMove < destination.getStored() ? toMove : destination.getStored();
         destination.addToStorage(-toMove);
     }
@@ -99,7 +116,7 @@ public class Connection {
         }
 
         int availableDesinationCapacity = destination.getCapacity() - destination.getStored();
-        int maxToMove = bandwith < availableDesinationCapacity ? bandwith : availableDesinationCapacity;
+        int maxToMove = bandwidth < availableDesinationCapacity ? bandwidth : availableDesinationCapacity;
 
         int toMove = maxToMove;
         if (source.getStored() <= maxToMove) {
@@ -107,7 +124,7 @@ public class Connection {
         }
 
         source.addToStorage(-toMove);
-        toMove *= multipler;
+        toMove *= multiplier;
         destination.addToStorage(toMove);
     }
 

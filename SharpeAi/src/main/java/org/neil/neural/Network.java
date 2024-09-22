@@ -1,14 +1,17 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.neil.neural.input.InputNode;
 import org.neil.neural.output.OutputNode;
+import org.neil.neural.serializer.NetworkSerializer;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
+@JsonSerialize(using = NetworkSerializer.class)
 public class Network {
 
     private Map<Node, List<Connection>> connections;
@@ -16,10 +19,11 @@ public class Network {
     private final List<OutputNode> outputNodes;
     private final List<? extends Node> intermediate;
 
-    public Network( List<InputNode> inputNodes,
-                     List<OutputNode> outputNodes,
-                     List<? extends Node> intermediate,
-                    List<Connection> connections) {
+    @JsonCreator
+    public Network(@JsonProperty("inputs") List<InputNode> inputNodes,
+                   @JsonProperty("outputs")  List<OutputNode> outputNodes,
+                   @JsonProperty("intermediate")  List<? extends Node> intermediate,
+                   @JsonProperty("connections") List<Connection> connections) {
         this.inputNodes = Objects.requireNonNull(inputNodes)
                 .stream()
                 .toList();
@@ -40,7 +44,7 @@ public class Network {
         List<Connection> updatedConnections = connections.stream()
                 .map(x-> new Connection(nodeId.get(x.getSource().getId()),
                         nodeId.get(x.getDestination().getId()),
-                                x.getBandwith(),
+                                x.getBandwidth(),
                                 x.getMultiplier(),
                                 x.getConnectionType()
                         )).toList();
