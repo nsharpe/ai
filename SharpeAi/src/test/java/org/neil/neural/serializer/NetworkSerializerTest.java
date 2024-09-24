@@ -8,31 +8,41 @@ import org.neil.neural.Network;
 import org.neil.neural.Node;
 import org.neil.neural.NodeDefault;
 import org.neil.neural.RandomNetworkBuilder;
+import org.neil.neural.input.ConstantInputNode;
+import org.neil.neural.input.RandomInputNode;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class NetworkSerializerTest {
 
     @Test
     public void networkSerializer() throws Exception {
-        ObjectMapper om = new ObjectMapper();
-        om.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION.mappedFeature(), true);
 
-        String json = om.writeValueAsString(new RandomNetworkBuilder(x -> Collections.emptyList(),
+        Network original = new RandomNetworkBuilder(x -> Collections.emptyList(),
                 x -> Collections.emptyList())
                 .maxNodes(1)
                 .minNodes(1)
                 .maxConnection(1)
-                .build());
+                .build();
 
-        System.out.println(json);
+        Object obj = serializeThenDeserialize(original);
+
+        assertNotNull(obj);
 
         // Does a spot check to see if nodes can be deserialized
-        Network network = om.readValue(json, Network.class);
+        Network network = assertInstanceOf(Network.class,obj);
+
         assertTrue(network.getInputs().isEmpty());
         assertTrue(network.getOutputs().isEmpty());
         assertEquals(1,network.getIntermediateNodes().size());
@@ -41,51 +51,50 @@ public class NetworkSerializerTest {
         if(connection == null){
             throw new NullPointerException();
         }
-        assertEquals(connection.getDestination(),connection.getSource());
+        assertSame(connection.getDestination(),connection.getSource());
+        assertSame(connection.getDestination(),network.getIntermediateNodes().stream().findAny().orElseThrow());
+        assertNotSame(connection.getDestination(), original.getIntermediateNodes().stream().findFirst().orElseThrow());
     }
 
     @Test
-    public void networkOneConnectionOneNodeSerializer() throws Exception {
-        ObjectMapper om = new ObjectMapper();
+    public void largeNetworkSerializer() throws Exception {
+        //The goal is to try as many
 
-        Node node = new NodeDefault(1);
-        Connection connection = new Connection(
-                node,
-                node,
-                1,
-                1.0,
-                Connection.ConnectionType.ADD
-        );
+        Network original = new RandomNetworkBuilder(x -> Collections.emptyList(),
+                x -> Collections.emptyList())
+                .maxNodes(1000)
+                .minNodes(1000)
+                .maxConnection(1000)
+                .build();
 
-        om.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION.mappedFeature(), true);
-        String json = om.writeValueAsString(new Network(List.of(),
-                List.of(),
-                List.of(node),
-                List.of(connection)));
+        Object obj = serializeThenDeserialize(original);
 
-        System.out.println(json);
+        assertNotNull(obj);
 
         // Does a spot check to see if nodes can be deserialized
-        om.readValue(json, Network.class);
+        Network network = assertInstanceOf(Network.class,obj);
+
+        Map<Integer,Node> originalNodes = original.getIntermediateNodes().stream().collect(
+                Collectors.toMap(Node::getId,x->x)
+        );
+
+        for(Node node: network.getIntermediateNodes()){
+           Node originalNode = originalNodes.get(node.getId());
+           assertNotNull(originalNode);
+           assertNotSame(originalNode,node);
+           assertInstanceOf(originalNode.getClass(),node);
+        }
     }
 
-    @Test
-    public void nodeRandomTest() throws Exception {
-        ObjectMapper om = new ObjectMapper();
-        om.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION.mappedFeature(), true);
-        List<Node> nodes = new RandomNetworkBuilder(x -> Collections.emptyList(), x -> Collections.emptyList())
-                .maxNodes(101)
-                .minNodes(100)
-                .build().getIntermediateNodes();
+    private static Object serializeThenDeserialize(Object obj) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
 
-        for (Node node : nodes) {
-            String json = om.writeValueAsString(node);
-            try {
-                om.readValue(json, Node.class);
-            } catch (Exception e) {
-                System.out.println(node.getClass());
-                throw e;
-            }
-        }
+        objectOutputStream.writeObject(obj);
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+
+        return objectInputStream.readObject();
     }
 }

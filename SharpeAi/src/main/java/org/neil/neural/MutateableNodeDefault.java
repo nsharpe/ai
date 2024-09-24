@@ -1,6 +1,10 @@
 package org.neil.neural;
 
+import java.io.Serial;
+
 public class MutateableNodeDefault extends NodeDefault implements MutateableNode{
+    @Serial
+    private static final long serialVersionUID = 3108793121583625752L;
 
     public MutateableNodeDefault(int id, int capacity, int activationLimit) {
         super(id, capacity, activationLimit);

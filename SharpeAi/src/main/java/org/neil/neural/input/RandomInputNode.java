@@ -2,6 +2,7 @@ package org.neil.neural.input;
 
 import org.neil.neural.NodeDefault;
 
+import java.io.Serial;
 import java.util.Random;
 
 
@@ -12,7 +13,11 @@ import java.util.Random;
  *
  */
 public class RandomInputNode<E> extends NodeDefault implements InputNode<E> {
-    private static Random random = new Random();
+    private static final Random random = new Random();
+
+    @Serial
+    private final static long serialVersionUID = -3593584282714208032L;
+
     public RandomInputNode(int id, int capacity) {
         super(id, capacity, 1);
     }

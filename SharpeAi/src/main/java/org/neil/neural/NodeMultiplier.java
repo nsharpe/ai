@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.io.Serial;
+
 @JsonTypeName("nodeMultiplier")
 @JsonDeserialize(as=NodeMultiplier.class)
 public class NodeMultiplier extends NodeDefault implements MutateableNode{
+
+    @Serial
+    private final static long serialVersionUID = 1395182505655397178L;
 
     public NodeMultiplier(int id) {
         super(id);

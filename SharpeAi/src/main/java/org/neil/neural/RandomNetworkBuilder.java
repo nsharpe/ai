@@ -7,6 +7,8 @@ import org.neil.neural.output.OutputNodeGenerator;
 import org.neil.simulation.MutationStrategy;
 import org.neil.simulation.SimulationInput;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -14,8 +16,12 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
-public final class RandomNetworkBuilder{
+public final class RandomNetworkBuilder implements Serializable  {
     private static Random random = new Random();
+
+    @Serial
+    private final static long serialVersionUID = -1318841703743764474L;
+
 
     private final InputNodeGenerator inputs;
     private final OutputNodeGenerator outputs;

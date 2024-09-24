@@ -4,15 +4,13 @@ package org.neil.neural;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.AllArgsConstructor;
-import org.neil.neural.serializer.NodeDeserializer;
 
+import java.io.Serial;
 import java.util.Objects;
 
 @JsonTypeName("default")
@@ -21,6 +19,9 @@ import java.util.Objects;
 @JsonDeserialize(as= NodeDefault.class)
 @JsonIdentityInfo( generator= ObjectIdGenerators.PropertyGenerator.class,scope = Node.class)
 public class NodeDefault implements Node {
+
+    @Serial
+    private final static long serialVersionUID = -1273882565886466611L;
 
     private final int id;
     @JsonProperty("capacity")

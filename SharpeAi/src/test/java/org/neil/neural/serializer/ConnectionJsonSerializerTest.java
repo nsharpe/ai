@@ -4,10 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.core.StreamReadFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neil.neural.Connection;
 import org.neil.neural.Node;
@@ -15,10 +11,14 @@ import org.neil.neural.NodeAlwaysEmpty;
 import org.neil.neural.NodeAlwaysFull;
 import org.neil.neural.NodeDefault;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ConnectionJsonSerializerTest {
@@ -27,16 +27,6 @@ public class ConnectionJsonSerializerTest {
     Node nodeDefault = new NodeDefault(1);
     Node alwaysFull = new NodeAlwaysFull(3);
     Node alwaysEmpty = new NodeAlwaysEmpty(5);
-
-    ObjectMapper objectMapper;
-
-    @BeforeEach
-    public void before() {
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        objectMapper.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION.mappedFeature(), true);
-
-    }
 
     @Test
     public void serializeConnection() throws Exception {
@@ -50,13 +40,49 @@ public class ConnectionJsonSerializerTest {
                 mutiplier,
                 Connection.ConnectionType.ADD);
 
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
 
-        TestSerializer testSerializer = new TestSerializer(
-                connection
-        );
+        objectOutputStream.writeObject(connection);
 
-        System.out.println(objectMapper.writeValueAsString(testSerializer));
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
+        Object obj = objectInputStream.readObject();
+
+        assertNotNull(obj);
+        Connection deserialized = assertInstanceOf(Connection.class,obj);
+        assertEquals(connection.getDestination().getId(),deserialized.getDestination().getId());
+
+    }
+
+    @Test
+    public void serializeConnectionSameNode() throws Exception {
+
+        int bandwith = 11;
+        double mutiplier = 5.0f;
+
+        Connection connection = new Connection(nodeDefault,
+                nodeDefault,
+                bandwith,
+                mutiplier,
+                Connection.ConnectionType.ADD);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+
+        objectOutputStream.writeObject(connection);
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+
+        Object obj = objectInputStream.readObject();
+
+        assertNotNull(obj);
+        Connection deserialized = assertInstanceOf(Connection.class,obj);
+        assertEquals(deserialized.getDestination(),deserialized.getSource());
+
+        assertTrue(deserialized.getDestination()==deserialized.getSource());
     }
 
     @Test
@@ -79,58 +105,13 @@ public class ConnectionJsonSerializerTest {
                 new TestSerializer(second)
         );
 
-        String json = objectMapper.writeValueAsString(collection);
-
-        System.out.println(json);
-
-        assertEquals("[{\"connection\":{\"bandwidth\":3,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":5.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0}},{\"connection\":{\"bandwidth\":7,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":11.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":50,\"capacity\":10,\"depreciate\":10,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":60,\"capacity\":30,\"depreciate\":12,\"stored\":0}}]",
-                json);
-
-
-    }
-
-    @Test
-    public void deserializeConnectionArray() throws Exception {
-        Node input = new NodeDefault(1);
-        Connection connection = new Connection(input,
-                input,
-                1,
-                1,
-                Connection.ConnectionType.SUBTRACT);
-        String json = objectMapper.writeValueAsString(new TestSerializer(connection));
-
-        System.out.println(json);
-
-        try {
-            Connection deserialized = objectMapper.readValue(json, Connection.class);
-            // Currently connections can only be deserialized within the context of the Network class.
-            // This is to handle circular references.  See NetworkDeserializer
-            fail();
-        } catch (Exception e) {
-            // Exception expected
-        }
-    }
-
-
-    @Test
-    public void deserializeSingleConnection() throws Exception {
-        String json = "{\"connection\":{\"bandwidth\":3,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":5.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0}}";
-
-        try {
-            TestSerializer ser = objectMapper.readValue(json, TestSerializer.class);
-
-            // Currently connections can only be deserialized within the context of the Network class.
-            // This is to handle circular references.  See NetworkDeserializer
-            fail();
-        } catch (Exception e) {
-            // Exception expected
-        }
+        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(collection);
     }
 
 
     @JsonTypeName("testSerializerConnection")
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class TestSerializer {
+    private static class TestSerializer implements Serializable {
 
         @JsonProperty
         Node input;

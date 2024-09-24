@@ -1,19 +1,20 @@
 package org.neil.neural;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonTypeName("nodeMax")
 @JsonDeserialize(as= NodeMax.class)
 public class NodeMax extends NodeDefault implements MutateableNode{
+
+    @Serial
+    private static final long serialVersionUID = 820838137585241510L;
 
     @JsonProperty
     private int numberOfInputsKept = 5;

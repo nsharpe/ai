@@ -1,15 +1,18 @@
 package org.neil.neural;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.io.Serial;
 
 @JsonTypeName("nodeDivisor")
 @JsonDeserialize(as=NodeDivisor.class)
 public class NodeDivisor extends NodeDefault implements MutateableNode{
+
+    @Serial
+    private final static long serialVersionUID = 7173205259211958917L;
 
     public NodeDivisor(int id) {
         super(id);

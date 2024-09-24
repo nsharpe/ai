@@ -1,16 +1,18 @@
 package org.neil.neural;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.io.Serial;
 
 @JsonTypeName("alwaysEmpty")
 @JsonDeserialize(as= NodeAlwaysEmpty.class)
 public class NodeAlwaysEmpty extends NodeDefault{
+
+    @Serial
+    private final static long serialVersionUID = -9066639195578819682L;
 
     public NodeAlwaysEmpty(int id) {
         super(id);

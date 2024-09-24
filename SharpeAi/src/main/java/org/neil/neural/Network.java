@@ -9,13 +9,18 @@ import org.neil.neural.output.OutputNode;
 import org.neil.neural.serializer.NetworkDeserializer;
 import org.neil.neural.serializer.NetworkSerializer;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @JsonSerialize(using = NetworkSerializer.class)
 @JsonDeserialize(using = NetworkDeserializer.class)
-public class Network {
+public class Network implements Serializable {
+
+    @Serial
+    private final static long serialVersionUID = -1310867321387108725L;
 
     private Map<Node, List<Connection>> connections;
     private final List<InputNode> inputNodes;

@@ -6,11 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Random;
 
 
-public class Connection {
+public class Connection implements Serializable {
+
+    @Serial
+    private final static long serialVersionUID = -2250361909761596387L;
+
     private static Random random = new Random();
 
     private final Node source;
