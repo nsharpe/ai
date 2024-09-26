@@ -10,18 +10,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.io.Serial;
 import java.util.Objects;
 
 @JsonTypeName("default")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
-@JsonDeserialize(as= NodeDefault.class)
+@JsonDeserialize(as= AbstractNode.class)
 @JsonIdentityInfo( generator= ObjectIdGenerators.PropertyGenerator.class,scope = Node.class)
-public class NodeDefault implements Node {
-
-    @Serial
-    private final static long serialVersionUID = -1273882565886466611L;
+public abstract class AbstractNode implements Node {
 
     private final int id;
     @JsonProperty("capacity")
@@ -37,13 +33,13 @@ public class NodeDefault implements Node {
     @JsonProperty("depreciate")
     private final int depreciate;
 
-    public NodeDefault(int id) {
+    public AbstractNode(int id) {
         this(id, Integer.MAX_VALUE, Integer.MAX_VALUE / 2);
     }
 
-    public NodeDefault(int id,
-                       int capacity,
-                       int activationLimit) {
+    public AbstractNode(int id,
+                        int capacity,
+                        int activationLimit) {
         this(id,
                 capacity,
                 0,
@@ -53,12 +49,12 @@ public class NodeDefault implements Node {
     }
 
     @JsonCreator()
-    public NodeDefault(@JsonProperty("@id") int id,
-                       @JsonProperty("capacity")int capacity,
-                       @JsonProperty("stored")int stored,
-                       @JsonProperty("activateable") boolean activateable,
-                       @JsonProperty("activationLimit") int activationLimit,
-                       @JsonProperty("depreciate") int depreciate) {
+    public AbstractNode(@JsonProperty("@id") int id,
+                        @JsonProperty("capacity")int capacity,
+                        @JsonProperty("stored")int stored,
+                        @JsonProperty("activateable") boolean activateable,
+                        @JsonProperty("activationLimit") int activationLimit,
+                        @JsonProperty("depreciate") int depreciate) {
         if (id <= 0) {
             throw new IllegalStateException("id must be positive");
         }
@@ -73,7 +69,7 @@ public class NodeDefault implements Node {
         this.depreciate = depreciate;
     }
 
-    public NodeDefault(Node node) {
+    public AbstractNode(Node node) {
         this(node.getId(), node.getCapacity(), node.getActivationLimit());
     }
 
@@ -137,15 +133,10 @@ public class NodeDefault implements Node {
     }
 
     @Override
-    public Node copy() {
-        return new NodeDefault(this);
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NodeDefault that = (NodeDefault) o;
+        AbstractNode that = (AbstractNode) o;
         return id == that.id;
     }
 

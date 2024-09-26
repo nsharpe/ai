@@ -1,9 +1,9 @@
 package org.neil.neural.output;
 
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.object.Creature;
 
-public class LeftDirectionOutputNode extends NodeDefault implements OutputNode<Creature> {
+public class LeftDirectionOutputNode extends AbstractNode implements OutputNode<Creature> {
 
     public LeftDirectionOutputNode(int id, int capacity) {
         super(id, capacity, 0);

@@ -1,8 +1,8 @@
 package org.neil.neural.input;
 
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 
-public class ProximityInputNode extends NodeDefault implements InputNode<Inputs> {
+public class ProximityInputNode extends AbstractNode implements InputNode<Inputs> {
     public ProximityInputNode(int id, int capacity) {
         super(id, capacity, 0);
     }

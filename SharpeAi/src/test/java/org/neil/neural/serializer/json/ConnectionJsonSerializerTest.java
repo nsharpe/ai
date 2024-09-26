@@ -10,10 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neil.neural.Connection;
+import org.neil.neural.MutateableNodeDefault;
 import org.neil.neural.Node;
 import org.neil.neural.NodeAlwaysEmpty;
 import org.neil.neural.NodeAlwaysFull;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ConnectionJsonSerializerTest {
 
 
-    Node nodeDefault = new NodeDefault(1);
+    Node nodeDefault = new MutateableNodeDefault(1,100,50);
     Node alwaysFull = new NodeAlwaysFull(3);
     Node alwaysEmpty = new NodeAlwaysEmpty(5);
 
@@ -62,14 +63,14 @@ public class ConnectionJsonSerializerTest {
     @Test
     public void serializerArrayList() throws Exception {
 
-        Connection first = new Connection(new NodeDefault(1, 20, 100),
-                new NodeDefault(2, 20, 100),
+        Connection first = new Connection(new MutateableNodeDefault(1, 20, 100),
+                new MutateableNodeDefault(2, 20, 100),
                 3,
                 5,
                 Connection.ConnectionType.ADD);
 
-        Connection second = new Connection(new NodeDefault(1, 10, 50),
-                new NodeDefault(2, 30, 60),
+        Connection second = new Connection(new MutateableNodeDefault(1, 10, 50),
+                new MutateableNodeDefault(2, 30, 60),
                 7,
                 11,
                 Connection.ConnectionType.ADD);
@@ -91,7 +92,7 @@ public class ConnectionJsonSerializerTest {
 
     @Test
     public void deserializeConnectionArray() throws Exception {
-        Node input = new NodeDefault(1);
+        Node input = new MutateableNodeDefault(1,100,50);
         Connection connection = new Connection(input,
                 input,
                 1,

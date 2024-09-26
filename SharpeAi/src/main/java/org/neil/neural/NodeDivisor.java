@@ -9,7 +9,7 @@ import java.io.Serial;
 
 @JsonTypeName("nodeDivisor")
 @JsonDeserialize(as=NodeDivisor.class)
-public class NodeDivisor extends NodeDefault implements MutateableNode{
+public class NodeDivisor extends AbstractNode implements MutateableNode{
 
     @Serial
     private final static long serialVersionUID = 7173205259211958917L;
@@ -56,5 +56,20 @@ public class NodeDivisor extends NodeDefault implements MutateableNode{
     @Override
     public Node copy() {
         return new NodeDivisor(this);
+    }
+
+    public static Mutator mutator(){
+        return new Mutator();
+    }
+
+    public static class Mutator implements NodeMutator<NodeDivisor>{
+
+        @Serial
+        private static final long serialVersionUID = -8057973137161253840L;
+
+        @Override
+        public NodeDivisor generate(int id, int capacity) {
+            return new NodeDivisor(id,capacity,capacity/2);
+        }
     }
 }

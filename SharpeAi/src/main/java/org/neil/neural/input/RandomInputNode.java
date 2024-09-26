@@ -1,6 +1,6 @@
 package org.neil.neural.input;
 
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 
 import java.io.Serial;
 import java.util.Random;
@@ -12,7 +12,7 @@ import java.util.Random;
  * @Author Neil Sharpe
  *
  */
-public class RandomInputNode<E> extends NodeDefault implements InputNode<E> {
+public class RandomInputNode<E> extends AbstractNode implements InputNode<E> {
     private static final Random random = new Random();
 
     @Serial

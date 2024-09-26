@@ -4,9 +4,10 @@ import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.neil.neural.Connection;
+import org.neil.neural.MutateableNodeDefault;
 import org.neil.neural.Network;
 import org.neil.neural.Node;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.neural.RandomNetworkBuilder;
 
 import java.util.Collections;
@@ -48,7 +49,7 @@ public class NetworkSerializerTest {
     public void networkOneConnectionOneNodeSerializer() throws Exception {
         ObjectMapper om = new ObjectMapper();
 
-        Node node = new NodeDefault(1);
+        Node node = new MutateableNodeDefault(1,100,50);
         Connection connection = new Connection(
                 node,
                 node,

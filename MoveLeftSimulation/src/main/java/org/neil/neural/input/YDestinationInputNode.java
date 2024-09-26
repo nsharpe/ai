@@ -1,11 +1,11 @@
 package org.neil.neural.input;
 
 import org.neil.board.Coordinates;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 
 import java.util.function.Supplier;
 
-public class YDestinationInputNode extends NodeDefault implements InputNode<Inputs> {
+public class YDestinationInputNode extends AbstractNode implements InputNode<Inputs> {
     private final Supplier<Coordinates> coordinatesSupplier;
     public YDestinationInputNode(int id, int capacity, Supplier<Coordinates> coordinatesSupplier) {
         super(id, capacity, 0);

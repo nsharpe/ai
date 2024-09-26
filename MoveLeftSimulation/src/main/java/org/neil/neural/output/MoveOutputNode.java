@@ -1,10 +1,10 @@
 package org.neil.neural.output;
 
 import org.neil.board.Coordinates;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.object.Creature;
 
-public class MoveOutputNode extends NodeDefault implements OutputNode<Creature> {
+public class MoveOutputNode extends AbstractNode implements OutputNode<Creature> {
 
     public MoveOutputNode(int id, int capacity) {
         super(id, capacity, 0);

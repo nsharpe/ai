@@ -11,7 +11,7 @@ import java.util.List;
 
 @JsonTypeName("nodeMax")
 @JsonDeserialize(as= NodeMax.class)
-public class NodeMax extends NodeDefault implements MutateableNode{
+public class NodeMax extends AbstractNode implements MutateableNode{
 
     @Serial
     private static final long serialVersionUID = 820838137585241510L;
@@ -92,5 +92,21 @@ public class NodeMax extends NodeDefault implements MutateableNode{
     public MutateableNode mutate(int capacityMin, int capacityMax, int activationMax) {
         int capacity = generateNewCapacity(capacityMin,capacityMax);
         return new NodeMax(this.getId(),capacity,generateNewActivation(capacity,activationMax));
+    }
+
+
+    public static Mutator mutator(){
+        return new Mutator();
+    }
+
+    public static class Mutator implements NodeMutator<NodeMax>{
+
+        @Serial
+        private static final long serialVersionUID = 5266982723203463212L;
+
+        @Override
+        public NodeMax generate(int id, int capacity) {
+            return new NodeMax(id,capacity,capacity/2);
+        }
     }
 }

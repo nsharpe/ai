@@ -41,13 +41,13 @@ public final class RandomNetworkBuilder implements Serializable  {
     private volatile double mutationRate;
     private volatile MutationStrategy mutationStrategy = MutationStrategy.ALWAYS_ALLOW;
 
-    private final List<BiFunction<Integer, Integer, Node>> nodeSupplier = List.of(
-            (id, capacity) -> new MutateableNodeDefault(id, capacity, capacity / 2),
-            (id, capacity) -> new NodeMultiplier(id, capacity, capacity / 2),
-            (id, capacity) -> new NodeDivisor(id, capacity, capacity / 2),
-            (id, capacity) -> new NodeMax(id, capacity, capacity / 2),
-            (id, capacity) -> new NodeAlwaysFull(id, capacity),
-            (id, capacity) -> new NodeAlwaysEmpty(id, capacity)
+    private final List<NodeMutator<?>> nodeSupplier = List.of(
+            MutateableNodeDefault.mutator(),
+            NodeMultiplier.mutator(),
+            NodeDivisor.mutator(),
+            NodeMax.mutator(),
+            NodeAlwaysFull.mutator(),
+            NodeAlwaysEmpty.mutator()
     );
 
     public RandomNetworkBuilder(SimulationInput simulationInput) {
@@ -89,7 +89,7 @@ public final class RandomNetworkBuilder implements Serializable  {
     }
 
     public Node createIntermediateNode(int id, int capacity) {
-        return nodeSupplier.get(random.nextInt(nodeSupplier.size())).apply(id, capacity);
+        return nodeSupplier.get(random.nextInt(nodeSupplier.size())).generate(id, capacity);
     }
 
 

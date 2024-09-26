@@ -1,9 +1,8 @@
 package org.neil.neural.input;
 
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 
 import java.io.Serial;
-import java.util.Random;
 
 /**
  * An input node that at the start of a tick for a neural network fills to capacity
@@ -11,7 +10,7 @@ import java.util.Random;
  * @Author Neil Sharpe
  *
  */
-public class ConstantInputNode<E> extends NodeDefault implements InputNode<E> {
+public class ConstantInputNode<E> extends AbstractNode implements InputNode<E> {
     @Serial
     private final static long serialVersionUID = 2678688287496952476L;
 

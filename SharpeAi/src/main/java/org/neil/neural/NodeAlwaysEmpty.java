@@ -9,7 +9,7 @@ import java.io.Serial;
 
 @JsonTypeName("alwaysEmpty")
 @JsonDeserialize(as= NodeAlwaysEmpty.class)
-public class NodeAlwaysEmpty extends NodeDefault{
+public class NodeAlwaysEmpty extends AbstractNode {
 
     @Serial
     private final static long serialVersionUID = -9066639195578819682L;
@@ -49,5 +49,20 @@ public class NodeAlwaysEmpty extends NodeDefault{
     @Override
     public Node copy() {
         return new NodeAlwaysEmpty(this);
+    }
+
+    public static Mutator mutator(){
+        return new Mutator();
+    }
+
+    public static class Mutator implements NodeMutator<NodeAlwaysEmpty>{
+
+        @Serial
+        private static final long serialVersionUID = -2759793543225005001L;
+
+        @Override
+        public NodeAlwaysEmpty generate(int id, int capacity) {
+            return new NodeAlwaysEmpty(id,capacity);
+        }
     }
 }

@@ -2,12 +2,17 @@ package org.neil.neural.input;
 
 import org.neil.board.Coordinates;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CreatureInputs implements InputNodeGenerator {
+
+    @Serial
+    private static final long serialVersionUID= 4149427688655578599L;
+
     private final int defaultCapacity = Integer.MAX_VALUE;
     private Supplier<Coordinates> coordinatesSupplier = null;
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.neil.neural.Node;
 import org.neil.neural.NodeAlwaysEmpty;
 import org.neil.neural.NodeAlwaysFull;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.neural.NodeDivisor;
 import org.neil.neural.NodeMax;
 import org.neil.neural.NodeMultiplier;
@@ -21,7 +21,7 @@ public class NodeDeserializer extends StdDeserializer<Node> {
     public static final Map<String,Class<? extends Node>> NODE_IMPLEMENTER;
 
     static {
-        NODE_IMPLEMENTER = Map.of("default",NodeDefault.class,
+        NODE_IMPLEMENTER = Map.of("default", AbstractNode.class,
                 "alwaysFull",NodeAlwaysFull.class,
                 "alwaysEmpty",NodeAlwaysEmpty.class,
                 "nodeMax", NodeMax.class,

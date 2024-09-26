@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.neil.neural.MutateableNodeDefault;
 import org.neil.neural.Node;
 import org.neil.neural.NodeAlwaysEmpty;
 import org.neil.neural.NodeAlwaysFull;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.neural.NodeDivisor;
 import org.neil.neural.NodeMax;
 import org.neil.neural.NodeMultiplier;
@@ -35,10 +35,10 @@ public class NodeSerializerTest {
 
     @Test
     public void testDefaultNodeSerializer() throws Exception{
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeDefault(1));
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new MutateableNodeDefault(1,100,50));
 
         System.out.println(json);
-        Node node = objectMapper.readValue(json, NodeDefault.class);
+        Node node = objectMapper.readValue(json, AbstractNode.class);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class NodeSerializerTest {
         MultipleNodes multipleNodes = new MultipleNodes();
         multipleNodes.nodes = List.of(new NodeAlwaysEmpty(1),
                 new NodeAlwaysFull(2),
-                new NodeDefault(3));
+                new MutateableNodeDefault(3,100,50));
 
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(multipleNodes);
 
@@ -97,7 +97,7 @@ public class NodeSerializerTest {
         MultipleNodes node = objectMapper.readValue(json, MultipleNodes.class);
         assertTrue(node.nodes.get(0) instanceof NodeAlwaysEmpty);
         assertTrue(node.nodes.get(1) instanceof NodeAlwaysFull);
-        assertTrue(node.nodes.get(2) instanceof NodeDefault);
+        assertTrue(node.nodes.get(2) instanceof AbstractNode);
     }
 
     public static class MultipleNodes{

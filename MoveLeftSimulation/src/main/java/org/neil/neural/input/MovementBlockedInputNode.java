@@ -1,10 +1,10 @@
 package org.neil.neural.input;
 
 import org.neil.board.Coordinates;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.object.Direction;
 
-public class MovementBlockedInputNode extends NodeDefault implements InputNode<Inputs> {
+public class MovementBlockedInputNode extends AbstractNode implements InputNode<Inputs> {
     public MovementBlockedInputNode(int id, int capacity) {
         super(id, capacity, 0);
     }

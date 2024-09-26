@@ -1,14 +1,14 @@
 package org.neil.neural.input;
 
 import org.neil.board.Coordinates;
-import org.neil.neural.NodeDefault;
+import org.neil.neural.AbstractNode;
 import org.neil.object.Direction;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DirectionViewInputNode extends NodeDefault implements InputNode<Inputs> {
+public class DirectionViewInputNode extends AbstractNode implements InputNode<Inputs> {
     public DirectionViewInputNode(int id, int capacity) {
         super(id, capacity, 0);
     }

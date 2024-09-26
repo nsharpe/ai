@@ -16,7 +16,7 @@ public class OutputNodeTest {
         Assertions.assertEquals(0, toTest.getStored());
     }
 
-    private static class OutputNodeNodeTester extends NodeDefault implements OutputNode<Integer> {
+    private static class OutputNodeNodeTester extends AbstractNode implements OutputNode<Integer> {
         public OutputNodeNodeTester() {
             super(1, 100,1);
         }

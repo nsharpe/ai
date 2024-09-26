@@ -1,15 +1,10 @@
 package org.neil.neural.serializer;
 
-import com.fasterxml.jackson.core.StreamReadFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.neil.neural.Connection;
 import org.neil.neural.Network;
 import org.neil.neural.Node;
-import org.neil.neural.NodeDefault;
 import org.neil.neural.RandomNetworkBuilder;
-import org.neil.neural.input.ConstantInputNode;
-import org.neil.neural.input.RandomInputNode;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
