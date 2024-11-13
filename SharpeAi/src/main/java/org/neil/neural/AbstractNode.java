@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Objects;
 
-@JsonTypeName("default")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
 @JsonDeserialize(as= AbstractNode.class)

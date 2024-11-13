@@ -1,13 +1,30 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.io.Serial;
 
+@JsonTypeName("default")
+@JsonDeserialize(as=MutateableNodeDefault.class)
 public class MutateableNodeDefault extends AbstractNode implements MutateableNode{
     @Serial
     private static final long serialVersionUID = 3108793121583625752L;
 
     public MutateableNodeDefault(int id, int capacity, int activationLimit) {
         super(id, capacity, activationLimit);
+    }
+
+    @JsonCreator()
+    public MutateableNodeDefault(@JsonProperty("@id") int id,
+                        @JsonProperty("capacity")int capacity,
+                        @JsonProperty("stored")int stored,
+                        @JsonProperty("activateable") boolean activateable,
+                        @JsonProperty("activationLimit") int activationLimit,
+                        @JsonProperty("depreciate") int depreciate) {
+        super(id,capacity,stored,activateable,activationLimit,depreciate);
     }
 
     @Override

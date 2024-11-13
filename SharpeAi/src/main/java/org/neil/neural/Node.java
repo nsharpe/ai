@@ -19,7 +19,7 @@ import java.io.Serializable;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = NodeAlwaysEmpty.class, name = "alwaysEmpty"),
         @JsonSubTypes.Type(value = NodeAlwaysFull.class, name = "alwaysFull"),
-        @JsonSubTypes.Type(value = AbstractNode.class, name = "default"),
+        @JsonSubTypes.Type(value = MutateableNodeDefault.class, name = "default"),
         @JsonSubTypes.Type(value = NodeDivisor.class,name = "nodeDivisor"),
         @JsonSubTypes.Type(value = NodeMultiplier.class,name="nodeMultiplier"),
         @JsonSubTypes.Type(value = NodeMax.class, name="nodeMax"),

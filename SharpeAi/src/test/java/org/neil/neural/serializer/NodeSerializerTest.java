@@ -38,7 +38,7 @@ public class NodeSerializerTest {
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new MutateableNodeDefault(1,100,50));
 
         System.out.println(json);
-        Node node = objectMapper.readValue(json, AbstractNode.class);
+        Node node = objectMapper.readValue(json, MutateableNodeDefault.class);
     }
 
     @Test
