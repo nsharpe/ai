@@ -73,7 +73,7 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public void addToStorage(int toAdd) {
+    public synchronized void addToStorage(int toAdd) {
         stored += toAdd;
         if (stored > capacity) {
             stored = capacity;

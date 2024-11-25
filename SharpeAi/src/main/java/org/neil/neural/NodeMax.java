@@ -53,7 +53,7 @@ public class NodeMax extends AbstractNode implements MutateableNode{
     }
 
     @Override
-    public void addToStorage(int toAdd) {
+    public synchronized void addToStorage(int toAdd) {
         if(toAdd > getCapacity()){
             toAdd = getCapacity();
         }
