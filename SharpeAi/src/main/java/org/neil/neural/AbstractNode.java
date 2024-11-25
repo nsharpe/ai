@@ -22,7 +22,7 @@ public abstract class AbstractNode implements Node {
     @JsonProperty("capacity")
     private final int capacity;
     @JsonProperty("stored")
-    private volatile int stored = 0;
+    private volatile long stored = 0;
     @JsonProperty("activateable")
     private volatile boolean activateable;
 
@@ -79,7 +79,7 @@ public abstract class AbstractNode implements Node {
             stored = capacity;
         }
 
-        if (stored > capacity / 2) {
+        if (stored > activationLimit) {
             activateable = true;
         }
         if (stored == 0) {
@@ -106,7 +106,7 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public int getStored() {
-        return stored;
+        return (int)stored;
     }
 
     @Override
