@@ -47,7 +47,8 @@ public final class RandomNetworkBuilder implements Serializable  {
             NodeDivisor.mutator(),
             NodeMax.mutator(),
             NodeAlwaysFull.mutator(),
-            NodeAlwaysEmpty.mutator()
+            NodeAlwaysEmpty.mutator(),
+            DifferentialNode.mutator()
     );
 
     public RandomNetworkBuilder(SimulationInput simulationInput) {

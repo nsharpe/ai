@@ -50,7 +50,7 @@ public interface Node extends Serializable {
     Node copy();
 
     default boolean isActivateable(){
-        return getActivationLimit() < getStored();
+        return getActivationLimit() > getStored();
     }
 
     int getActivationLimit();

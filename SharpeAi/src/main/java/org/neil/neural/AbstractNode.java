@@ -87,7 +87,7 @@ public abstract class AbstractNode implements Node {
         }
 
         if (stored < 0) {
-            throw new IllegalStateException("stored can't be less then zero");
+            stored = 0;
         }
         if (stored > capacity) {
             throw new IllegalStateException("stored can't be greater then capacity");
