@@ -25,6 +25,7 @@ public class DifferentialNode implements Node {
     @Override
     public void addToStorage(int toAdd) {
         long newStoredValue = stored + (previousValue - toAdd);
+        previousValue = toAdd;
         if(newStoredValue > capacity) {
             newStoredValue = capacity;
         }
