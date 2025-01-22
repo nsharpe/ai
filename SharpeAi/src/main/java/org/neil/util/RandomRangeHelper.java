@@ -31,6 +31,13 @@ public class RandomRangeHelper implements Serializable {
         return nextBoolean();
     }
 
+    public static boolean mutateBoolean(double mr, boolean original){
+        if(mutate(mr)){
+            return original;
+        }
+        return nextBoolean();
+    }
+
     /**
      * Returns true if a mutation should occur
      *
