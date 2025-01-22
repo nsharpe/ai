@@ -72,7 +72,6 @@ release {
 
 repositories {
     mavenLocal()
-    mavenCentral()
 }
 
 sourceCompatibility = '1.17'
