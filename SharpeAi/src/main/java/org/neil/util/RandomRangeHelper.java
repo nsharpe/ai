@@ -67,8 +67,12 @@ public class RandomRangeHelper implements Serializable {
         return ThreadLocalRandom.current().nextDouble();
     }
 
-    public static float nextFloat(float min, float max){
-        return ThreadLocalRandom.current().nextFloat(min,max);
+    public static double nextDouble(double origin, double bound){
+        return ThreadLocalRandom.current().nextDouble(origin,bound);
+    }
+
+    public static float nextFloat(float origin, float bound){
+        return ThreadLocalRandom.current().nextFloat(origin,bound);
     }
 
     public static int nextInt(int origin, int bound){

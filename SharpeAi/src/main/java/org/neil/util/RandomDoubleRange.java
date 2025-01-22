@@ -10,13 +10,13 @@ public record RandomDoubleRange(double origin,
     private static final long serialVersionUID = 4532255181379368350L;
 
 
-    public double nextFloat() {
-        return RandomRangeHelper.nextFloat(origin, bound);
+    public double nextDouble() {
+        return RandomRangeHelper.nextDouble(origin, bound);
     }
 
     public double mutateNumber(double chanceToMutate,
                               double originalValue){
-        if(RandomRangeHelper.nextFloat(0,1.0f) > chanceToMutate){
+        if(RandomRangeHelper.nextDouble(0,1.0) > chanceToMutate){
             return originalValue;
         }
 
@@ -31,6 +31,6 @@ public record RandomDoubleRange(double origin,
             return Math.min(bound,Math.max(origin,
                 RandomRangeHelper.nextFloat(0.97f,1.03f) * originalValue));
         }
-        return nextFloat();
+        return nextDouble();
     }
 }
