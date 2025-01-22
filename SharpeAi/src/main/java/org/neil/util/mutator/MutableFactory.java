@@ -46,6 +46,12 @@ public class MutableFactory<T extends Mutatable,I> implements Serializable {
         return Collections.unmodifiableMap(mutators);
     }
 
+    public MutableFactory<T,I> clear(){
+        mutatorList.clear();
+        mutators.clear();
+        return this;
+    }
+
     public MutableFactory<T,I> removeMutatorForClass(Class<? extends T> toRemove){
         mutatorList.remove(mutators.remove(toRemove));
         return this;
