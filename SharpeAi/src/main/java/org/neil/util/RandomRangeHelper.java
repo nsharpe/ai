@@ -73,10 +73,7 @@ public class RandomRangeHelper implements Serializable {
         if(items.isEmpty()){
             return Optional.empty();
         }
-        int next = nextInt(0,items.size()+1);
-        if(next>=items.size()){
-            throw new IllegalStateException("Error with getRandomElementOrNone");
-        }
+        int next = nextInt(0,items.size());
         return Optional.of(items.get(next));
     }
 
