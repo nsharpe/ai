@@ -11,12 +11,12 @@ public record RandomFloatRange(float origin,
 
 
     public float nextFloat() {
-        return RandomHelper.nextFloat(origin, bound);
+        return RandomRangeHelper.nextFloat(origin, bound);
     }
 
     public float mutateNumber(float chanceToMutate,
                               float originalValue){
-        if(RandomHelper.nextFloat(0,1.0f) > chanceToMutate){
+        if(RandomRangeHelper.nextFloat(0,1.0f) > chanceToMutate){
             return originalValue;
         }
 
@@ -27,9 +27,9 @@ public record RandomFloatRange(float origin,
          *
          * Thus the following line where the value is mutated with a range of originalValue +-3%
          */
-        if(RandomHelper.nextFloat(0,1.0f) > Math.max(1-chanceToMutate,0.8f)){
+        if(RandomRangeHelper.nextFloat(0,1.0f) > Math.max(1-chanceToMutate,0.8f)){
             return Math.min(bound,Math.max(origin,
-                RandomHelper.nextFloat(0.97f,1.03f) * originalValue));
+                RandomRangeHelper.nextFloat(0.97f,1.03f) * originalValue));
         }
         return nextFloat();
     }

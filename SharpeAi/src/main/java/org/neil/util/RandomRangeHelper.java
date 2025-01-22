@@ -1,46 +1,19 @@
 package org.neil.util;
 
-import com.badlogic.gdx.math.Vector2;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RandomHelper implements Serializable {
+public class RandomRangeHelper implements Serializable {
     @Serial
     private static final long serialVersionUID = 2365009739870931668L;
 
-    @JsonIgnore
-    private Vector2 mapDimensions;
-
-    public RandomHelper(@JsonProperty("width") float width,
-                        @JsonProperty("height") float height){
-        this(new Vector2(width,height));
-    }
-
-    public RandomHelper(Vector2 mapDimensions) {
-        this.mapDimensions = Objects.requireNonNull(mapDimensions);
-    }
-
-    public float getWidth(){
-        return mapDimensions.x;
-    }
-
-    public float getHeight(){
-        return mapDimensions.y;
-    }
-
-
-    public Vector2 randomPosition(){
-        float x = mapDimensions.x;
-        float y = mapDimensions.y;
-        return new Vector2(ThreadLocalRandom.current().nextFloat(-x,x),
-            ThreadLocalRandom.current().nextFloat(-y,y));
+    private RandomRangeHelper(){
+        //noop
     }
 
     public static boolean nextBoolean(){
