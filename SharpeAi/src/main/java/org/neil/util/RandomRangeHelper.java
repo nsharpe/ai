@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The purpose of this class is to provide wide changes to how random numbers are handled in a central location
+ * In theory this class is completely unnecessary
+ */
 public class RandomRangeHelper implements Serializable {
     @Serial
     private static final long serialVersionUID = 2365009739870931668L;
@@ -29,6 +33,10 @@ public class RandomRangeHelper implements Serializable {
 
     public static short nextShort(){
         return (short)ThreadLocalRandom.current().nextInt(Short.MIN_VALUE,Short.MAX_VALUE);
+    }
+
+    public static double nextFloat(double min, double max){
+        return ThreadLocalRandom.current().nextDouble(min,max);
     }
 
     public static float nextFloat(){
@@ -67,9 +75,16 @@ public class RandomRangeHelper implements Serializable {
         }
         int next = nextInt(0,items.size()+1);
         if(next>=items.size()){
-            return Optional.empty();
+            throw new IllegalStateException("Error with getRandomElementOrNone");
         }
         return Optional.of(items.get(next));
+    }
+
+    public static <X> Optional<X> getRandomElement(double mutationRate, Optional<X> original, List<X> items){
+        if(ThreadLocalRandom.current().nextDouble() > mutationRate){
+            return original;
+        }
+        return getRandomElement(items);
     }
 
     public static <X> Optional<X> getRandomElement(float mutationRate, Optional<X> original, List<X> items){
@@ -77,6 +92,13 @@ public class RandomRangeHelper implements Serializable {
             return original;
         }
         return getRandomElement(items);
+    }
+
+    public static <X> Optional<X> getRandomElementOrNone(double mutationRate, Optional<X> original, List<X> items){
+        if(ThreadLocalRandom.current().nextDouble() > mutationRate){
+            return original;
+        }
+        return getRandomElementOrNone(items);
     }
 
     public static <X> Optional<X> getRandomElementOrNone(float mutationRate, Optional<X> original, List<X> items){
