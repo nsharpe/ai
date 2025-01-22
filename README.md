@@ -42,7 +42,7 @@ From the root directory you can run
 
 `./gradlew clean build run`
 
-## Publishing to maven
+## Creating a release
 run
 
-`./gradlew clean SharpeAi:publishToMavenLocal`
+`./gradlew release`
