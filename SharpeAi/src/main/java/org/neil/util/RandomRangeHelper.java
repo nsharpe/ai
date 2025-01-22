@@ -25,10 +25,30 @@ public class RandomRangeHelper implements Serializable {
     }
 
     public static boolean mutateBoolean(float mr, boolean original){
-        if(nextFloat() < mr){
+        if(mutate(mr)){
             return original;
         }
         return nextBoolean();
+    }
+
+    /**
+     * Returns true if a mutation should occur
+     *
+     * @param mutationRate
+     * @return
+     */
+    public static boolean mutate(float mutationRate){
+        return nextFloat() < mutationRate;
+    }
+
+    /**
+     * Returns true if a mutation should occur
+     *
+     * @param mutationRate
+     * @return
+     */
+    public static boolean mutate(double mutationRate){
+        return nextDouble() < mutationRate;
     }
 
     public static short nextShort(){
@@ -43,6 +63,10 @@ public class RandomRangeHelper implements Serializable {
         return ThreadLocalRandom.current().nextFloat();
     }
 
+    public static double nextDouble(){
+        return ThreadLocalRandom.current().nextDouble();
+    }
+
     public static float nextFloat(float min, float max){
         return ThreadLocalRandom.current().nextFloat(min,max);
     }
@@ -55,11 +79,12 @@ public class RandomRangeHelper implements Serializable {
         return items[ThreadLocalRandom.current().nextInt(items.length)];
     }
 
-    public static <X> X getRandomElement(float mutationRate, X original, X[] items){
-        if(ThreadLocalRandom.current().nextFloat() > mutationRate){
-            return original;
+    public static <X> X getRandomElement(float mutationRate, X original, X[] items) {
+        if (mutate(mutationRate)) {
+            return items[ThreadLocalRandom.current().nextInt(items.length)];
         }
-        return items[ThreadLocalRandom.current().nextInt(items.length)];
+
+        return original;
     }
 
     public static <X> Optional<X> getRandomElement(List<X> items){
@@ -78,30 +103,30 @@ public class RandomRangeHelper implements Serializable {
     }
 
     public static <X> Optional<X> getRandomElement(double mutationRate, Optional<X> original, List<X> items){
-        if(ThreadLocalRandom.current().nextDouble() > mutationRate){
-            return original;
+        if(mutate(mutationRate)){
+            getRandomElement(items);
         }
-        return getRandomElement(items);
+        return original;
     }
 
     public static <X> Optional<X> getRandomElement(float mutationRate, Optional<X> original, List<X> items){
-        if(ThreadLocalRandom.current().nextFloat() > mutationRate){
-            return original;
+        if(mutate(mutationRate)) {
+            return getRandomElement(items);
         }
-        return getRandomElement(items);
+        return original;
     }
 
     public static <X> Optional<X> getRandomElementOrNone(double mutationRate, Optional<X> original, List<X> items){
-        if(ThreadLocalRandom.current().nextDouble() > mutationRate){
-            return original;
+        if(mutate(mutationRate)) {
+            return getRandomElementOrNone(items);
         }
-        return getRandomElementOrNone(items);
+        return original;
     }
 
     public static <X> Optional<X> getRandomElementOrNone(float mutationRate, Optional<X> original, List<X> items){
-        if(ThreadLocalRandom.current().nextFloat() > mutationRate){
-            return original;
+        if(mutate(mutationRate)) {
+            return getRandomElementOrNone(items);
         }
-        return getRandomElementOrNone(items);
+        return original;
     }
 }
