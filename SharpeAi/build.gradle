@@ -35,6 +35,8 @@ publishing {
     }
 }
 
+afterReleaseBuild.dependsOn publishToMavenLocal
+
 release {
 
     failOnCommitNeeded = true
