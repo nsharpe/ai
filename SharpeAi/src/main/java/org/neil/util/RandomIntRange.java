@@ -13,6 +13,23 @@ public record RandomIntRange(int origin,
         return RandomRangeHelper.nextInt(origin, bound);
     }
 
+    public int mutateNumber(double chanceToMutate,
+                            int originalValue){
+        if(RandomRangeHelper.nextFloat(0,1.0f) > chanceToMutate){
+            return originalValue;
+        }
+        if(RandomRangeHelper.nextFloat(0,1.0f) > chanceToMutate){
+
+            if(bound-origin < 100){
+                return bound(RandomRangeHelper.nextInt(originalValue-1,originalValue+2));
+            }
+
+            return bound(
+                    (int)(originalValue + ((float)originalValue * RandomRangeHelper.nextFloat(0.99f,1.01f)) ));
+        }
+        return next();
+    }
+
     public int mutateNumber(float chanceToMutate,
                               int originalValue){
         if(RandomRangeHelper.nextFloat(0,1.0f) > chanceToMutate){
