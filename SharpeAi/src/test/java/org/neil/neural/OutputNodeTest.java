@@ -18,7 +18,7 @@ public class OutputNodeTest {
 
     private static class OutputNodeNodeTester extends AbstractNode implements OutputNode<Integer> {
         public OutputNodeNodeTester() {
-            super(1, 100,1);
+            super(1, 100,1,0);
         }
 
         @Override

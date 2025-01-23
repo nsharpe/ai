@@ -329,7 +329,7 @@ public final class RandomNetworkBuilder implements Serializable  {
         for (int i = 0; i < numberOfNodes; i++) {
             int storage = randomRange(minStorage, maxStorage);
 
-            nodes.add(new MutateableNodeDefault(i + 1000, storage, 10));
+            nodes.add(new MutateableNodeDefault(i + 1000, storage, 10,0));
         }
 
         return nodes;

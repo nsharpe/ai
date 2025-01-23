@@ -1,5 +1,6 @@
 package org.neil.neural.input;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.neil.neural.AbstractNode;
 
 import java.io.Serial;
@@ -18,8 +19,10 @@ public class RandomInputNode<E> extends AbstractNode implements InputNode<E> {
     @Serial
     private final static long serialVersionUID = -3593584282714208032L;
 
-    public RandomInputNode(int id, int capacity) {
-        super(id, capacity, 1);
+    public RandomInputNode(int id,
+                           int capacity,
+                           @JsonProperty("mutationRate") double mutationRate) {
+        super(id, capacity, 1,mutationRate);
     }
 
     @Override
@@ -34,6 +37,6 @@ public class RandomInputNode<E> extends AbstractNode implements InputNode<E> {
 
     @Override
     public InputNode copy() {
-        return new RandomInputNode(getId(), getCapacity());
+        return new RandomInputNode(getId(), getCapacity(),0);
     }
 }

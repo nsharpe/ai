@@ -24,12 +24,12 @@ public class NodeMax extends AbstractNode implements MutateableNode{
     @JsonProperty
     private volatile Integer currentMax = 0;
 
-    public NodeMax(int id) {
-        super(id);
+    public NodeMax(int id, double mutationRate) {
+        super(id,mutationRate);
     }
 
-    public NodeMax(int id, int capacity, int activation) {
-        super(id, capacity, activation);
+    public NodeMax(int id, int capacity, int activation, double mutationRate) {
+        super(id, capacity, activation,mutationRate);
     }
 
     @JsonCreator
@@ -41,8 +41,9 @@ public class NodeMax extends AbstractNode implements MutateableNode{
                    @JsonProperty("depreciate") int depreciate,
                    @JsonProperty("numberOfInputsKept") int numberOfInputsKept,
                    @JsonProperty("lastInputs") List<Integer> lastInputs,
-                   @JsonProperty("currentMax") Integer currentMax) {
-        super(id, capacity, stored, activateable, activationLimit, depreciate);
+                   @JsonProperty("currentMax") Integer currentMax,
+                   @JsonProperty("mutationRate") double mutationRate) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate, mutationRate);
         this.numberOfInputsKept = numberOfInputsKept;
         this.lastInputs = lastInputs;
         this.currentMax = currentMax;
@@ -91,7 +92,7 @@ public class NodeMax extends AbstractNode implements MutateableNode{
     @Override
     public MutateableNode mutate(int capacityMin, int capacityMax, int activationMax) {
         int capacity = generateNewCapacity(capacityMin,capacityMax);
-        return new NodeMax(this.getId(),capacity,generateNewActivation(capacity,activationMax));
+        return new NodeMax(this.getId(),capacity,generateNewActivation(capacity,activationMax),0.0);
     }
 
 
@@ -106,7 +107,7 @@ public class NodeMax extends AbstractNode implements MutateableNode{
 
         @Override
         public NodeMax generate(int id, int capacity) {
-            return new NodeMax(id,capacity,capacity/2);
+            return new NodeMax(id,capacity,capacity/2,0);
         }
     }
 }

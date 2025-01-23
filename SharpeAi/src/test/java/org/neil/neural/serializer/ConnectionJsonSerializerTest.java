@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ConnectionJsonSerializerTest {
 
 
-    Node nodeDefault = new MutateableNodeDefault(1,100,50);
-    Node alwaysFull = new NodeAlwaysFull(3);
-    Node alwaysEmpty = new NodeAlwaysEmpty(5);
+    Node nodeDefault = new MutateableNodeDefault(1,100,50,0);
+    Node alwaysFull = new NodeAlwaysFull(3,7.0);
+    Node alwaysEmpty = new NodeAlwaysEmpty(5,0.7);
 
     @Test
     public void serializeConnection() throws Exception {
@@ -89,14 +89,14 @@ public class ConnectionJsonSerializerTest {
     @Test
     public void serializerArrayList() throws Exception {
 
-        Connection first = new Connection(new MutateableNodeDefault(1, 20, 100),
-                new MutateableNodeDefault(2, 20, 100),
+        Connection first = new Connection(new MutateableNodeDefault(1, 20, 100,0),
+                new MutateableNodeDefault(2, 20, 100,0),
                 3,
                 5,
                 Connection.ConnectionType.ADD);
 
-        Connection second = new Connection(new MutateableNodeDefault(1, 10, 50),
-                new MutateableNodeDefault(2, 30, 60),
+        Connection second = new Connection(new MutateableNodeDefault(1, 10, 50,0),
+                new MutateableNodeDefault(2, 30, 60,0),
                 7,
                 11,
                 Connection.ConnectionType.ADD);

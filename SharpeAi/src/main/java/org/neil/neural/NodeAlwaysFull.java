@@ -14,12 +14,12 @@ public class NodeAlwaysFull extends AbstractNode {
     @Serial
     private final static long serialVersionUID = -8797062803984779965L;
 
-    public NodeAlwaysFull(int id) {
-        super(id);
+    public NodeAlwaysFull(int id,double mutationRate) {
+        super(id,mutationRate);
     }
 
-    public NodeAlwaysFull(int id, int capacity) {
-        super(id, capacity, capacity / 2);
+    public NodeAlwaysFull(int id, int capacity,double mutationRate) {
+        super(id, capacity, capacity / 2,mutationRate);
         super.addToStorage(capacity);
     }
 
@@ -29,8 +29,9 @@ public class NodeAlwaysFull extends AbstractNode {
                           @JsonProperty("stored")int stored,
                           @JsonProperty("activateable") boolean activateable,
                           @JsonProperty("activationLimit") int activationLimit,
-                          @JsonProperty("depreciate") int depreciate) {
-        super(id, capacity, stored, activateable, activationLimit, depreciate);
+                          @JsonProperty("depreciate") int depreciate,
+                          @JsonProperty("mutationRate") double mutationRate) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate,mutationRate);
     }
 
     public NodeAlwaysFull(Node node) {

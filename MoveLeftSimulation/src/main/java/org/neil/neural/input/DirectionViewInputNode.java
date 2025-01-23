@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class DirectionViewInputNode extends AbstractNode implements InputNode<Inputs> {
     public DirectionViewInputNode(int id, int capacity) {
-        super(id, capacity, 0);
+        super(id, capacity, 0,0);
     }
 
     @Override

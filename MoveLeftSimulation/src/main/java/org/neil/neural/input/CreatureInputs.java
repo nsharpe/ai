@@ -42,11 +42,11 @@ public class CreatureInputs implements InputNodeGenerator {
 
     public Collection<InputNode> defaultInputs(int startingIndex) {
         return Stream.of(
-                new ConstantInputNode(startingIndex++, defaultCapacity),
+                new ConstantInputNode(startingIndex++, defaultCapacity,0),
                 new DirectionViewInputNode(startingIndex++, defaultCapacity),
                 new MovementBlockedInputNode(startingIndex++, defaultCapacity),
                 new ProximityInputNode(startingIndex++, defaultCapacity),
-                new RandomInputNode(startingIndex++, defaultCapacity),
+                new RandomInputNode(startingIndex++, defaultCapacity,0),
                 new XDirectionInputNode(startingIndex++, defaultCapacity),
                 new XPositionInputNode(startingIndex++, defaultCapacity),
                 new YDirectionInputNode(startingIndex++,defaultCapacity),

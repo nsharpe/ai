@@ -7,7 +7,7 @@ import org.neil.object.Creature;
 public class MoveOutputNode extends AbstractNode implements OutputNode<Creature> {
 
     public MoveOutputNode(int id, int capacity) {
-        super(id, capacity, 0);
+        super(id, capacity, 0,0);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.neil.neural;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serial;
 
 public class DifferentialNode implements Node {
@@ -11,15 +13,18 @@ public class DifferentialNode implements Node {
     private final int capacity;
     private final int activationThreshold;
     private final int depreciate;
+    private final double mutationRate;
 
-    public DifferentialNode(int id,
-                            int capacity,
-                            int activationThreshold,
-                            int depreciate) {
+    public DifferentialNode(@JsonProperty("id")int id,
+                            @JsonProperty("capacity")int capacity,
+                            @JsonProperty("activationThreshold")int activationThreshold,
+                            @JsonProperty("depreciate")int depreciate,
+                            @JsonProperty("mutationRate") double mutationRate) {
         this.id = id;
         this.capacity = capacity;
         this.activationThreshold = activationThreshold;
         this.depreciate = depreciate;
+        this.mutationRate = mutationRate;
     }
 
     @Override
@@ -60,7 +65,8 @@ public class DifferentialNode implements Node {
         return new DifferentialNode(id,
                 capacity,
                 activationThreshold,
-                depreciate);
+                depreciate,
+                mutationRate);
     }
 
     @Override
@@ -71,6 +77,11 @@ public class DifferentialNode implements Node {
     @Override
     public void depreciate() {
         this.stored -= Math.min(this.stored,this.depreciate);
+    }
+
+    @Override
+    public double mutationRate() {
+        return mutationRate;
     }
 
     public static Mutator mutator(){
@@ -84,7 +95,7 @@ public class DifferentialNode implements Node {
 
         @Override
         public DifferentialNode generate(int id, int capacity) {
-            return new DifferentialNode(id,capacity,capacity/2,Math.min(1,capacity/10));
+            return new DifferentialNode(id,capacity,capacity/2,Math.min(1,capacity/10),0);
         }
     }
 }

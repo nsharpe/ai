@@ -32,19 +32,24 @@ public abstract class AbstractNode implements Node {
     @JsonProperty("depreciate")
     private final int depreciate;
 
-    public AbstractNode(int id) {
-        this(id, Integer.MAX_VALUE, Integer.MAX_VALUE / 2);
+    @JsonProperty("mutationRate")
+    private final double mutationRate;
+
+    public AbstractNode(int id,double mutationRate) {
+        this(id, Integer.MAX_VALUE, Integer.MAX_VALUE / 2,mutationRate);
     }
 
     public AbstractNode(int id,
                         int capacity,
-                        int activationLimit) {
+                        int activationLimit,
+                        double mutationRate) {
         this(id,
                 capacity,
                 0,
                 false,
                 activationLimit,
-                activationLimit/5);
+                activationLimit/5,
+                mutationRate);
     }
 
     @JsonCreator()
@@ -53,7 +58,8 @@ public abstract class AbstractNode implements Node {
                         @JsonProperty("stored")int stored,
                         @JsonProperty("activateable") boolean activateable,
                         @JsonProperty("activationLimit") int activationLimit,
-                        @JsonProperty("depreciate") int depreciate) {
+                        @JsonProperty("depreciate") int depreciate,
+                        @JsonProperty("mutationRate") double mutationRate) {
         if (id <= 0) {
             throw new IllegalStateException("id must be positive");
         }
@@ -66,10 +72,11 @@ public abstract class AbstractNode implements Node {
         this.activateable = activateable;
         this.activationLimit = activationLimit;
         this.depreciate = depreciate;
+        this.mutationRate = mutationRate;
     }
 
     public AbstractNode(Node node) {
-        this(node.getId(), node.getCapacity(), node.getActivationLimit());
+        this(node.getId(), node.getCapacity(), node.getActivationLimit(),node.mutationRate());
     }
 
     @Override
@@ -124,6 +131,11 @@ public abstract class AbstractNode implements Node {
 
     public boolean isActivateable() {
         return activateable;
+    }
+
+    @Override
+    public double mutationRate() {
+        return mutationRate;
     }
 
     @Override

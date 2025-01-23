@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.neil.neural.serializer.NodeDeserializer;
+import org.neil.util.mutator.Mutatable;
 
 import java.io.Serializable;
 
@@ -27,7 +28,7 @@ import java.io.Serializable;
 )
 @JsonDeserialize(using = NodeDeserializer.class)
 @JsonIdentityInfo( generator= ObjectIdGenerators.PropertyGenerator.class,scope = Node.class)
-public interface Node extends Serializable {
+public interface Node extends Serializable, Mutatable {
     void addToStorage(int toAdd);
 
     @JsonProperty("@id")

@@ -35,7 +35,7 @@ public class NodeSerializerTest {
 
     @Test
     public void testDefaultNodeSerializer() throws Exception{
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new MutateableNodeDefault(1,100,50));
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new MutateableNodeDefault(1,100,50,0));
 
         System.out.println(json);
         Node node = objectMapper.readValue(json, AbstractNode.class);
@@ -43,7 +43,7 @@ public class NodeSerializerTest {
 
     @Test
     public void testNodeAlwaysEmpty() throws Exception{
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeAlwaysEmpty(1));
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeAlwaysEmpty(1,0));
 
         System.out.println(json);
         Node node = objectMapper.readValue(json, Node.class);
@@ -51,7 +51,7 @@ public class NodeSerializerTest {
 
     @Test
     public void testNodeAlwaysFull() throws Exception{
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeAlwaysFull(1));
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeAlwaysFull(1,0));
 
         System.out.println(json);
         Node node = objectMapper.readValue(json, Node.class);
@@ -59,7 +59,7 @@ public class NodeSerializerTest {
 
     @Test
     public void testNodeMax() throws Exception{
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeMax(1));
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeMax(1,0));
 
         System.out.println(json);
         objectMapper.readValue(json, NodeMax.class);
@@ -68,7 +68,7 @@ public class NodeSerializerTest {
 
     @Test
     public void testMultiplerNode() throws Exception {
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeMultiplier(1));
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new NodeMultiplier(1,0));
 
         System.out.println(json);
         objectMapper.readValue(json, NodeMultiplier.class);
@@ -87,9 +87,9 @@ public class NodeSerializerTest {
     @Test
     public void testNodes() throws JsonProcessingException {
         MultipleNodes multipleNodes = new MultipleNodes();
-        multipleNodes.nodes = List.of(new NodeAlwaysEmpty(1),
-                new NodeAlwaysFull(2),
-                new MutateableNodeDefault(3,100,50));
+        multipleNodes.nodes = List.of(new NodeAlwaysEmpty(1,0),
+                new NodeAlwaysFull(2,0),
+                new MutateableNodeDefault(3,100,50,0));
 
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(multipleNodes);
 

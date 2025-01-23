@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 public class DistanceInputNode extends AbstractNode implements InputNode<Inputs> {
     private final Supplier<Coordinates> coordinatesSupplier;
     public DistanceInputNode(int id, int capacity, Supplier<Coordinates> coordinatesSupplier) {
-        super(id, capacity, 0);
+        super(id, capacity, 0,0);
         this.coordinatesSupplier = coordinatesSupplier;
     }
 

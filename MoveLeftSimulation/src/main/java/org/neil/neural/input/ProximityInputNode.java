@@ -4,7 +4,7 @@ import org.neil.neural.AbstractNode;
 
 public class ProximityInputNode extends AbstractNode implements InputNode<Inputs> {
     public ProximityInputNode(int id, int capacity) {
-        super(id, capacity, 0);
+        super(id, capacity, 0,0);
     }
 
     @Override

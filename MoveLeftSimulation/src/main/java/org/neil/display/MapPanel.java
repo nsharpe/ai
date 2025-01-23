@@ -50,8 +50,8 @@ public class MapPanel extends JPanel {
     Collection<Coordinates> previousFrame = Collections.emptyList();
 
     public MapPanel() {
-        //initLeftDestination();
-        initMovingDestination();
+        initLeftDestination();
+        //initMovingDestination();
 
 
         ExecutorService simulationThread = Executors.newSingleThreadExecutor();

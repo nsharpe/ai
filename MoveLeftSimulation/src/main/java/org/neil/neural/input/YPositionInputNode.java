@@ -4,7 +4,7 @@ import org.neil.neural.AbstractNode;
 
 public class YPositionInputNode extends AbstractNode implements InputNode<Inputs> {
     public YPositionInputNode(int id, int capacity) {
-        super(id, capacity, 0);
+        super(id, capacity, 0,0);
     }
 
     @Override

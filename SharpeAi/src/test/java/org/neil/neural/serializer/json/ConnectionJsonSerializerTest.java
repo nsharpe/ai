@@ -14,7 +14,6 @@ import org.neil.neural.MutateableNodeDefault;
 import org.neil.neural.Node;
 import org.neil.neural.NodeAlwaysEmpty;
 import org.neil.neural.NodeAlwaysFull;
-import org.neil.neural.AbstractNode;
 
 import java.util.List;
 
@@ -25,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ConnectionJsonSerializerTest {
 
 
-    Node nodeDefault = new MutateableNodeDefault(1,100,50);
-    Node alwaysFull = new NodeAlwaysFull(3);
-    Node alwaysEmpty = new NodeAlwaysEmpty(5);
+    Node nodeDefault = new MutateableNodeDefault(1,100,50,0);
+    Node alwaysFull = new NodeAlwaysFull(3,0.7);
+    Node alwaysEmpty = new NodeAlwaysEmpty(5,0.7);
 
     ObjectMapper objectMapper;
 
@@ -63,14 +62,14 @@ public class ConnectionJsonSerializerTest {
     @Test
     public void serializerArrayList() throws Exception {
 
-        Connection first = new Connection(new MutateableNodeDefault(1, 20, 100),
-                new MutateableNodeDefault(2, 20, 100),
+        Connection first = new Connection(new MutateableNodeDefault(1, 20, 100,0),
+                new MutateableNodeDefault(2, 20, 100,0),
                 3,
                 5,
                 Connection.ConnectionType.ADD);
 
-        Connection second = new Connection(new MutateableNodeDefault(1, 10, 50),
-                new MutateableNodeDefault(2, 30, 60),
+        Connection second = new Connection(new MutateableNodeDefault(1, 10, 50,0),
+                new MutateableNodeDefault(2, 30, 60,0),
                 7,
                 11,
                 Connection.ConnectionType.ADD);
@@ -84,7 +83,7 @@ public class ConnectionJsonSerializerTest {
 
         System.out.println(json);
 
-        assertEquals("[{\"connection\":{\"bandwidth\":3,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":5.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"stored\":0}},{\"connection\":{\"bandwidth\":7,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":11.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":50,\"capacity\":10,\"depreciate\":10,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":60,\"capacity\":30,\"depreciate\":12,\"stored\":0}}]",
+        assertEquals("[{\"connection\":{\"bandwidth\":3,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":5.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"mutationRate\":0.0,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":100,\"capacity\":20,\"depreciate\":20,\"mutationRate\":0.0,\"stored\":0}},{\"connection\":{\"bandwidth\":7,\"connectionType\":\"ADD\",\"destination\":2,\"multiplier\":11.0,\"source\":1},\"input\":{\"type\":\"default\",\"@id\":1,\"activateable\":false,\"activationLimit\":50,\"capacity\":10,\"depreciate\":10,\"mutationRate\":0.0,\"stored\":0},\"output\":{\"type\":\"default\",\"@id\":2,\"activateable\":false,\"activationLimit\":60,\"capacity\":30,\"depreciate\":12,\"mutationRate\":0.0,\"stored\":0}}]",
                 json);
 
 
@@ -92,7 +91,7 @@ public class ConnectionJsonSerializerTest {
 
     @Test
     public void deserializeConnectionArray() throws Exception {
-        Node input = new MutateableNodeDefault(1,100,50);
+        Node input = new MutateableNodeDefault(1,100,50,0);
         Connection connection = new Connection(input,
                 input,
                 1,

@@ -6,7 +6,7 @@ import org.neil.object.Direction;
 
 public class MovementBlockedInputNode extends AbstractNode implements InputNode<Inputs> {
     public MovementBlockedInputNode(int id, int capacity) {
-        super(id, capacity, 0);
+        super(id, capacity, 0,0);
     }
 
     @Override

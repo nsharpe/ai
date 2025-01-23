@@ -13,12 +13,12 @@ public class NodeMultiplier extends AbstractNode implements MutateableNode{
     @Serial
     private final static long serialVersionUID = 1395182505655397178L;
 
-    public NodeMultiplier(int id) {
-        super(id);
+    public NodeMultiplier(int id,double mutationRate) {
+        super(id,mutationRate);
     }
 
-    public NodeMultiplier(int id, int capacity, int activation) {
-        super(id, capacity, activation);
+    public NodeMultiplier(int id, int capacity, int activation,double mutationRate) {
+        super(id, capacity, activation,mutationRate);
     }
 
     public NodeMultiplier(@JsonProperty("@id") int id,
@@ -26,8 +26,9 @@ public class NodeMultiplier extends AbstractNode implements MutateableNode{
                           @JsonProperty("stored")int stored,
                           @JsonProperty("activateable") boolean activateable,
                           @JsonProperty("activationLimit") int activationLimit,
-                          @JsonProperty("depreciate") int depreciate) {
-        super(id, capacity, stored, activateable, activationLimit, depreciate);
+                          @JsonProperty("depreciate") int depreciate,
+                          @JsonProperty("mutationRate") double mutationRate) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate,mutationRate);
     }
 
     public NodeMultiplier(Node node) {
@@ -53,7 +54,7 @@ public class NodeMultiplier extends AbstractNode implements MutateableNode{
     @Override
     public MutateableNode mutate(int capacityMin, int capacityMax, int activationMax) {
         int capacity = generateNewCapacity(capacityMin,capacityMax);
-        return new NodeMultiplier(this.getId(),capacity,generateNewActivation(capacity,activationMax));
+        return new NodeMultiplier(this.getId(),capacity,generateNewActivation(capacity,activationMax),0);
     }
 
 
@@ -68,7 +69,7 @@ public class NodeMultiplier extends AbstractNode implements MutateableNode{
 
         @Override
         public NodeMultiplier generate(int id, int capacity) {
-            return new NodeMultiplier(id,capacity,capacity/2);
+            return new NodeMultiplier(id,capacity,capacity/2,0);
         }
     }
 }

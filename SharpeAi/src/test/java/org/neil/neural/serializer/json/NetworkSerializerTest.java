@@ -49,7 +49,7 @@ public class NetworkSerializerTest {
     public void networkOneConnectionOneNodeSerializer() throws Exception {
         ObjectMapper om = new ObjectMapper();
 
-        Node node = new MutateableNodeDefault(1,100,50);
+        Node node = new MutateableNodeDefault(1,100,50,0);
         Connection connection = new Connection(
                 node,
                 node,

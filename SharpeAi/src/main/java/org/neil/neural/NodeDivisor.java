@@ -15,11 +15,11 @@ public class NodeDivisor extends AbstractNode implements MutateableNode{
     private final static long serialVersionUID = 7173205259211958917L;
 
     public NodeDivisor(int id) {
-        super(id);
+        super(id,0);
     }
 
     public NodeDivisor(int id, int capacity, int activationLimit) {
-        super(id, capacity, activationLimit);
+        super(id, capacity, activationLimit,0);
     }
 
     @JsonCreator
@@ -28,8 +28,9 @@ public class NodeDivisor extends AbstractNode implements MutateableNode{
                        @JsonProperty("stored")int stored,
                        @JsonProperty("activateable") boolean activateable,
                        @JsonProperty("activationLimit") int activationLimit,
-                       @JsonProperty("depreciate") int depreciate) {
-        super(id, capacity, stored, activateable, activationLimit, depreciate);
+                       @JsonProperty("depreciate") int depreciate,
+                       @JsonProperty("mutationRate") double mutationRate) {
+        super(id, capacity, stored, activateable, activationLimit, depreciate,mutationRate);
     }
 
     public NodeDivisor(Node node) {
