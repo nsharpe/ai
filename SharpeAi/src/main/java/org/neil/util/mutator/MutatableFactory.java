@@ -15,7 +15,7 @@ import java.util.Objects;
 
 import static org.neil.util.RandomRangeHelper.*;
 
-public class MutableFactory<T extends Mutatable,I> implements Serializable {
+public class MutatableFactory<T extends Mutatable,I> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -8272928161691239743L;
@@ -30,14 +30,14 @@ public class MutableFactory<T extends Mutatable,I> implements Serializable {
     private final List<Mutator<? extends T,I>> mutatorList = new ArrayList<>();
 
 
-    public MutableFactory<T,I> add(Mutator<? extends T,I> mutator){
+    public MutatableFactory<T,I> add(Mutator<? extends T,I> mutator){
         Objects.requireNonNull(mutator);
         mutators.put(mutator.mutatorClass(),mutator);
         mutatorList.add(mutator);
         return this;
     }
 
-    public MutableFactory<T,I> addMutators(Collection<Mutator<? extends T,I>> mutators){
+    public MutatableFactory<T,I> addMutators(Collection<Mutator<? extends T,I>> mutators){
         mutators.forEach(this::add);
         return this;
     }
@@ -46,13 +46,13 @@ public class MutableFactory<T extends Mutatable,I> implements Serializable {
         return Collections.unmodifiableMap(mutators);
     }
 
-    public MutableFactory<T,I> clear(){
+    public MutatableFactory<T,I> clear(){
         mutatorList.clear();
         mutators.clear();
         return this;
     }
 
-    public MutableFactory<T,I> removeMutatorForClass(Class<? extends T> toRemove){
+    public MutatableFactory<T,I> removeMutatorForClass(Class<? extends T> toRemove){
         mutatorList.remove(mutators.remove(toRemove));
         return this;
     }
