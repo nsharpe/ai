@@ -18,9 +18,7 @@ public enum MutationStrategy {
             MutationType.CONNECTION_REMOVAL),
     ADD_ONLY(MutationType.CONNECTION_ADD,
             MutationType.CONNECTION_TO_NODE),
-    MODIFY_WEIGHTS(MutationType.CONNECTION_RANDOMIZE_MULTIPLIER,
-            MutationType.ADD_CONNECTION_BANDWIDTH,
-            MutationType.REDUCE_CONNECTION_BANDWIDTH,
+    MODIFY_WEIGHTS(MutationType.CONNECTION_STRENGTH,
             MutationType.NODE_RANDOMIZE_CAPACITY),
     ALWAYS_ALLOW(allBut(Collections.singleton(MutationType.REBUILD)));
 

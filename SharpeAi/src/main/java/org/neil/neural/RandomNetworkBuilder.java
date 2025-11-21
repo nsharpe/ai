@@ -6,11 +6,12 @@ import org.neil.neural.output.OutputNode;
 import org.neil.neural.output.OutputNodeGenerator;
 import org.neil.simulation.MutationStrategy;
 import org.neil.simulation.SimulationInput;
+import org.neil.util.RandomRangeHelper;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -128,6 +129,7 @@ public final class RandomNetworkBuilder implements Serializable  {
                 network.streamConnections(),
                 mutation);
     }
+
     private Network copyWithChanceToMutate(Stream<Node> intermediateStream,
                                            Stream<Connection> connectionStream,
                                            final MutationType mutation){
@@ -159,13 +161,12 @@ public final class RandomNetworkBuilder implements Serializable  {
                         .collect(Collectors.toList());
             }
         } else if (mutation == MutationType.MUTATE_NODE) {
-            Node toModify = randomEntry(intermediate.stream()
+            List<MutateableNode> mutateableNodes = intermediate.stream()
                     .filter( x -> x instanceof MutateableNode)
-                    .collect(Collectors.toList()));
-            if(toModify != null){
-                MutateableNode mutate = ((MutateableNode) toModify).mutate(minStorage,maxStorage,maxActivation);
-                intermediate = updateNode(intermediate,mutate);
-            }
+                    .filter(x-> ThreadLocalRandom.current().nextDouble() < mutationRate )
+                    .map(x->((MutateableNode) x).mutate(minStorage,maxStorage,maxActivation))
+                    .toList();
+            intermediate = updateNode(intermediate,mutateableNodes);
         } else if (mutation == MutationType.NODE_TYPE && !intermediate.isEmpty()){
             Node toModify = randomEntry(intermediate);
             intermediate = updateNode(intermediate,createIntermediateNode(toModify.getId(), toModify.getCapacity()) );
@@ -192,24 +193,10 @@ public final class RandomNetworkBuilder implements Serializable  {
 
         } else if (mutation == MutationType.CONNECTION_REMOVAL && connections.size() > minConnection) {
             connections.remove(random.nextInt(connections.size()));
-        } else if (mutation == MutationType.CONNECTION_RANDOMIZE_MULTIPLIER) {
-            Connection toModify = connections.get(random.nextInt(connections.size()));
-            connections.remove(toModify);
-            connections.add(toModify.copyNewMultiplier(randomConnectionMultipler()));
-        } else if (mutation == MutationType.ADD_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
-            Connection toModify = connections.get(random.nextInt(connections.size()));
-            connections.remove(toModify);
-            connections.add(toModify.copyModifyBandWidth(bandwidthModificationIncrements));
-        } else if (mutation == MutationType.REDUCE_CONNECTION_BANDWIDTH && !connections.isEmpty()) {
-            Connection toModify = connections.get(random.nextInt(connections.size()));
-            if (toModify.getBandwidth() > bandwidthModificationIncrements) {
-                connections.remove(toModify);
-                connections.add(toModify.copyModifyBandWidth(-bandwidthModificationIncrements));
-            }
-        } else if (mutation == MutationType.RANDOMIZE_CONNECTION_BANDWIDTH && connections.size() > minConnection) {
-            Connection toModify = connections.get(random.nextInt(connections.size()));
-            connections.remove(toModify);
-            connections.add(toModify.copyNewBandWidth(random.nextInt(maxBandwith)));
+        } else if(mutation == MutationType.CONNECTION_STRENGTH){
+            connections = connections.stream()
+                    .map( x -> ThreadLocalRandom.current().nextDouble() > mutationRate ? x : randomizeConnection(x))
+                    .toList();
         } else if (mutation == MutationType.SHUFFLE_CONNECTION_PRIORITY && connections.size() > 1) {
             Collections.shuffle(connections);
         }else if (mutation == MutationType.SHUFFLE_ALL_CONNECTIONS && connections.size() > minConnection) {
@@ -278,6 +265,38 @@ public final class RandomNetworkBuilder implements Serializable  {
                 .filter(x->x.getId() != toUpdate.getId()),Stream.of(toUpdate)).toList();
     }
 
+    private static List<Node> updateNode(List<Node> nodes,List<? extends Node> toUpdate){
+        Set<Integer> ids = toUpdate.stream().map(Node::getId).collect(Collectors.toSet());
+        return Stream.concat(nodes.stream()
+                .filter(x-> !ids.contains( x.getId())),toUpdate.stream()).toList();
+    }
+
+    private Connection randomizeConnection(Connection connection){
+        return switch( RandomRangeHelper.getRandomElement(ConnectionMutationType.values()) ){
+            case REDUCE_CONNECTION_BANDWIDTH -> copyReduceConnectionBandwidth(connection);
+            case ADD_CONNECTION_BANDWIDTH -> copyIncreaseConnectionBandwidth(connection);
+            case RANDOMIZE_CONNECTION_BANDWIDTH -> connection.copyNewBandWidth(ThreadLocalRandom.current().nextInt(minBandwith,maxBandwith));
+            case CONNECTION_RANDOMIZE_MULTIPLIER -> connection.copyNewMultiplier(randomConnectionMultipler());
+        };
+    }
+
+    private Connection copyReduceConnectionBandwidth(Connection connection){
+        int bandwidth = Math.max( connection.getBandwidth() - ThreadLocalRandom.current().nextInt(bandwidthModificationIncrements),minBandwith);
+        return connection.copyNewBandWidth(bandwidth);
+    }
+
+    private Connection copyIncreaseConnectionBandwidth(Connection connection){
+        int bandwidth = Math.min( connection.getBandwidth() + ThreadLocalRandom.current().nextInt(bandwidthModificationIncrements),maxBandwith);
+        return connection.copyNewBandWidth(bandwidth);
+    }
+
+    private enum ConnectionMutationType{
+        CONNECTION_RANDOMIZE_MULTIPLIER,
+        ADD_CONNECTION_BANDWIDTH,
+        REDUCE_CONNECTION_BANDWIDTH,
+        RANDOMIZE_CONNECTION_BANDWIDTH
+    }
+
     public enum MutationType {
         NODE_REMOVAL,
         MUTATE_NODE,
@@ -286,10 +305,7 @@ public final class RandomNetworkBuilder implements Serializable  {
         CONNECTION_TO_NODE,
         CONNECTION_ADD,
         CONNECTION_REMOVAL,
-        CONNECTION_RANDOMIZE_MULTIPLIER,
-        ADD_CONNECTION_BANDWIDTH,
-        REDUCE_CONNECTION_BANDWIDTH,
-        RANDOMIZE_CONNECTION_BANDWIDTH,
+        CONNECTION_STRENGTH,
         SHUFFLE_CONNECTION_PRIORITY,
         SHUFFLE_ALL_CONNECTIONS,
         SHUFFLE_CONNECTION,
@@ -298,9 +314,7 @@ public final class RandomNetworkBuilder implements Serializable  {
         private static Random random = new Random();
 
         public static List<MutationType> connectionWeights = List.of(
-                ADD_CONNECTION_BANDWIDTH,
-                REDUCE_CONNECTION_BANDWIDTH,
-                CONNECTION_RANDOMIZE_MULTIPLIER);
+                CONNECTION_STRENGTH);
         private static final List<MutationType> defaultMutationTypes = List.of(MutationType.values())
                 .stream()
                 .filter( x -> x != NONE)

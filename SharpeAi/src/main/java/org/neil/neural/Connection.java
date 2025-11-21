@@ -78,7 +78,7 @@ public class Connection implements Serializable {
     }
 
     public Connection copyNewBandWidth(int amount) {
-        return new Connection(this.source, this.destination, bandwidth + amount, multiplier, connectionType);
+        return new Connection(this.source, this.destination, bandwidth, multiplier, connectionType);
     }
 
     public double getMultiplier() {
