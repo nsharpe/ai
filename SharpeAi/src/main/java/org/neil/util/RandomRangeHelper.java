@@ -115,7 +115,7 @@ public class RandomRangeHelper implements Serializable {
 
     public static <X> Optional<X> getRandomElement(double mutationRate, Optional<X> original, List<X> items){
         if(mutate(mutationRate)){
-            getRandomElement(items);
+            return getRandomElement(items);
         }
         return original;
     }
