@@ -22,7 +22,7 @@ public class Network implements Serializable {
     @Serial
     private final static long serialVersionUID = -1310867321387108725L;
 
-    private Map<Node, List<Connection>> connections;
+    private List<Connection> connections;
     private final List<InputNode> inputNodes;
     private final List<OutputNode> outputNodes;
     private final List<? extends Node> intermediate;
@@ -49,20 +49,15 @@ public class Network implements Serializable {
                 intermediate.stream())
         ).collect(Collectors.toMap(x->x.getId(), x->x));
 
-        List<Connection> updatedConnections = connections.stream()
+        this.connections = connections.stream()
                 .map(x-> new Connection(nodeId.get(x.getSource().getId()),
                         nodeId.get(x.getDestination().getId()),
                                 x.getBandwidth(),
                                 x.getMultiplier(),
                                 x.getConnectionType()
-                        )).toList();
-
-        this.connections = new HashMap<>();
-
-        for (Connection connection : updatedConnections) {
-            this.connections.computeIfAbsent(connection.getSource(), x -> new ArrayList<>())
-                    .add(connection);
-        }
+                        ))
+                .sorted(Comparator.comparing(Connection::getSourceId))
+                .toList();
     }
     private Network(NetworkBuilder networkBuilder) {
         this(networkBuilder.inputNodes,
@@ -73,10 +68,7 @@ public class Network implements Serializable {
 
     public void increment() {
         try {
-            connections.values()
-                    .stream()
-                    .flatMap(x -> x.stream())
-                    .forEach(x -> x.activate());
+            connections.forEach(Connection::activate);
         }catch (Exception e){
             e.printStackTrace();
             throw e;
@@ -96,7 +88,7 @@ public class Network implements Serializable {
     }
 
     public Stream<Connection> streamConnections(){
-        return connections.values().stream().flatMap(x-> x.stream());
+        return connections.stream();
     }
 
     public static NetworkBuilder builder(){
