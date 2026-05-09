@@ -32,16 +32,9 @@ public class Network implements Serializable {
                    @JsonProperty("outputs")  List<OutputNode> outputNodes,
                    @JsonProperty("intermediate")  List<? extends Node> intermediate,
                    @JsonProperty("connections") List<Connection> connections) {
-        this.inputNodes = Objects.requireNonNull(inputNodes)
-                .stream()
-                .toList();
-        this.intermediate = Objects.requireNonNull(intermediate)
-                .stream()
-                .toList();
-        this.outputNodes = Objects.requireNonNull(outputNodes)
-                .stream()
-                .toList();;
-        Objects.requireNonNull(connections);
+        this.inputNodes = new ArrayList<>(inputNodes);
+        this.intermediate = new ArrayList<>(intermediate);
+        this.outputNodes = new ArrayList<>(outputNodes);
 
         Map<Integer,Node> nodeId = Stream.concat(
                 inputNodes.stream(),Stream.concat(
@@ -56,7 +49,6 @@ public class Network implements Serializable {
                                 x.getMultiplier(),
                                 x.getConnectionType()
                         ))
-                .sorted(Comparator.comparing(Connection::getSourceId))
                 .toList();
     }
     private Network(NetworkBuilder networkBuilder) {
